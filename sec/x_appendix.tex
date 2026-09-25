@@ -247,17 +247,20 @@ requiring precise tuning of the lower-level gripper loss.
 \section{OST-Map Representation Details}
 \label{app:ost_map_representation}
 
-This section specifies the concrete OST-Map representation used by OSTRA. The
-implementation follows the 4D-map codebase\footnote{\url{https://github.com/Zehao-Du/4dmap_v1}},
-whose representation module defines the scene, object, primitive-node, and
-relation-edge abstractions described below. We use the name OST-Map to
-emphasize how this representation is temporally aligned and used to supervise
-object-state transitions.
+This section provides a detailed description of the OST-Map introduced in
+\cref{sec:ost_map}. The representation is designed around three requirements.
+First, it should separate task-relevant objects from irrelevant scene detail.
+Second, it should expose the internal geometry and interaction structure that
+distinguish object states beyond a single rigid pose. Third, the same
+structural entities should remain identifiable across time so that observed
+and future object-state transitions can be expressed in a shared space.
 
 \subsection{Hierarchical Scene Representation}
 \label{app:ost_map_hierarchy}
 
-At time $t$, the scene is represented by
+OST-Map represents a scene through the hierarchy
+\emph{scene $\rightarrow$ object $\rightarrow$ structural node}. At time $t$,
+the map is written as
 \begin{equation}
     \mathcal{M}_t
     =
@@ -271,26 +274,29 @@ At time $t$, the scene is represented by
 \end{equation}
 where $\mathcal{O}$ is the set of task-relevant objects,
 $\mathcal{V}_t$ and $\mathcal{E}_t$ are the flattened structural nodes and
-edges, and $\Pi$ maps each node and edge back to its parent object. The
-implementation stores this hierarchy as a scene-level \texttt{Map\_4d}
-containing multiple \texttt{Object} instances. Each object owns a list of
-primitive nodes and internal relation edges. The scene container additionally
-records object-specific node and edge slices, object names, and text prompts.
-This preserves object grouping while exposing one graph to the map encoder.
+edges, and $\Pi$ assigns every node and relation to its parent object. This
+hierarchy preserves object membership while presenting the complete scene as
+one relational graph.
 
-An object is not restricted to one node. It is decomposed into the minimum set
-of parameterized geometric primitives needed to expose task-relevant
-structure. For example, a charger contains one body node and two prong nodes,
-while a receptacle contains a divider node and a rectangular-ring node.
-Primitive decomposition makes articulated parts, interaction regions, and
-geometric relations explicit without requiring a dense mesh in the policy
-input.
+An object may contain one or several structural nodes. The decomposition is
+chosen to expose the geometry that matters for manipulation rather than to
+reconstruct every visual detail. A simple block is represented by one cuboid
+node. In contrast, a charger is decomposed into a body and two prongs, while
+its receptacle is decomposed into a center divider and a rectangular face
+loop. The latter decomposition makes the relative placement of the prongs,
+slots, and insertion opening explicit even though the charger and receptacle
+are each perceived as a single object.
+
+OST-Map separates attributes according to how they vary over time.
+Object identity, node semantics, primitive geometry, and the graph schema are
+fixed within an episode. Node poses and pairwise relative poses vary as the
+scene evolves. This factorization provides stable structural correspondence
+without assuming that the objects themselves remain stationary.
 
 \subsection{Structural Nodes}
 \label{app:ost_map_nodes}
 
-Each structural node is implemented by a geometry primitive such as a cuboid
-or rectangular ring. Its complete representation is
+Each structural node describes one task-relevant geometric part:
 \begin{equation}
     v_{t,i}
     =
@@ -308,30 +314,33 @@ or rectangular ring. Its complete representation is
     \bigr).
     \label{eq:ost_map_node_full}
 \end{equation}
-Here, $o_i$ is the persistent parent-object identity, $c_i$ is a semantic
-label, $\tau_i$ is the primitive type, and $\theta_i$ contains its structural
-parameters, such as cuboid height, length, and width. The set
-$\mathcal{P}_i$ contains points sampled from the primitive surface, and
-$\mathcal{A}_i$ contains task-relevant affordance points when they are
-available. The optional sets $\mathcal{F}_i$ and $\mathcal{D}_i$ describe
-primitive faces and axes. They provide candidate reference anchors for
-relations. Finally, $(p_{t,i},q_{t,i})$ is the node pose, represented by a
-3D position and a unit quaternion in the implementation.
+Here, $o_i$ is the persistent parent-object identity and $c_i$ is the semantic
+identity of the structural part. The primitive type $\tau_i$ specifies a
+geometric family, such as a cuboid, cylinder, sphere, ring, or rectangular
+ring. Its parameters $\theta_i$ describe the corresponding dimensions, such
+as side lengths, radius, height, or inner and outer extent.
 
-The code exposes these quantities as \texttt{Node\_Position},
-\texttt{Node\_Semantic}, \texttt{Node\_Affordance},
-\texttt{Node\_Face}, \texttt{Node\_Axis}, \texttt{position}, and
-\texttt{rotation}. Structural parameters determine the local primitive
-geometry. An object pose then places its primitive nodes in the scene. This
-factorization separates episode-level geometry from time-varying state.
-Semantic identity, primitive type, structural parameters, and local
-affordances remain fixed within an episode, while node poses change as the
-robot manipulates the scene.
+The structural parameters generate several complementary geometric
+descriptions. $\mathcal{P}_i$ is a set of points sampled from the primitive
+surface and provides shape evidence without requiring a dense object mesh.
+$\mathcal{A}_i$ is an optional set of affordance points identifying regions
+that are particularly relevant to interaction, such as grasping, contact, or
+insertion regions. $\mathcal{F}_i$ and $\mathcal{D}_i$ respectively denote
+candidate faces and axes. They provide local geometric references for
+relations between structural parts.
+
+The time-dependent state of a node is its pose
+$(p_{t,i},q_{t,i})\in\mathbb{R}^{3}\times\mathbb{S}^{3}$, where $p_{t,i}$ is
+the node position and $q_{t,i}$ is a unit quaternion. Thus, two observations
+of the same node share $o_i$, $c_i$, $\tau_i$, and $\theta_i$, but may differ
+in position and orientation. Structural parameters are not treated as an
+additional unstructured state vector; their effect is expressed through the
+resulting geometry, affordances, and anchors.
 
 \subsection{Relation Edges}
 \label{app:ost_map_edges}
 
-An edge connects two structural nodes and is represented as
+An edge relates two structural nodes:
 \begin{equation}
     e_{t,ij}
     =
@@ -346,100 +355,60 @@ An edge connects two structural nodes and is represented as
     \bigr).
     \label{eq:ost_map_edge_full}
 \end{equation}
-The relation type $r_{ij}$ belongs to the implementation vocabulary
-\{\textit{Free}, \textit{Fixed}, \textit{Revolute}, \textit{Prismatic},
-\textit{Cylindrical}, \textit{Planar-Contact}, \textit{Alignment}\}.
-The vector $\eta_{ij}$ stores relation-specific geometric parameters.
-The endpoint anchors $a_{ij}^{i}$ and $a_{ij}^{j}$ select a face or axis from
-the corresponding nodes. Each anchor is represented by a local frame
-containing a normal, tangent, bitangent, and position. The relative pose
-$(\Delta p_{t,ij},\Delta q_{t,ij})$ captures the current displacement and
-relative orientation between the endpoints.
+The relation type $r_{ij}$ describes how the endpoint parts may be connected.
+OST-Map supports seven relation types:
+\begin{itemize}
+    \item \textit{Fixed} relations preserve a rigid relative transformation.
+    \item \textit{Revolute} relations allow rotation around a shared axis.
+    \item \textit{Prismatic} relations allow translation along a designated
+    direction.
+    \item \textit{Cylindrical} relations allow both translation and rotation
+    along a shared axis.
+    \item \textit{Planar-Contact} relations preserve contact between two
+    surfaces while allowing motion within the plane.
+    \item \textit{Alignment} relations constrain directions without fixing
+    relative position.
+    \item \textit{Free} relations impose no task-specific constraint.
+\end{itemize}
 
-Task templates specify edges with known physical or functional relations. For
-all remaining node pairs, the implementation can complete the graph with
-\textit{Free} edges. These edges use zero relation parameters and anchors but
-retain the measured relative pose. Consequently, the encoder receives both
-explicit task constraints and unconstrained spatial relations through one
-uniform edge interface.
+The vector $\eta_{ij}\in\mathbb{R}^{3}$ stores relation-dependent continuous
+parameters. The references $a_{ij}^{i}$ and $a_{ij}^{j}$ select a face or axis
+from each endpoint. A face anchor is described by its center, normal, tangent,
+and bitangent; an axis anchor is described by a point and its direction, with
+unused components set to zero. Finally,
+$(\Delta p_{t,ij},\Delta q_{t,ij})$ records the current relative translation
+and quaternion orientation.
 
-\subsection{Tensor Interface to the Map Encoder}
-\label{app:ost_map_tensor_interface}
-
-The scene hierarchy is converted into a batched graph before encoding.
-\Cref{tab:ost_map_tensor_layout} lists the exact model-facing fields. Primitive
-surface and affordance points are flattened across nodes and accompanied by
-index vectors that assign every point to a graph node. This preserves
-variable-size point sets without padding every primitive to the same size.
-Text semantics are mapped to semantic IDs or replaced by precomputed semantic
-embeddings. Edges are flattened in the same order as their source and
-destination indices.
-
-\begin{table}[t]
-    \centering
-    \caption{\textbf{OST-Map tensor layout.}
-    $N$, $M$, $P$, and $K$ denote the numbers of nodes, edges, structural
-    points, and affordance points in one graph.}
-    \label{tab:ost_map_tensor_layout}
-    \vspace{2pt}
-    \small
-    \setlength{\tabcolsep}{5pt}
-    \begin{adjustbox}{max width=\columnwidth}
-    \begin{tabular}{lll}
-        \toprule
-        Field & Shape & Content \\
-        \midrule
-        \texttt{node\_pos} & $N\times3$ & Node positions \\
-        \texttt{node\_rot} & $N\times4$ & Quaternion rotations \\
-        \texttt{x\_sem\_id} or \texttt{x\_sem} & $N$ or $N\times D_s$
-        & Semantic IDs or embeddings \\
-        \texttt{x\_pos}, \texttt{pos\_batch\_idx} & $P\times3$, $P$
-        & Primitive surface points and node assignments \\
-        \texttt{x\_aff}, \texttt{aff\_batch\_idx} & $K\times3$, $K$
-        & Affordance points and node assignments \\
-        \texttt{edge\_index} & $2\times M$ & Directed graph connectivity \\
-        \texttt{edge\_type} & $M\times1$ & Relation type \\
-        \texttt{edge\_param} & $M\times3$ & Relation parameters \\
-        \texttt{edge\_anchor} & $M\times24$ & Two 12D endpoint frames \\
-        \texttt{edge\_pose} & $M\times7$ & Relative position and quaternion \\
-        \bottomrule
-    \end{tabular}
-    \end{adjustbox}
-\end{table}
-
-The encoder applies PointNet-style aggregation to
-\texttt{x\_pos} and \texttt{x\_aff}, combines the resulting structural and
-affordance features with semantics and node pose, and embeds relation type,
-parameters, anchors, and relative pose on each edge. A graph transformer then
-propagates information between structural nodes. The resulting node tokens
-retain their 3D coordinates and persistent node indices, which allows OSTRA to
-apply temporal and spatial positional encoding before Transition-Guided
-Attention.
+Known structural relations can be specified by the task template. Every other
+node pair is connected by a \textit{Free} relation. A free relation has no
+constraint parameters or anchors, but it still carries the measured relative
+pose. Consequently, the graph represents both explicit geometric structure
+and unconstrained spatial context through the same edge form.
 
 \subsection{Task Templates}
 \label{app:ost_map_templates}
 
-Each task provides a template that determines object identities, primitive
-decomposition, structural-parameter slices, and relation-parameter slices.
-The same template is instantiated at every time step. Only the estimated
-object and node poses are updated during tracking. The metadata file also
-defines the actor names used to retrieve task states and fixes the ordering of
-objects and nodes presented to the policy.
+Each task defines a structural template specifying the task-relevant objects,
+their primitive decomposition, the ordering of structural nodes, and the
+episode-level geometric parameters. The same template is instantiated at
+every time step. Perception estimates the object poses and structural
+parameters, while tracking updates the poses without changing node identity or
+ordering.
 
 \Cref{tab:ost_map_templates} gives representative templates from the
-implementation. In \textit{Stack Cube}, the two cubes are each represented by
-one cuboid node. In \textit{Plug Charger}, the two task objects expand into
-five structural nodes. The charger body pose anchors two prongs whose
-dimensions and separation are specified by structural and relation
-parameters. The receptacle is decomposed into its center divider and face
-loop, making the insertion geometry explicit. In RLBench2 \textit{Push Box},
-one cuboid node represents the manipulated box.
+tasks considered in this work. In \textit{Stack Cube}, each cube is adequately
+described by one cuboid node. In \textit{Plug Charger}, two perceived objects
+expand into five structural nodes. The charger contains a body and two prongs,
+whose dimensions and separation determine the insertion geometry. The
+receptacle contains a center divider and a rectangular face loop, exposing the
+two slots and their boundary. In RLBench2 \textit{Push Box}, one cuboid node
+captures the manipulated object because no finer decomposition is required.
 
 \begin{table}[t]
     \centering
     \caption{\textbf{Representative task-specific OST-Map templates.}
-    The listed dimensions are fixed episode-level structural and relation
-    parameters, while node poses vary over time.}
+    The listed parameters describe episode-level geometry, while node poses
+    vary over time.}
     \label{tab:ost_map_templates}
     \vspace{2pt}
     \small
@@ -451,7 +420,7 @@ one cuboid node represents the manipulated box.
         \midrule
         Stack Cube & 2 & 2 & 6 size
         & red cuboid, green cuboid \\
-        Plug Charger & 2 & 5 & 14 size + 1 relation
+        Plug Charger & 2 & 5 & 14 size + 1 prong spacing
         & body, two prongs, divider, ring \\
         RLBench2 Push Box & 1 & 1 & 3 size
         & box cuboid \\
@@ -459,6 +428,57 @@ one cuboid node represents the manipulated box.
     \end{tabular}
     \end{adjustbox}
 \end{table}
+
+\subsection{Attribute Encoding}
+\label{app:ost_map_attribute_encoding}
+
+\Cref{tab:ost_map_tensor_layout} summarizes the numerical attributes used to
+encode one OST-Map. Node geometry and affordances are represented as
+variable-size point sets, allowing simple and complex primitives to use
+different sampling densities. Each point remains associated with its
+structural node. Node semantics may be represented by learned identifiers or
+pretrained semantic embeddings. Relations use a shared fixed-width
+description regardless of relation type.
+
+\begin{table}[t]
+    \centering
+    \caption{\textbf{Numerical attributes of an OST-Map.}
+    $N$, $M$, $P$, and $K$ denote the numbers of nodes, relations, structural
+    points, and affordance points in one map.}
+    \label{tab:ost_map_tensor_layout}
+    \vspace{2pt}
+    \small
+    \setlength{\tabcolsep}{5pt}
+    \begin{adjustbox}{max width=\columnwidth}
+    \begin{tabular}{lll}
+        \toprule
+        Attribute & Shape & Interpretation \\
+        \midrule
+        Node position & $N\times3$ & Current structural-node centers \\
+        Node orientation & $N\times4$ & Unit quaternions \\
+        Node semantics & $N$ or $N\times D_s$
+        & Semantic identities or embeddings \\
+        Structural points & $P\times3$
+        & Primitive surface samples assigned to nodes \\
+        Affordance points & $K\times3$
+        & Interaction-region samples assigned to nodes \\
+        Relation connectivity & $2\times M$ & Endpoint node indices \\
+        Relation type & $M\times1$ & Discrete relation identities \\
+        Relation parameters & $M\times3$ & Continuous geometric parameters \\
+        Relation anchors & $M\times24$ & Two 12D endpoint frames \\
+        Relative pose & $M\times7$ & Relative position and quaternion \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+For each node, the structural and affordance point sets are aggregated and
+combined with semantic and pose attributes. For each relation, relation type,
+continuous parameters, anchors, and relative pose provide complementary
+descriptions of how the endpoint nodes are arranged. Relational propagation
+then produces one coordinate-aware token per structural node. Because the
+tokens retain both their 3D positions and persistent node identities, they can
+be compared across time and used directly by Transition-Guided Attention.
 
 \subsection{Temporal Alignment and Transition Targets}
 \label{app:ost_map_temporal_alignment}
@@ -479,13 +499,23 @@ For an observation window, OSTRA therefore receives
 where the $i$-th node always refers to the same structural part. Tracking
 updates $p_{t,i}$ and $q_{t,i}$ while leaving the node identity and graph
 schema unchanged. Differences across aligned node poses directly expose
-object-state evolution, including rigid motion, articulated displacement, and
-changes in inter-object configuration.
+object-state evolution, including rigid motion, articulated displacement,
+part alignment, and changes in inter-object configuration.
 
-Future transition supervision uses the same node ordering. At each selected
-future keyframe, the target contains the future pose of every structural node.
-The object-state prediction head thus estimates a sequence in the same
-structured space as the history rather than predicting an unrelated latent
-vector. This shared representation is what allows the predicted future
-OST-Map to condition TCP-subgoal generation and, subsequently, continuous
-action generation.
+Future transition supervision uses the same node ordering. For the reported
+OSTRA model, each selected future keyframe provides the target position of
+every structural node:
+\begin{equation}
+    Y_t^M
+    =
+    \left\{
+    p^\star_{t,h,i}
+    \right\}_{h=1,i=1}^{H_k,N}.
+    \label{eq:future_map_target_appendix}
+\end{equation}
+The prediction target is therefore expressed in the same structured space as
+the observed history rather than as an unrelated latent vector. Orientation
+remains part of each observed OST-Map, while future node positions provide the
+transition targets used in the reported model. This shared correspondence
+allows the predicted object-state sequence to condition TCP-subgoal
+generation and, subsequently, continuous action generation.
