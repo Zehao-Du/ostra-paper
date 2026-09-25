@@ -108,6 +108,75 @@ TCP keyframes and action chunks are denoised from Gaussian noise, the first
 predicted actions are executed, and the policy replans from the updated
 history.
 
+\subsection{OST-Map Construction Accuracy}
+\label{app:ost_map_accuracy}
+
+We directly evaluate the accuracy of the OST-Map Constructor independently of
+the downstream policy. Object extraction is measured by mask mean intersection
+over union (mIoU). Pose accuracy is reported as the mean translation and
+rotation error of matched task objects. Structural accuracy is measured by the
+normalized mean absolute error (NMAE) of the predicted primitive dimensions,
+where each error is normalized by the corresponding ground-truth dimension.
+Temporal identity accuracy measures the fraction of tracked object and
+structural-node identities that remain consistent over the full observation
+window.
+
+We additionally report complete-map accuracy, a strict frame-level metric. An
+OST-Map is counted as correct only when all task-relevant objects are detected,
+their identities are correct, and every structural node satisfies the
+translation, rotation, and structural-error thresholds. This metric therefore
+captures whether the complete structured state supplied to OSTRA is reliable,
+rather than averaging independently correct map attributes.
+For complete-map accuracy, we use mask IoU threshold
+$\tau_{\mathrm{mask}}=\textit{TBD}$, translation threshold
+$\tau_p=\textit{TBD}$ cm, rotation threshold
+$\tau_R=\textit{TBD}^{\circ}$, and structural NMAE threshold
+$\tau_{\theta}=\textit{TBD}\%$.
+
+\begin{table*}[t]
+    \centering
+    \caption{\textbf{Accuracy of the OST-Map Constructor.}
+    Translation and rotation errors are measured on matched task objects.
+    Structural NMAE averages over all predicted primitive dimensions.
+    Identity accuracy evaluates correspondence over the complete observation
+    window, and complete-map accuracy requires every task-relevant map element
+    to satisfy the evaluation thresholds.}
+    \label{tab:ost_map_accuracy}
+    \vspace{2pt}
+    \small
+    \setlength{\tabcolsep}{6pt}
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{lcccccc}
+        \toprule
+        Benchmark
+        & Mask mIoU (\%) $\uparrow$
+        & Translation (cm) $\downarrow$
+        & Rotation ($^\circ$) $\downarrow$
+        & Structural NMAE (\%) $\downarrow$
+        & Identity accuracy (\%) $\uparrow$
+        & Complete-map accuracy (\%) $\uparrow$ \\
+        \midrule
+        RLBench2
+        & \textit{TBD} & \textit{TBD} & \textit{TBD}
+        & \textit{TBD} & \textit{TBD} & \textit{TBD} \\
+        ManiSkill
+        & \textit{TBD} & \textit{TBD} & \textit{TBD}
+        & \textit{TBD} & \textit{TBD} & \textit{TBD} \\
+        LIBERO
+        & \textit{TBD} & \textit{TBD} & \textit{TBD}
+        & \textit{TBD} & \textit{TBD} & \textit{TBD} \\
+        Real world
+        & \textit{TBD} & \textit{TBD} & \textit{TBD}
+        & \textit{TBD} & \textit{TBD} & \textit{TBD} \\
+        \midrule
+        Overall
+        & \textit{TBD} & \textit{TBD} & \textit{TBD}
+        & \textit{TBD} & \textit{TBD} & \textit{TBD} \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table*}
+
 \subsection{Benchmarks and Baseline Details}
 \label{app:benchmarks}
 
