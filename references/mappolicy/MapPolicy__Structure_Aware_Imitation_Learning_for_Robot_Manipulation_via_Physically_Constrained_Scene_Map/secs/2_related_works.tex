@@ -1,0 +1,19 @@
+\section{Related Works}
+\label{sec:related_works}
+
+\paragraph{Imitation Learning for Robot Manipulation}
+Imitation Learning (IL) provides an efficient paradigm for robot manipulation by learning a mapping function from observations to actions from demonstrations. Classical approaches are closely related to inverse reinforcement learning~\cite{Ng2000Algorithms,Abbeel2004Apprenticeship}. Modern behavior cloning trains policies with supervised objectives~\cite{Schaal1996Learning,Schaal2003Learning,Ross2010Reduction,ijcai2019Recent,Chen2023Sequential}. Multi-task and generalist manipulation policies, such as PerAct~\cite{shridhar2022peract}, CLIPort~\cite{Shridhar2022CLIPort}, Lift3D~\cite{Jia_2025_CVPR}, Baku~\cite{Haldar2025BAKU}, Track2Act~\cite{Bharadhwaj2024Track2Act}, Gen2Act~\cite{Bharadhwaj25a2025Gen2Act}, RoboAgent~\cite{Bharadhwaj2024RoboAgent}, and large-scale robot learning models~\cite{Neill2024Open}, demonstrate the benefit of stronger perception backbones, larger corpora, and more expressive policy parameterizations.
+
+Recent generative IL methods enhance generalization and robustness.
+OSVI-WM~\cite{goswami2026osviwm} introduced an end-to-end imitation learning architecture trained solely on in-domain data without large-scale pretraining and a world-model-guided trajectory generation module tailored for unseen tasks.
+Latent Policy Barrier~\cite{sun2026latent} implicitly treats the latent expert demonstration distribution itself as a barrier that separates safe, in-distribution states from unsafe, out-of-distribution regions.
+3D Equivariant Visuomotor Policy~\cite{hu2026d} introduces an SO(3)-equivariant policy learning framework that uses spherical projection from 2D RGB inputs to model 3D symmetries. 
+% Despite these advances, most IL policies depend on currently visible observations, requiring the policy network to implicitly infer hidden object relations.
+% To solve this, MapPolicy replaces implicit visual inference with an explicit Scene Map that structurally encodes both visible and occluded task components.
+
+\paragraph{Object-Centric Representations for Manipulation}
+
+Object-centric representations have been widely explored as a way to improve generalization in robot manipulation. Early methods use object poses, bounding boxes, or graph-structured object abstractions to decouple manipulation policies from raw pixels~\cite{Sieb2020Graph,Wang2019Deep,Devin2018Deep,Tremblay2018Deep,Tyree20226Dof,Migimatsu2020Object}. A broader object-centric learning literature studies how to discover or refine object slots, keypoints, and structured object latents from visual data~\cite{Kipf2019ContrastiveLO,Greff2019MultiObjectRL,Engelcke2019GENESISGS,Kulkarni2019UnsupervisedLO,Locatello2020Object,Qian2022Discovering,Yuan2022Sornet,Bruno2023Unsupervised,Chang2022Object,Fan2023Unsupervised,Seitzer2023Bridging}. More recent works leverage learned, foundation-model, or pretrained object-centric features to construct stronger scene encoders for manipulation, including object proposal priors~\cite{zhu2022viola}, object-centric 3D policy representations~\cite{zhu2023learning}, 3D semantic fields~\cite{Wang2025GenDP}, grounded spatial value maps~\cite{Yang2025GravMAD}, pretrained object-centric scene encoders~\cite{Qian2024SOFT}, composed ``what'' and ``where'' object representations~\cite{Shi2024Composing}, and task-oriented hierarchical object decomposition~\cite{Qian2024Task}. These methods improve the policy's ability to localize task-relevant entities and reduce reliance on global image appearance.
+
+
+Despite their effectiveness, these methods primarily improve the representation or learning of the observed part of the scene. In contrast, our approach equips the policy with the ability to reason about unseen structure, addressing partial observability from a more fundamental perspective.

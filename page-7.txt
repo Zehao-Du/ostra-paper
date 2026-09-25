@@ -1,0 +1,80 @@
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+324      Initial State             Task Progress                 End State       Initial State              Task Progress                  End State
+
+325
+326
+                          Placing Fork in Drawer (Real World)                                    Build Letter M with Blocks (Real World)
+327
+328
+329                         Stack Three Blocks (Real World)                                            Cook the Pear (Real World)
+330
+331
+332                           Collect Blocks (Real World)                                         Arrange Food with Fork (Real World)
+
+
+333
+334
+                         Place Bread in Microwave (Real World)                                          Push the Box (RLBench2)
+335
+336
+337                         Hang the Wine Bottle (LIBERO)                                               Place Sphere (ManiSkill)
+
+338   Figure 4: Task demonstrations from initial state to task completion. The seven real-world tasks are
+339   Place Fork in Drawer, Stack Three Blocks, Collect Blocks, Place Bread in Microwave, Build Letter
+340   M with Blocks, Cook the Pear, and Arrange Food with Fork. The figure also shows representative
+341   tasks from the three simulation benchmarks: Push the Box from RLBench2 (James et al., 2020),
+342   Place Sphere from ManiSkill (Gu et al., 2023), and Hang the Wine Bottle from LIBERO (Liu et al.,
+343   2023).
+344
+      Chi et al., 2025; Ze et al., 2024; Fang et al., 2025; Yang et al., 2025; Zhu et al., 2023a; Hsu et al.,
+345
+      2025). Detailed descriptions of all baselines are provided in Appendix A.1.
+346
+347
+      Simulation results. As summarized in Table 1, OSTRA achieves average success rates of 89.8%,
+348
+      74.5%, and 97.4% on RLBench2, ManiSkill, and LIBERO, respectively. It improves over the
+349
+      strongest reported baseline in each benchmark by 5.3, 17.7, and 0.7 percentage points. Full per-
+350   task results are provided in Appendix A.2.
+351
+352
+      4.2      R EAL -W ORLD E XPERIMENTS
+353
+354   We further evaluate OSTRA on a 7-DoF Realman 75-BF robot arm equipped with a Pika parallel
+355   gripper. RGB-D observations are captured by an Intel RealSense D415 camera, and point clouds are
+356   reconstructed using Open3D (Zhou et al., 2018). The map constructor operates on predicted object
+357   masks, poses, and structural parameters rather than simulator state. This setting therefore evaluates
+358   both the robustness of object-state reasoning and the effect of errors accumulated by the OST-Map
+359   perception pipeline.
+360
+361   Task suite. We consider seven tasks covering articulated interaction, long-horizon rearrangement,
+362   thin or reflective objects, and global spatial constraints. Place Fork in Drawer requires opening
+363   a drawer, grasping a fork, placing it inside, and closing the drawer. Stack Three Blocks requires
+364   two sequential placements while preserving the state of the partial stack. Arrange Food with Fork
+365
+      tests compositional placement of multiple objects in a cluttered scene. Place Bread in Microwave
+      combines door manipulation, object transfer, partial occlusion, and door closure. Build Letter M
+366
+      with Blocks requires arranging five blocks into a specified global pattern and is the longest task in
+367
+      the suite. Collect Blocks requires gathering multiple displaced blocks into a target container, while
+368   Cook the Pear requires manipulating two food items through a shared cooking setup. These tasks,
+369   visualized in Figure 4, expose different forms of object-state transition: articulated state, support
+370   relations, containment, occupancy, and multi-object layout.
+371
+372   Real-world results. As shown in Table 2, we report success rates over 20 real-robot trials for each
+373   task and method. OSTRA achieves an average success rate of 84.3%, outperforming the strongest
+374   baseline, SAM2Act+ (59.3%), by 25.0 percentage points and ranking first on all seven tasks. Com-
+375   pared with Diffusion Policy (Chi et al., 2025) and DP3 (Ze et al., 2024), OSTRA produces more
+376   reliable multi-stage behavior on the drawer and microwave tasks and better preserves inter-object
+377   relations in stacking and shape construction. The largest gain over the best baseline occurs on Build
+      Letter M with Blocks (65% versus 15%), supporting our claim that explicit object-state transition
+
+
+                                                                             7
+

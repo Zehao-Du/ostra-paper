@@ -1,0 +1,23 @@
+\begin{table}[t]
+\centering
+\caption{System error breakdown on MetaWorld~\cite{Yu2020Meta,mclean2025metaworld}. We use oracle replacements to identify the dominant bottleneck in MapPolicy. Oracle quantities are used only for analysis and are not part of the inference interface. $\Delta$ reports the improvement over Full MapPolicy.}
+\label{tab:system_breakdown}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{adjustbox}{max width=0.9\columnwidth}
+\begin{tabular}{l|ccc|>{\columncolor{white}}c|c}
+\toprule
+Setting & GT Extraction & GT Object Pose & GT Structural Size & Avg. Success & $\Delta$ \\
+\midrule
+Full MapPolicy &  &  &  & \cellcolor{blue1}93.2 & 0.0 \\
++ GT Extraction & $\checkmark$ &  &  & \cellcolor{blue1}93.4 & +0.2 \\
++ GT Object Pose &  & $\checkmark$ &  & \cellcolor{blue2}94.0 & +0.8 \\
++ GT Structural Size &  &  & $\checkmark$ & \cellcolor{blue2}94.6 & +1.4 \\
++ GT Extraction + GT Object Pose & $\checkmark$ & $\checkmark$ &  & \cellcolor{blue1}93.4 & +0.2 \\
++ GT Extraction + GT Structural Size & $\checkmark$ &  & $\checkmark$ & \cellcolor{blue3}95.1 & +1.9 \\
++ GT Object Pose + GT Structural Size &  & $\checkmark$ & $\checkmark$ & \cellcolor{blue4}95.9 & +2.7 \\
++ GT Extraction + GT Object Pose + GT Structural Size & $\checkmark$ & $\checkmark$ & $\checkmark$ & \cellcolor{blue4}96.0 & +2.8 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}

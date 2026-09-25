@@ -1,0 +1,63 @@
+\begin{minipage}[t]{0.4615\textwidth}
+    \centering
+    \caption{\textbf{OSTRA ablations on RLBench2.}
+    We vary attention order, prediction stages, and stop-gradient boundaries.
+    Ex12 is OSTRA.}
+    \label{tab:ablation_architecture}
+    \vspace{2pt}
+    \scriptsize
+    \renewcommand{\arraystretch}{1.12}
+    \setlength{\tabcolsep}{2pt}
+    \raisebox{-\height}{\resizebox{\linewidth}{!}{%
+    \begin{tabular}{c|cccc|ccc|cc|c}
+        \toprule
+        \rowcolor{tablehead}
+        & \multicolumn{4}{c|}{Attention}
+        & \multicolumn{3}{c|}{Denoising}
+        & \multicolumn{2}{c|}{Stop-Grad.} & \\
+        \rowcolor{tablehead}
+        & Map & Vis. & $M\!\to\!V$ & $V\!\to\!M$
+        & Obj. & TCP & Hier. & Obj. & TCP & \textbf{Mean} \\
+        \midrule
+        Ex1 & $\checkmark$ & -- & -- & --
+        & $\checkmark$ & $\checkmark$ & $\checkmark$
+        & $\checkmark$ & $\checkmark$ & \cellcolor{blue1}76.5 \\
+        Ex2 & -- & $\checkmark$ & -- & --
+        & $\checkmark$ & $\checkmark$ & $\checkmark$
+        & $\checkmark$ & $\checkmark$ & \cellcolor{blue2}78.2 \\
+        Ex3 & $\checkmark$ & $\checkmark$ & -- & --
+        & $\checkmark$ & $\checkmark$ & $\checkmark$
+        & $\checkmark$ & $\checkmark$ & \cellcolor{blue3}85.4 \\
+        Ex4 & $\checkmark$ & $\checkmark$ & -- & $\checkmark$
+        & $\checkmark$ & $\checkmark$ & $\checkmark$
+        & $\checkmark$ & $\checkmark$ & \cellcolor{blue4}87.1 \\
+        \midrule
+        Ex5 & $\checkmark$ & $\checkmark$ & $\checkmark$ & --
+        & -- & -- & -- & -- & -- & \cellcolor{blue1}75.8 \\
+        Ex6 & $\checkmark$ & $\checkmark$ & $\checkmark$ & --
+        & $\checkmark$ & -- & $\checkmark$
+        & $\checkmark$ & -- & \cellcolor{blue2}83.4 \\
+        Ex7 & $\checkmark$ & $\checkmark$ & $\checkmark$ & --
+        & -- & $\checkmark$ & $\checkmark$
+        & -- & $\checkmark$ & \cellcolor{blue3}84.6 \\
+        Ex8 & $\checkmark$ & $\checkmark$ & $\checkmark$ & --
+        & $\checkmark$ & $\checkmark$ & --
+        & -- & -- & \cellcolor{blue2}81.5 \\
+        \midrule
+        Ex9 & $\checkmark$ & $\checkmark$ & $\checkmark$ & --
+        & $\checkmark$ & $\checkmark$ & $\checkmark$
+        & -- & -- & \cellcolor{blue3}85.9 \\
+        Ex10 & $\checkmark$ & $\checkmark$ & $\checkmark$ & --
+        & $\checkmark$ & $\checkmark$ & $\checkmark$
+        & $\checkmark$ & -- & \cellcolor{blue4}87.4 \\
+        Ex11 & $\checkmark$ & $\checkmark$ & $\checkmark$ & --
+        & $\checkmark$ & $\checkmark$ & $\checkmark$
+        & -- & $\checkmark$ & \cellcolor{blue4}88.3 \\
+        \rowcolor{tablehead}
+        \textbf{Ex12} & $\checkmark$ & $\checkmark$ & $\checkmark$ & --
+        & $\checkmark$ & $\checkmark$ & $\checkmark$
+        & $\checkmark$ & $\checkmark$ & \cellcolor{blue4}\textbf{89.8} \\
+        \bottomrule
+    \end{tabular}%
+    }}
+\end{minipage}

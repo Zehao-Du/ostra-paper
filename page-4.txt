@@ -1,0 +1,141 @@
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+162                                                (a) OST-Map Constructor                                                                                                          (b) OST-Map Transition
+163                                                       Structural Parameter Estimator                                                                                              History     Future OST-Map
+                              Masked Point Cloud                           Cabinet                                                                      OST-Map                     OST-Map 𝑴𝟑𝒕      Query 𝑴𝟑𝒕
+                                                                                                       Structural Parameters
+164     Depth Image                                                                        MLP
+
+
+
+
+                                                        PointNet
+                                                                           Drawer
+                                                                                           MLP                  𝑙𝑐
+165                                                                         Fork
+                                                                                                                            𝑙ℎ
+                                                                                                                                  𝑙𝑏
+                                                                                                                       ℎ𝑑
+                                                                                           MLP                  ℎ𝑐
+166                                                                         Block                          𝑤𝑐
+                                                                                                                             𝑙𝑓
+                                                                                                                                                                                         𝑴𝒕−𝟐             𝑴𝒕+𝟏
+                                                                                           MLP
+167                                                                PCD Features
+
+                                                      Masked RGB
+168      RGB Image
+                                                                                                                            Pose Parameters                 Map
+                                                                                                                                                           Encoder                       𝑴𝒕−𝟏             𝑴𝒕+𝟐
+169                           SAM 3           Cabinet                      Drawer
+                                                                                                  Foundation
+                                                                                                     Pose
+170
+171                                            Fork                         Block
+                                                                                                                                                        History OST-Map
+                                                                                                                                                            Token 𝑴𝒕                     𝑴𝒕               𝑴𝒕+𝟑
+
+172                                            History                        Future OST-Map
+                                                                                         𝒇                           Scene 𝑺𝒕          Noisy KeyPose 𝒂𝒌,𝒊          Noisy Actions 𝒂𝒄,𝒊
+173                                          OST-Map 𝑴𝒉𝒕                         Query 𝑴𝒕                                                             𝒕                           𝒕
+
+
+174
+                                                                                                            Staged Attention
+175
+         State 𝑺𝒕
+          Robot
+
+
+
+
+                        MLP
+
+
+
+
+                                                                                     Regression
+176
+
+
+
+
+                                                                                                                                              Denoise
+
+
+
+
+                                                                                                                                                                          Denoise
+                                    FiLM       Diffusion                                                                                                                                          Denoised Actions 𝑎𝑡𝑐
+177                                           Transformer
+         Denoising
+          Step 𝒊
+
+
+
+
+                        MLP
+
+
+
+
+178
+179
+180                                                                        Future OST-Map 𝑴𝒕
+                                                                                                       𝒇
+                                                                                                                                              𝒂𝒌,𝒊−𝟏
+                                                                                                                                               𝒕                          𝒂𝒄,𝒊−𝟏
+                                                                                                                                                                           𝒕
+
+                                                                                                    (c) Action Head
+181
+182   Figure 2: Overview of OSTRA. (a) OST-Map Constructor: RGB-D observations are converted
+183   into identity-consistent object-centric maps by estimating task-relevant object masks, structural pa-
+184   rameters, and 6-DoF poses. (b) Object-State Transition Modeling: temporally aligned historical
+185   OST-Maps provide explicit object-state transition context and are used to query future object states.
+186
+      (c) Transition-Guided Action Generation: historical OST-Map tokens, future object-state queries,
+      dense Semantic Field tokens, robot states, and the diffusion timestep are processed by OSTRA,
+187
+      which progressively predicts future object states, TCP keyposes, and continuous actions following
+188
+      the hierarchy object state → TCP subgoal → action.
+189
+190   Transition-Guided Action Generation. Transition-Guided Attention first grounds prediction
+191   queries in historical OST-Map tokens and then incorporates dense Semantic Field tokens. Staged
+192   Action Generation follows the hierarchy object state → TCP subgoal → action: future OST-Map
+193   keyframes condition TCP-keyframe denoising, whose representation then conditions continuous-
+194   action generation.
+195
+196   3.2            OST-M AP : O BJECT-S TATE T RANSITION M AP
+197
+198
+      As illustrated in Figure 3, OST-Map represents task-relevant objects by composing parameterized
+      primitives into parts and identity-consistent structural nodes. Persistent node identities preserve
+199
+      fine-grained structure while enabling state tracking over time.
+200
+201   For a task with N structural nodes, the OST-Map at time t is defined as an attributed graph Mt =
+202   (Vt , Et ). Each node vt,i ∈ Vt is represented as
+203                                                                           
+                                             vt,i = ci , Pi , Ai , pt,i , qt,i ,                    (1)
+204
+205   where ci denotes its semantic identity, Pi and Ai denote its structural and affordance point sets, and
+206   (pt,i , qt,i ) ∈ R3 × S3 denotes its 6-DoF pose. The semantic identity and local structural attributes
+207   remain fixed within an episode, while the pose evolves as manipulation changes the object state.
+208   Each edge et,ij ∈ Et stores its relation type, parameters, reference anchors, and relative pose; free-
+209   relation edges connect pairs without task-specific relations. The ordered sequence Mt−To +1:t thus
+210   captures object-state evolution in an identity-aligned space.
+211
+212   3.3            OSTRA: O BJECT-S TATE T RANSITION R EASONING A RCHITECTURE
+213
+214   OST-Map Construction and Transition Targets. As shown in Figure 2(a), OSTRA first con-
+215   structs an OST-Map from each RGB-D observation. SAM 3 (Carion et al., 2026) segments prompted
+      task objects, FoundationPose (Wen et al., 2024) registers and tracks their 6-DoF poses, and Point-
+
+
+                                                                                                                      4
+

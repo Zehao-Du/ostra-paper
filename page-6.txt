@@ -1,0 +1,91 @@
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+270
+      Algorithm 1 Staged Action Generation in OSTRA
+271
+272
+      Require: Map context F M , scene context F S , robot state st
+273   Ensure: Action chunk A     bt
+       1: Construct future object queries Z M
+274
+       2: Initialize Y E,N , AN ∼ N (0, I)
+275
+       3: for n = N, . . . , 1 do
+276
+       4:    P M , YbnM ← O BJECT S TAGE(Z M , F M , F S , st , n)
+277
+       5:    P E, bϵE
+                    n ← TCPS TAGE (Y
+                                       E,n
+                                            , F M , F S , sg(P M ), st , n)
+278            A A b
+       6:    P ,b ϵn , Gn ← ACTION S TAGE(An , F M , F S , sg(P E ), st , n)
+279
+       7:    Y E,n−1 ← D ENOISE(Y E,n , b  ϵEn , n)
+280
+       8:    An−1 ← D ENOISE(An , b  ϵA
+                                      n , n)
+281    9: end for
+282   10: return A0 with predicted gripper states
+283
+284
+285   Training Objective and Inference. OSTRA is trained with direct supervision at all three levels of
+286   the hierarchy. The objective combines future object-state prediction, TCP diffusion, action diffusion,
+287   and gripper supervision:
+288
+289
+                                   L = λM ∥Yb M − Y M ∥1 + λE ∥b
+                                                               ϵE − ϵE ∥1
+                                                                                                          (4)
+290                                    + λA ∥b                 b − G∥1 .
+                                              ϵA − ϵA ∥1 + λG ∥G
+291
+      The four terms supervise object evolution, geometric TCP subgoals, continuous control, and gripper
+292
+      state, respectively. Stop-gradient between stages requires each stage to satisfy its own target rather
+293
+      than only downstream action losses.
+294
+295   At inference, map and field contexts are encoded once per replanning step. Each reverse step exe-
+296   cutes Algorithm 1; after denoising, the policy executes the first portion of the predicted action and
+297
+      replans from the updated history.
+298
+299   4     E XPERIMENTS
+300
+301   Our experiments address five questions: Q1: Does OSTRA outperform baseline policies across
+302   simulation benchmarks (Section 4.1)? Q2: Do these benefits hold in real-world manipulation (Sec-
+303   tion 4.2)? Q3: How do errors and computational costs in the foundation-model components affect
+304   OSTRA? We study their impact on task success in Section 4.3 and their latency in Section 4.4. Q4:
+305
+      Which architectural designs contribute to performance? Q5: How sensitive is OSTRA to its key
+      hyperparameters? The last two questions are addressed by the design ablations and hyperparameter
+306
+      analysis in Section 4.5.
+307
+308
+      4.1   S IMULATION E XPERIMENTS
+309
+310   Benchmarks and Experimental Setup. We benchmark OSTRA on three manipulation suites,
+311   with representative task rollouts shown in Figure 4. RLBench2, based on RLBench (James et al.,
+312   2020), contains seven multi-stage tasks in our evaluation and is used to evaluate OSTRA on long-
+313   horizon manipulation requiring consistent reasoning over object-state transitions. ManiSkill (Gu
+314   et al., 2023) contains six contact-rich tasks covering insertion, placement, tool use, and stacking, and
+315   is used to evaluate OSTRA on tabletop manipulation with strong geometric and contact constraints.
+316   LIBERO (Liu et al., 2023) contains four suites—Spatial, Object, Goal, and Long—with ten tasks
+317   each, and is used to evaluate OSTRA on diverse language-conditioned manipulation tasks with
+318
+      varying spatial, object, goal, and long-horizon requirements.
+319   Across all three benchmarks, we use the official datasets and follow the official evaluation protocols.
+320   The primary evaluation metric is task success rate. Detailed observation, training, and evaluation
+321   settings are provided in Appendix A.
+322
+323   Baselines. We compare OSTRA with benchmark-specific methods spanning action generation,
+      history and memory, future prediction, and object-centric perception and motion (Zhao et al., 2023;
+
+
+                                                         6
+

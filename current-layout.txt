@@ -1,0 +1,968 @@
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+000
+001
+      OSTRA: L EARNING M ULTI -S TAGE ROBOT M ANIP -
+002   ULATION THROUGH O BJECT-S TATE T RANSITION S U -
+003
+004   PERVISION
+005
+006
+       Anonymous authors
+007
+       Paper under double-blind review
+008
+009
+010
+011                                                 A BSTRACT
+012
+013            Sparse supervision is a key challenge in multi-stage manipulation, with the lack
+014            of supervision over the past-to-future evolution of objects required by the policy
+015            being particularly critical. To address this issue, we introduce the Object-State
+016
+               Transition Map (OST-Map), a unified object-centric representation that organizes
+               task-relevant objects as identity-consistent graphs and represents historical and
+017
+               future object states in a shared structured space. Building on OST-Map, we pro-
+018
+               pose OSTRA, a diffusion-based Object-State Transition Reasoning Architecture
+019            that hierarchically predicts future object states, target TCP poses, and continuous
+020            action trajectories. OSTRA combines Transition-Guided Attention, which priori-
+021            tizes historical object-state transitions during future-state prediction, with Staged
+022            Denoising, which progressively translates predicted object changes into robot sub-
+023            goals and executable actions. Experiments on three simulation benchmarks and
+024            seven diverse real-world tasks demonstrate consistent improvements over repre-
+025            sentative imitation learning baselines. Further ablations validate the contributions
+026            of OST-Map and the proposed architectural designs.
+027
+028
+029   1    I NTRODUCTION
+030
+031   Sparse supervision is a key challenge in imitation learning, particularly for multi-stage robot ma-
+032   nipulation tasks (Zare et al., 2024; Mandlekar et al., 2020; Chen et al., 2023; Jain et al., 2025).
+033
+      Completing such tasks requires a policy not only to understand the environment at the current time
+      step, but also to retain knowledge of the past—for example, whether prior subtasks succeeded and
+034
+      how key objects changed (Figure 1, left) (Kang & Kuo, 2025; Mark et al., 2026). Because an envi-
+035
+      ronment consists of objects, the policy must understand how these objects have changed over time.
+036   Therefore, the currently observed environment alone is insufficient for the policy to predict the most
+037   appropriate action. The policy must also be aware of object changes within the environment. We
+038   refer to this challenge as the object-state transition supervision gap.
+039
+      Early imitation learning methods improve short-term action prediction through action chunking or
+040
+      limited observation windows, but do not explicitly capture long-horizon task-relevant state transi-
+041
+      tions (Zhao et al., 2023; Chi et al., 2025). Recent approaches incorporate past information through
+042   observation histories, latent memories, or task progress (Liang & Boularias, 2021; Shi et al., 2026;
+043   Mark et al., 2026). Others use future observations, goal states, or latent plans as additional supervi-
+044   sion (Lynch et al., 2020; Mandlekar et al., 2020; Belkhale & Sadigh, 2023). However, these methods
+045   represent temporal information at observation, latent, or task level, providing limited supervision on
+046   individual-object evolution during execution. Our method bridges this gap by unifying both tempo-
+047   ral directions at the object level. Specifically, it represents past object-state transitions as structured
+048   historical context and predicts future object states as auxiliary supervision, enabling the policy to
+049   reason about how task-relevant objects have changed and how they should evolve next.
+050   To provide such supervision over past-to-future object evolution, we introduce the Object-State
+051   Transition Map (OST-Map), an object-centric representation of observed and future states in a
+052   shared structured space. OST-Map avoids requiring policies to discover transition-relevant cues
+053   from visual histories using robot-centric action supervision alone. Specifically, OST-Map represents
+      each task-relevant object as an identity-consistent graph of structural nodes. Each node encodes
+
+
+                                                          1
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+054
+           Object-State Transition Supervision Gap                                  Object-State Transition Reasoning Architecture   Evaluation on Simulation and Real-world Tasks
+055    Long-horizon manipulation task“Place A Fork in A Drawer.”
+
+056                                                                                    Historical        Dense           Robot
+                                                                                       OST-Maps       Semantic Field     State
+057
+                                                                                                                                      Stack Blocks   Place Fork       Hang Bottle on LIBERO
+058
+059
+060    Key-objects changes “Drawer open?/close? Fork grasped?/placed?”
+
+061             3
+                                1
+                                     Drawer
+                                                  2
+                                                      Drawer
+                                                                   3
+                                                                       Drawer
+                                                                                                                                       Place Bread   Build Letter M   Place Sphere on ManiSkill
+       1
+                    6                 ready            open            closed
+062         2
+                            5
+
+                                4                 5                6
+                        4
+                                                        Fork            Fork             Future           TCP          Continuous
+                                       Fork
+063                                   ready           grasped          placed         Object States     Key poses        Actions
+
+064   State Transition Chain         1        2       4        5       6        3
+                                                                                                                                       Cook Pear     Arrange Food      Push Box on RLBench2
+                                    Only one chain is right in 6! = 720 chains
+065
+066   Figure 1: Overview of OSTRA. Multi-stage manipulation requires resolving the object-state transi-
+067   tion supervision gap: the policy must infer the correct transition chain from historical object changes.
+068
+      OSTRA combines historical OST-Maps, a dense Semantic Field, and the robot state to predict fu-
+      ture object states, TCP keyposes, and continuous actions, and is evaluated across simulation and
+069
+      real-world tasks.
+070
+071   its semantic identity, geometric parameters, and 6-DoF pose, while the graph edges capture struc-
+072
+      tural and spatial relations among nodes and objects. By preserving object and node identities across
+      time, OST-Map organizes observations into temporally ordered object-centric tokens that explicitly
+073
+      characterize how task-relevant objects evolve. It further represents future object states in the same
+074
+      structured space, allowing the transition from historical to future object states to be directly super-
+075   vised. In this way, OST-Map turns otherwise implicit task progress and anticipated object changes
+076   into explicit intermediate targets between visual perception and robot action generation.
+077
+078
+      Building on OST-Map, we introduce OSTRA, an Object-State Transition Reasoning Architecture
+      for multi-stage manipulation (Figure 1, middle). OSTRA is a diffusion-based framework that hierar-
+079
+      chically predicts future object states, target TCP poses, and continuous action trajectories. It incor-
+080
+      porates two key designs. First, Transition-Guided Attention attends to historical OST-Map tokens
+081   before incorporating dense Semantic Field tokens, encouraging the model to prioritize task-relevant
+082   object-state transitions when predicting future states. Second, Staged Denoising follows an object-
+083   to-TCP-to-action hierarchy that progressively translates predicted object-state changes into robot
+084   subgoals and executable actions. Together, these designs connect object-level transition reasoning
+085   with robot-level planning and continuous control, enabling the policy to reason from how objects
+086   have changed to how they should evolve next and which actions should realize those changes.
+087   We evaluate OSTRA on three simulation benchmarks and seven diverse real-world tasks. Across
+088   these settings, OSTRA consistently improves over representative imitation learning baselines on
+089   multi-stage manipulation tasks. Further ablation studies validate the contributions of OST-Map,
+090   Transition-Guided Attention, and Staged Denoising, demonstrating the effectiveness of structured
+091   object-state transition supervision for connecting scene evolution with robot action generation.
+092
+      Our contributions are: (1) To tackle the object-state transition supervision gap in multi-stage imita-
+093   tion learning, we introduce OST-Map, an object-centric representation that aligns historical object-
+094   state sequences with future object-state targets, enabling direct supervision of object-state transi-
+095   tions. (2) Building on OST-Map, we introduce OSTRA, a diffusion-based architecture with two key
+096   designs. a) Transition-Guided Attention applies cross-attention to OST-Map tokens before Semantic
+097   Field tokens, encouraging the model to prioritize object-state transition information. b) Staged De-
+098   noising hierarchically predicts future object states, TCP poses, and action trajectories, progressively
+099   translating object-level state changes into robot subgoals and continuous control. (3) We conduct
+100   evaluations across three simulation benchmarks and seven diverse real-world tasks, demonstrating
+101
+      consistent performance gains over representative imitation learning baselines.
+102
+103   2             R ELATED W ORK
+104
+105   2.1               L ONG -H ORIZON V ISUOMOTOR I MITATION L EARNING
+106
+107   Long-horizon manipulation requires policies to maintain coherent behavior across extended execu-
+      tion. Existing methods reduce the effective control horizon through action chunking, autoregressive
+
+
+                                                                                                                2
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+108
+      prediction, or diffusion-based action generation (Zhao et al., 2023; Chi et al., 2025; Haldar et al.,
+109   2024; Reuss et al., 2024). Other approaches introduce higher-level task structure through subgoals,
+110   skill composition, progress estimation, or planning (Shiarlis et al., 2018; Gupta et al., 2020; Chen
+111   et al., 2023; Kang & Kuo, 2025; Jain et al., 2025; Liu et al., 2026; Zhang et al., 2026b; Feng et al.,
+112   2025; Zhou et al., 2026). These methods improve extended execution by organizing actions or task
+113   stages over time, but generally do not explicitly supervise how task-relevant objects evolve from
+114   historical states toward future target states.
+115
+116   2.2   T EMPORAL M ODELING IN ROBOT P OLICIES
+117
+118   Temporal context is commonly incorporated through historical observations, latent memory states,
+119   recurrent features, or selectively retrieved past frames (Liang & Boularias, 2021; Fang et al., 2025;
+120
+      Shi et al., 2026; Mark et al., 2026). Recent memory-augmented policies further maintain recurrent
+      or hierarchical memory to capture dependencies beyond the current observation (Ji et al., 2026; Xiao
+121
+      et al., 2026; Li et al., 2026).
+122
+123   A complementary direction exploits future information as additional guidance. Existing methods
+124   condition policies on goal observations or latent plans (Lynch et al., 2020; Mandlekar et al., 2020),
+125   predict future visual states or joint video-action trajectories (Hu et al., 2025; Zhu et al., 2025), or
+126
+      learn predictive representations from future transitions and interaction targets (Zeng et al., 2024).
+      Despite incorporating complementary historical and future context, these approaches primarily rep-
+127
+      resent temporal information through holistic observations, latent memories, predicted frames, or
+128
+      task-level targets, rather than explicitly modeling identity-consistent state transitions of individual
+129   objects over time.
+130
+131
+      2.3   O BJECT-C ENTRIC R EPRESENTATIONS FOR M ANIPULATION
+132
+133   Object-centric policies organize perception and action around manipulable entities rather than holis-
+134   tic scene features. Existing approaches use object proposals or 3D object features as policy inputs
+135   (Zhu et al., 2023b;a), learn affordance-, flow-, or contact-based interaction representations (Belkhale
+136   & Sadigh, 2023; Xu et al., 2025; Zhang et al., 2026a; Lee & Fazeli, 2025), or represent manipula-
+137   tion through explicit object motion, including SE(3) pose trajectories and object pointflow (Hsu
+138   et al., 2025; Yang et al., 2025). Recent work further introduces structured object-level intermediate
+139   representations based on physical concepts or semantic operations (Wei et al., 2026; Tang et al.,
+140
+      2026).
+141   Object-centric world models further use entity-level representations for dynamics and future pre-
+142   diction (Ferraro et al., 2025; Jeong et al., 2025), while graph-based approaches preserve explicit
+143   objects and relations for manipulation planning (Zhu et al., 2026). These methods typically repre-
+144   sent objects as perceptual units, interaction interfaces, motion variables, or future prediction targets.
+145   In contrast, OST-Map maintains identity-consistent structural states across both observation history
+146
+      and future task stages, enabling past-to-future object-state transitions to serve as explicit intermedi-
+      ate supervision for action generation.
+147
+148
+149   3     M ETHOD
+150
+151   3.1   OVERVIEW
+152
+153   Problem Formulation. We consider multi-stage robot manipulation from RGB-D observations.
+154   At time t, the policy receives an observation window Ot = {(Iτ , Dτ , sτ )}tτ =t−To +1 and predicts
+                                       a −1
+155   an action chunk At = {at+k }H   k=0 . Rather than directly mapping the current visual observation
+156   to robot actions, OSTRA explicitly models how task-relevant objects have evolved throughout the
+157   observation history and which object states should be achieved next.
+158   Object-State Transition Modeling. As shown in Figure 2, each RGB-D observation is converted
+159   into an OST-Map whose identity-consistent nodes encode object semantics, structure, affordance,
+160   and 6-DoF pose. Tracking these nodes yields aligned historical maps that expose object-state tran-
+161   sitions and supervise future states in the same structured space. A dense Semantic Field preserves
+      complementary local scene evidence.
+
+
+                                                         3
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+162                                                (a) OST-Map Constructor                                                                                                          (b) OST-Map Transition
+163                                                       Structural Parameter Estimator                                                                                              History     Future OST-Map
+                              Masked Point Cloud                           Cabinet                                                                      OST-Map                     OST-Map 𝑴𝟑𝒕      Query 𝑴𝟑𝒕
+                                                                                                       Structural Parameters
+164     Depth Image                                                                        MLP
+
+
+
+
+                                                        PointNet
+                                                                           Drawer
+                                                                                           MLP                  𝑙𝑐
+165                                                                         Fork
+                                                                                                                            𝑙ℎ
+                                                                                                                                  𝑙𝑏
+                                                                                                                       ℎ𝑑
+                                                                                           MLP                  ℎ𝑐
+166                                                                         Block                          𝑤𝑐
+                                                                                                                             𝑙𝑓
+                                                                                                                                                                                         𝑴𝒕−𝟐             𝑴𝒕+𝟏
+                                                                                           MLP
+167                                                                PCD Features
+
+                                                      Masked RGB
+168      RGB Image
+                                                                                                                            Pose Parameters                 Map
+                                                                                                                                                           Encoder                       𝑴𝒕−𝟏             𝑴𝒕+𝟐
+169                           SAM 3           Cabinet                      Drawer
+                                                                                                  Foundation
+                                                                                                     Pose
+170
+171                                            Fork                         Block
+                                                                                                                                                        History OST-Map
+                                                                                                                                                            Token 𝑴𝒕                     𝑴𝒕               𝑴𝒕+𝟑
+
+172                                            History                        Future OST-Map
+                                                                                         𝒇                           Scene 𝑺𝒕          Noisy KeyPose 𝒂𝒌,𝒊          Noisy Actions 𝒂𝒄,𝒊
+173                                          OST-Map 𝑴𝒉𝒕                         Query 𝑴𝒕                                                             𝒕                           𝒕
+
+
+174
+                                                                                                            Staged Attention
+175
+         State 𝑺𝒕
+          Robot
+
+
+
+
+                        MLP
+
+
+
+
+                                                                                     Regression
+176
+
+
+
+
+                                                                                                                                              Denoise
+
+
+
+
+                                                                                                                                                                          Denoise
+                                    FiLM       Diffusion                                                                                                                                          Denoised Actions 𝑎𝑡𝑐
+177                                           Transformer
+         Denoising
+          Step 𝒊
+
+
+
+
+                        MLP
+
+
+
+
+178
+179
+180                                                                        Future OST-Map 𝑴𝒕
+                                                                                                       𝒇
+                                                                                                                                              𝒂𝒌,𝒊−𝟏
+                                                                                                                                               𝒕                          𝒂𝒄,𝒊−𝟏
+                                                                                                                                                                           𝒕
+
+                                                                                                    (c) Action Head
+181
+182   Figure 2: Overview of OSTRA. (a) OST-Map Constructor: RGB-D observations are converted
+183   into identity-consistent object-centric maps by estimating task-relevant object masks, structural pa-
+184   rameters, and 6-DoF poses. (b) Object-State Transition Modeling: temporally aligned historical
+185   OST-Maps provide explicit object-state transition context and are used to query future object states.
+186
+      (c) Transition-Guided Action Generation: historical OST-Map tokens, future object-state queries,
+      dense Semantic Field tokens, robot states, and the diffusion timestep are processed by OSTRA,
+187
+      which progressively predicts future object states, TCP keyposes, and continuous actions following
+188
+      the hierarchy object state → TCP subgoal → action.
+189
+190   Transition-Guided Action Generation. Transition-Guided Attention first grounds prediction
+191   queries in historical OST-Map tokens and then incorporates dense Semantic Field tokens. Staged
+192   Action Generation follows the hierarchy object state → TCP subgoal → action: future OST-Map
+193   keyframes condition TCP-keyframe denoising, whose representation then conditions continuous-
+194   action generation.
+195
+196   3.2            OST-M AP : O BJECT-S TATE T RANSITION M AP
+197
+198
+      As illustrated in Figure 3, OST-Map represents task-relevant objects by composing parameterized
+      primitives into parts and identity-consistent structural nodes. Persistent node identities preserve
+199
+      fine-grained structure while enabling state tracking over time.
+200
+201   For a task with N structural nodes, the OST-Map at time t is defined as an attributed graph Mt =
+202   (Vt , Et ). Each node vt,i ∈ Vt is represented as
+203                                                                           
+                                             vt,i = ci , Pi , Ai , pt,i , qt,i ,                    (1)
+204
+205   where ci denotes its semantic identity, Pi and Ai denote its structural and affordance point sets, and
+206   (pt,i , qt,i ) ∈ R3 × S3 denotes its 6-DoF pose. The semantic identity and local structural attributes
+207   remain fixed within an episode, while the pose evolves as manipulation changes the object state.
+208   Each edge et,ij ∈ Et stores its relation type, parameters, reference anchors, and relative pose; free-
+209   relation edges connect pairs without task-specific relations. The ordered sequence Mt−To +1:t thus
+210   captures object-state evolution in an identity-aligned space.
+211
+212   3.3            OSTRA: O BJECT-S TATE T RANSITION R EASONING A RCHITECTURE
+213
+214   OST-Map Construction and Transition Targets. As shown in Figure 2(a), OSTRA first con-
+215   structs an OST-Map from each RGB-D observation. SAM 3 (Carion et al., 2026) segments prompted
+      task objects, FoundationPose (Wen et al., 2024) registers and tracks their 6-DoF poses, and Point-
+
+
+                                                                                                                      4
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+216
+                           𝐻                  𝑊
+217                                                     Cabinet Top
+218        𝑂𝑊      𝐼𝑊 𝐼
+                       𝐿          𝐻
+
+219                     𝑂𝐿                        𝐿     Cabinet Back           Cabinet
+
+220             Arch Box                Cuboid
+       𝑰𝑳 : Length of Inner Box   𝑯: Height of Cuboid
+                                  𝑾: Width of Cuboid
+221    𝑰𝑾 : Width of Inner Box
+       𝑶𝑳 : Length of Outer Box   𝑳: Length of Cuboid
+       𝑶𝑾 : Width of Outer Box
+222    𝑯: Height of Arch Box
+                                                        Drawer Body             Drawer
+223                Structure Primitives                 Object Parts           Object              OST-Map
+224
+      Figure 3: Representation of OST-Map. Parameterized structure primitives are composed into
+225   object parts and further assembled into task-relevant objects. Each object is represented by identity-
+226   consistent structural nodes and their relations, while node poses evolve with manipulation. The
+227   resulting OST-Map provides a compact object-centric representation of scene structure and object-
+228   state transitions.
+229
+      Net (Charles et al., 2017) with object-specific MLP heads estimates structural parameters from
+230
+      masked point clouds. These outputs instantiate a temporally aligned map sequence.
+231
+232   Historical OST-Maps encode observed transitions. During training, the structural-node positions at
+233   the next Hk task keyframes define future-state targets,
+234                                                                    YtM = {p⋆t,h,i }H k ,N
+                                                                                       h=1,i=1 .             (2)
+235
+236
+      paired with TCP keyframes YtE and action chunk At . Future observations construct supervision
+      only and are unavailable at inference, while the shared OST-Map space supplies identity-aligned
+237
+      transition supervision.
+238
+239
+      Multimodal Context Encoding. OSTRA combines a sparse OST-Map with a dense Semantic
+240   Field. Depth points Xt = {xt,j }P  j=1 are paired with image-aligned pretrained DINO features dt,j .
+241
+      PointNet++ encodes [xt,j ; dt,j ] into dense tokens FtS for cross-attention and downsampled tokens
+242
+      F̄tS for compact planning context.
+243
+244   For each historical map, node embeddings combine PointNet features of Pi and Ai with semantic,
+245   pose, temporal, and identity embeddings; edge embeddings encode relation attributes and relative
+246   pose. A graph transformer produces coordinate-aware map tokens FtM . Map and scene tokens
+247
+      retain 3D coordinates for relative spatial attention, while robot state and diffusion timestep condition
+      prediction blocks through adaptive normalization.
+248
+249
+      Transition-Guided Attention. A central challenge is the large imbalance between the sparse
+250
+      OST-Map tokens and the dense Semantic Field tokens. Directly mixing them in a single atten-
+251   tion context can weaken the structured transition cues carried by the OST-Map. OSTRA therefore
+252   introduces Transition-Guided Attention, in which each prediction query first attends to historical
+253   OST-Map tokens and subsequently to the dense Semantic Field:
+254
+                                 e = CA(Z, F M ),
+                                 Z                        Z + = CA(Z, e F S ),                       (3)
+255
+256   where CA denotes cross-attention. All cross-attention operations use relative 3D rotary positional
+257   encodings computed from the query and context coordinates.
+258   For future object-state prediction, the queries are constructed by repeating the latest observed
+259   structural-node coordinates over the next Hk keyframes and augmenting them with learned
+260   keyframe-time and node-identity embeddings. TCP and action queries are constructed from their
+261   corresponding noisy diffusion variables. The map-first order preserves transition grounding before
+262   the much denser visual context is introduced.
+263   Staged Action Generation. As illustrated in Figure 2(c), OSTRA translates object-state transi-
+264   tions into executable robot motion through the hierarchy object state → TCP subgoal → action. At
+265   each diffusion step, future-object queries yield an object plan P M and predicted states Yb M . Noisy
+266   TCP queries then combine ordered map-to-scene attention with sg(P M ) to produce a TCP plan P E
+267   and TCP-noise estimate. Finally, noisy action queries condition on sg(P E ) to predict action noise
+268   and gripper openness. TCP keyframes and actions are progressively denoised from Gaussian noise,
+269   whereas future object states are directly re-predicted at every step. Position and rotation use separate
+      noise schedules. Algorithm 1 summarizes the complete procedure.
+
+
+                                                                                     5
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+270
+      Algorithm 1 Staged Action Generation in OSTRA
+271
+272
+      Require: Map context F M , scene context F S , robot state st
+273   Ensure: Action chunk A     bt
+       1: Construct future object queries Z M
+274
+       2: Initialize Y E,N , AN ∼ N (0, I)
+275
+       3: for n = N, . . . , 1 do
+276
+       4:    P M , YbnM ← O BJECT S TAGE(Z M , F M , F S , st , n)
+277
+       5:    P E, bϵE
+                    n ← TCPS TAGE (Y
+                                       E,n
+                                            , F M , F S , sg(P M ), st , n)
+278            A A b
+       6:    P ,b ϵn , Gn ← ACTION S TAGE(An , F M , F S , sg(P E ), st , n)
+279
+       7:    Y E,n−1 ← D ENOISE(Y E,n , b  ϵEn , n)
+280
+       8:    An−1 ← D ENOISE(An , b  ϵA
+                                      n , n)
+281    9: end for
+282   10: return A0 with predicted gripper states
+283
+284
+285   Training Objective and Inference. OSTRA is trained with direct supervision at all three levels of
+286   the hierarchy. The objective combines future object-state prediction, TCP diffusion, action diffusion,
+287   and gripper supervision:
+288
+289
+                                   L = λM ∥Yb M − Y M ∥1 + λE ∥b
+                                                               ϵE − ϵE ∥1
+                                                                                                          (4)
+290                                    + λA ∥b                 b − G∥1 .
+                                              ϵA − ϵA ∥1 + λG ∥G
+291
+      The four terms supervise object evolution, geometric TCP subgoals, continuous control, and gripper
+292
+      state, respectively. Stop-gradient between stages requires each stage to satisfy its own target rather
+293
+      than only downstream action losses.
+294
+295   At inference, map and field contexts are encoded once per replanning step. Each reverse step exe-
+296   cutes Algorithm 1; after denoising, the policy executes the first portion of the predicted action and
+297
+      replans from the updated history.
+298
+299   4     E XPERIMENTS
+300
+301   Our experiments address five questions: Q1: Does OSTRA outperform baseline policies across
+302   simulation benchmarks (Section 4.1)? Q2: Do these benefits hold in real-world manipulation (Sec-
+303   tion 4.2)? Q3: How do errors and computational costs in the foundation-model components affect
+304   OSTRA? We study their impact on task success in Section 4.3 and their latency in Section 4.4. Q4:
+305
+      Which architectural designs contribute to performance? Q5: How sensitive is OSTRA to its key
+      hyperparameters? The last two questions are addressed by the design ablations and hyperparameter
+306
+      analysis in Section 4.5.
+307
+308
+      4.1   S IMULATION E XPERIMENTS
+309
+310   Benchmarks and Experimental Setup. We benchmark OSTRA on three manipulation suites,
+311   with representative task rollouts shown in Figure 4. RLBench2, based on RLBench (James et al.,
+312   2020), contains seven multi-stage tasks in our evaluation and is used to evaluate OSTRA on long-
+313   horizon manipulation requiring consistent reasoning over object-state transitions. ManiSkill (Gu
+314   et al., 2023) contains six contact-rich tasks covering insertion, placement, tool use, and stacking, and
+315   is used to evaluate OSTRA on tabletop manipulation with strong geometric and contact constraints.
+316   LIBERO (Liu et al., 2023) contains four suites—Spatial, Object, Goal, and Long—with ten tasks
+317   each, and is used to evaluate OSTRA on diverse language-conditioned manipulation tasks with
+318
+      varying spatial, object, goal, and long-horizon requirements.
+319   Across all three benchmarks, we use the official datasets and follow the official evaluation protocols.
+320   The primary evaluation metric is task success rate. Detailed observation, training, and evaluation
+321   settings are provided in Appendix A.
+322
+323   Baselines. We compare OSTRA with benchmark-specific methods spanning action generation,
+      history and memory, future prediction, and object-centric perception and motion (Zhao et al., 2023;
+
+
+                                                         6
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+324      Initial State             Task Progress                 End State       Initial State              Task Progress                  End State
+
+325
+326
+                          Placing Fork in Drawer (Real World)                                    Build Letter M with Blocks (Real World)
+327
+328
+329                         Stack Three Blocks (Real World)                                            Cook the Pear (Real World)
+330
+331
+332                           Collect Blocks (Real World)                                         Arrange Food with Fork (Real World)
+
+
+333
+334
+                         Place Bread in Microwave (Real World)                                          Push the Box (RLBench2)
+335
+336
+337                         Hang the Wine Bottle (LIBERO)                                               Place Sphere (ManiSkill)
+
+338   Figure 4: Task demonstrations from initial state to task completion. The seven real-world tasks are
+339   Place Fork in Drawer, Stack Three Blocks, Collect Blocks, Place Bread in Microwave, Build Letter
+340   M with Blocks, Cook the Pear, and Arrange Food with Fork. The figure also shows representative
+341   tasks from the three simulation benchmarks: Push the Box from RLBench2 (James et al., 2020),
+342   Place Sphere from ManiSkill (Gu et al., 2023), and Hang the Wine Bottle from LIBERO (Liu et al.,
+343   2023).
+344
+      Chi et al., 2025; Ze et al., 2024; Fang et al., 2025; Yang et al., 2025; Zhu et al., 2023a; Hsu et al.,
+345
+      2025). Detailed descriptions of all baselines are provided in Appendix A.1.
+346
+347
+      Simulation results. As summarized in Table 1, OSTRA achieves average success rates of 89.8%,
+348
+      74.5%, and 97.4% on RLBench2, ManiSkill, and LIBERO, respectively. It improves over the
+349
+      strongest reported baseline in each benchmark by 5.3, 17.7, and 0.7 percentage points. Full per-
+350   task results are provided in Appendix A.2.
+351
+352
+      4.2      R EAL -W ORLD E XPERIMENTS
+353
+354   We further evaluate OSTRA on a 7-DoF Realman 75-BF robot arm equipped with a Pika parallel
+355   gripper. RGB-D observations are captured by an Intel RealSense D415 camera, and point clouds are
+356   reconstructed using Open3D (Zhou et al., 2018). The map constructor operates on predicted object
+357   masks, poses, and structural parameters rather than simulator state. This setting therefore evaluates
+358   both the robustness of object-state reasoning and the effect of errors accumulated by the OST-Map
+359   perception pipeline.
+360
+361   Task suite. We consider seven tasks covering articulated interaction, long-horizon rearrangement,
+362   thin or reflective objects, and global spatial constraints. Place Fork in Drawer requires opening
+363   a drawer, grasping a fork, placing it inside, and closing the drawer. Stack Three Blocks requires
+364   two sequential placements while preserving the state of the partial stack. Arrange Food with Fork
+365
+      tests compositional placement of multiple objects in a cluttered scene. Place Bread in Microwave
+      combines door manipulation, object transfer, partial occlusion, and door closure. Build Letter M
+366
+      with Blocks requires arranging five blocks into a specified global pattern and is the longest task in
+367
+      the suite. Collect Blocks requires gathering multiple displaced blocks into a target container, while
+368   Cook the Pear requires manipulating two food items through a shared cooking setup. These tasks,
+369   visualized in Figure 4, expose different forms of object-state transition: articulated state, support
+370   relations, containment, occupancy, and multi-object layout.
+371
+372   Real-world results. As shown in Table 2, we report success rates over 20 real-robot trials for each
+373   task and method. OSTRA achieves an average success rate of 84.3%, outperforming the strongest
+374   baseline, SAM2Act+ (59.3%), by 25.0 percentage points and ranking first on all seven tasks. Com-
+375   pared with Diffusion Policy (Chi et al., 2025) and DP3 (Ze et al., 2024), OSTRA produces more
+376   reliable multi-stage behavior on the drawer and microwave tasks and better preserves inter-object
+377   relations in stacking and shape construction. The largest gain over the best baseline occurs on Build
+      Letter M with Blocks (65% versus 15%), supporting our claim that explicit object-state transition
+
+
+                                                                             7
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+378   Table 1: Summary of the main simulation results. We report average task success rate (%) on
+379   each benchmark. Full per-task results are provided in Appendix A.2. Best results are in bold, and
+380   second-best results are underlined.
+381        RLBench2 (James et al., 2020) (7 tasks)                ManiSkill (Gu et al., 2023) (6 tasks)                   LIBERO (Liu et al., 2023) (40 tasks)
+      Method                             Mean S.R. (%)   Method                                 Mean S.R. (%)    Method                               Mean S.R. (%)
+382   ACT (Zhao et al., 2023)                15.5        ACT (Zhao et al., 2023)                    21.3         ACT (Zhao et al., 2023)                  67.7
+383   DP3 (Ze et al., 2024)                  26.0        Diffusion Policy (Chi et al., 2025)        26.8         GROOT (Zhu et al., 2023a)                66.2
+      3D Diffuser Actor (Ke et al., 2025)    64.7        DP3 (Ze et al., 2024)                      53.8         Diffusion Policy (Chi et al., 2025)      72.4
+384   PerAct2 (Shridhar et al., 2023)        40.0        3D Diffuser Actor (Ke et al., 2025)        51.5         BAKU (Haldar et al., 2024)               93.0
+      PPI (Yang et al., 2025)                80.8        PPI (Yang et al., 2025)                    56.8         MDT (Reuss et al., 2024)                 76.1
+385   Diffusion Policy (Chi et al., 2025)    42.6        BAKU (Haldar et al., 2024)                 43.0         DP3 (Ze et al., 2024)                    73.0
+      SAM2Act+ (Fang et al., 2025)           84.5        FlowPolicy (Zhang et al., 2025)            39.5         UWM (Zhu et al., 2025)                   91.8
+386   GROOT (Zhu et al., 2023a)              45.2        SPOT (Hsu et al., 2025)                    47.5         MemoryVLA (Shi et al., 2026)             96.7
+387   SPOT (Hsu et al., 2025)                82.3        Im2Flow2Act (Xu et al., 2025)              45.7         BPP (Mark et al., 2026)                  90.9
+      OSTRA (Ours)                           89.8        OSTRA (Ours)                               74.5         OSTRA (Ours)                             97.4
+388
+389
+      Table 2: Real-world manipulation results. We report full-task success rate (%) over 20 trials per
+      task and the average across seven tasks. Best results are shown in bold, and second-best results are
+390
+      underlined.
+391
+                                                     Place Fork      Stack Three      Arrange Food      Place Bread         Build Letter M      Collect   Cook the
+392   Method                                Avg. ↑   in Drawer         Blocks          with Fork       in Microwave          with Blocks        Blocks      Pear
+393   ACT (Zhao et al., 2023)                19.3         15              10                   35               20                 0               30       25
+394   Diffusion Policy (Chi et al., 2025)    20.0         10               5                   40               20                 0               35       30
+      DP3 (Ze et al., 2024)                  40.7         40              20                   65               45                 0               60       55
+395   PPI (Yang et al., 2025)                50.7         50              30                   75               55                10               70       65
+396   SAM2Act+ (Fang et al., 2025)           59.3         55              40                   85               65                15               80       75
+      MemoryVLA (Shi et al., 2026)           54.3         50              35                   80               60                10               75       70
+397   MPI (Zeng et al., 2024)                44.3         45              25                   70               50                 0               65       55
+398   SPOT (Hsu et al., 2025)                52.1         45              35                   80               55                10               75       65
+      Im2Flow2Act (Xu et al., 2025)          42.9         40              25                   70               45                 5               60       55
+399
+      OSTRA (Ours)                           84.3         85              80                   95               85                65               90       90
+400
+401
+402   modeling helps retain structural and spatial information under noisy and partially occluded real-
+403   world observations.
+404
+405   4.3     S YSTEM E RROR B REAKDOWN
+406
+407   We use combinatorial ground-truth replacements to identify which errors in the OST-Map Construc-
+408   tor most affect downstream task success.
+409
+410   Setup. We examine three components: object extraction by SAM 3, object-pose estimation and
+411   tracking by FoundationPose, and structural-size estimation by the PointNet–MLP estimator. Their
+412   outputs are replaced with ground-truth masks, poses, or size parameters, respectively, while the
+413
+      policy weights and evaluation conditions remain fixed. The constructor processes these inputs to
+      form the maps supplied to the policy. We evaluate all eight combinations, including Full OSTRA
+414
+      with no replacements, three single-component replacements, three pairwise replacements, and the
+415
+      all-GT constructor. Ground-truth quantities are used only for this diagnosis, not during normal
+416   deployment.
+417
+418
+      Analysis. Table 3 reports average full-task success and its change in percentage points relative to
+419   Full OSTRA. Single-component replacements test the effect of correcting each error source; joint
+420   replacements reveal whether their effects interact. The Semantic Field encoder and action policy
+421   remain unchanged even in the all-GT setting, so residual failures cannot be attributed solely to map
+422   construction.
+423
+424   4.4     L ATENCY
+425
+426   Setup. We profile the real-world inference pipeline on an NVIDIA GeForce RTX 4090 with batch
+427   size one. The first frame performs mask segmentation, object-pose registration, structural estima-
+428   tion, and OST-Map initialization; subsequent frames track masks and poses and update the map.
+429   Both stages include map and feature encoding followed by policy inference.
+430
+431   Results. Table 4 shows that the first frame requires 2835.325 ms, while tracking reduces
+      subsequent-frame latency to 226.292 ms (4.419 FPS), a 12.5× speedup. Segmentation and pose
+
+
+                                                                                  8
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+432
+      Table 3: System error breakdown for OSTRA. We use ground-truth replacements to identify the
+433
+      dominant bottleneck in OST-Map construction. Ground-truth quantities are used only for analysis
+434   and are not part of the inference interface. ∆ reports the improvement over Full OSTRA.
+435           Setting                                                  GT Extraction   GT Object Pose   GT Structural Size   Avg. Success     ∆
+436           Full OSTRA                                                                                                         89.8         0.0
+437           + GT Extraction                                               ✓                                                    90.3        +0.5
+              + GT Object Pose                                                               ✓                                   91.9        +2.1
+438           + GT Structural Size                                                                             ✓                 93.4        +3.6
+              + GT Extraction + GT Object Pose                              ✓                ✓                                   92.1        +2.3
+439           + GT Extraction + GT Structural Size                          ✓                                  ✓                 94.2        +4.4
+              + GT Object Pose + GT Structural Size                                          ✓                 ✓                 95.7        +5.9
+440           + GT Extraction + GT Object Pose + GT Structural Size         ✓                ✓                 ✓                 96.4        +6.6
+441   Table 4: Inference latency (ms) and throughput. We report mean component and end-to-end
+442   latency for the first frame and subsequent frames at batch size one. The first frame initializes OST-
+443   Map; subsequent frames track objects and update the map.
+444
+      Stage                          Mask Seg. / Track. ↓ Pose Reg. / Track. ↓ Structure & Map ↓ Encoders & Policy ↓ Total (ms) ↓ FPS ↑
+445
+      First Frame (Initialization)         1412.350                   1386.425              21.340                 15.210               2835.325    0.353
+446
+      Later Frames (Tracking)                94.832                    96.155               20.125                 15.180               226.292     4.419
+447
+448
+449   estimation dominate the runtime, whereas structural estimation, OST-Map encoding, and policy in-
+450   ference add relatively little overhead.
+451
+452   4.5     A BLATION S TUDIES
+453
+454   We ablate OSTRA along four dimensions: the temporal roles and attributes of OST-Map, the order
+455   of map–visual attention, the staged denoising and stop-gradient design, and key temporal and loss
+456   hyperparameters. All variants are retrained on RLBench2 with the same data, backbone capacity,
+457
+      training budget, and evaluation seeds, and are evaluated by mean task success.
+458
+459   OST-Map. Table 5 compares no map or future-node loss (Ex1), history without future supervision
+460
+      (Ex2), and future supervision with only the latest map (Ex3), against the full model (Ex11). Ex2,
+      Ex3, and Ex11 retain all map attributes. With both temporal roles enabled, Ex4–Ex11 progressively
+461
+      add geometry, semantics, affordances, and the four edge attribute groups to pose-only nodes. All
+462
+      map-enabled variants share the graph encoder, constructor outputs, and node correspondence; omit-
+463   ted attributes are masked, and edge-attention biases are disabled when no edge attributes remain.
+464   The full OST-Map reaches 89.8%, improving over the no-map variant by 20.4 percentage points.
+465   History-only and future-only supervision achieve 84.5% and 85.8%, respectively, while their com-
+466   bination performs best; the consistent gains from Ex4 to Ex11 further show that both node and edge
+467   attributes contribute to performance.
+468
+469   Transition-Guided Attention. Ex1–Ex4 in Table 6 test map-only, visual-only, joint attention over
+470   concatenated tokens, and visual-first attention against map-first attention (Ex12). All retain the
+471   complete prediction hierarchy and both stop-gradient boundaries. M → V and V → M denote
+472   the two sequential attention orders. Map-first attention achieves 89.8%, outperforming map-only,
+473
+      visual-only, joint attention, and visual-first attention by 13.3, 11.6, 4.4, and 2.7 percentage points,
+      respectively.
+474
+475
+      Staged Denoising. With map-first attention fixed, Ex5–Ex8 test action-only prediction, object-to-
+476
+      action conditioning, TCP-to-action conditioning, and flat joint prediction. Removed stages lose their
+477
+      heads and auxiliary losses; the flat variant retains all targets without hierarchical conditioning (Hier.).
+478   Ex9–Ex12 test all four combinations of detaching object and TCP features passed downstream, with
+479   Ex12 as the full model. In Ex6, object features pass directly to the action stage. Node and TCP errors
+480   are recorded where their prediction stages are present. The full hierarchy improves over action-only
+481   prediction by 14.0 percentage points and over flat joint prediction by 8.3 points. Applying both
+482   stop-gradient boundaries yields a further 3.9-point gain over using neither, confirming the benefit of
+483   isolating the three prediction stages.
+484
+485   Hyperparameter sensitivity. Figure 5 considers four temporal counts—past keyframes Hp , re-
+      cent consecutive observations To , future keyframes Hk , and predicted actions Ha —and three loss
+
+
+                                                                                 9
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+486
+      Table 5: OST-Map ablations on RLBench2. We Table 6: OSTRA ablations on RLBench2.
+487
+      vary temporal supervision and map attributes with a We vary attention order, prediction stages, and
+488   fixed graph encoder. Mean is average success (%); stop-gradient boundaries. Mean is average
+489   Ex11 is the full model.                             success (%); Ex12 is the full model.
+490
+             Temporal         Node                 Edge                                  Attention      Denoising    Stop-Grad.
+491
+             Hist. Fut. Geo Pose Sem Aff Type Param Anchor RelPose Mean          Map Vis. M → V V → M Obj. TCP Hier. Obj. TCP Mean
+492
+      Ex1    –    –    –   –    –   –    –    –      –      –     69.4    Ex1    ✓   –     –      –     ✓   ✓   ✓    ✓   ✓    76.5
+493   Ex2    ✓    –    ✓   ✓    ✓   ✓    ✓    ✓      ✓      ✓     84.5    Ex2    –   ✓     –      –     ✓   ✓   ✓    ✓   ✓    78.2
+      Ex3    –    ✓    ✓   ✓    ✓   ✓    ✓    ✓      ✓      ✓     85.8    Ex3    ✓   ✓     –      –     ✓   ✓   ✓    ✓   ✓    85.4
+494                                                                       Ex4    ✓   ✓     –      ✓     ✓   ✓   ✓    ✓   ✓    87.1
+495   Ex4    ✓    ✓    –   ✓    –   –    –     –     –       –    75.1
+                                                                          Ex5    ✓   ✓     ✓       –    –   –   –    –   –    75.8
+      Ex5    ✓    ✓    ✓   ✓    –   –    –     –     –       –    78.8
+496   Ex6    ✓    ✓    ✓   ✓    ✓   –    –     –     –       –    82.5
+                                                                          Ex6    ✓   ✓     ✓       –    ✓   –   ✓    ✓   –    83.4
+                                                                          Ex7    ✓   ✓     ✓       –    –   ✓   ✓    –   ✓    84.6
+497   Ex7    ✓    ✓    ✓   ✓    ✓   ✓    –     –     –       –    85.2    Ex8    ✓   ✓     ✓       –    ✓   ✓   –    –   –    81.5
+498   Ex8    ✓    ✓    ✓   ✓    ✓   ✓    ✓    –      –      –     86.6    Ex9    ✓   ✓     ✓       –    ✓   ✓   ✓    –   –    85.9
+      Ex9    ✓    ✓    ✓   ✓    ✓   ✓    ✓    ✓      –      –     87.8    Ex10   ✓   ✓     ✓       –    ✓   ✓   ✓    ✓   –    87.4
+499   Ex10   ✓    ✓    ✓   ✓    ✓   ✓    ✓    ✓      ✓      –     88.9    Ex11   ✓   ✓     ✓       –    ✓   ✓   ✓    –   ✓    88.3
+500   Ex11   ✓    ✓    ✓   ✓    ✓   ✓    ✓    ✓      ✓      ✓     89.8    Ex12   ✓   ✓     ✓       –    ✓   ✓   ✓    ✓   ✓    89.8
+501
+502
+      ratios: λM /λA , λE /λA , and λG /λA . Each curve varies one parameter with the others fixed, sharing
+503   the full-model reference of 89.8% at x = 1. Performance is relatively stable near the reference set-
+504   ting but decreases when temporal context or prediction horizons become too short or too long; Ha
+505   and Hp show the largest variation. Among the loss ratios, the object-state loss is the most sensitive,
+506   whereas the gripper loss remains comparatively stable across the tested range.
+507
+508
+509
+510
+511
+512
+513
+514
+515
+516
+517
+518
+519
+520
+521
+522
+523
+524
+525
+526
+527
+528
+529
+530
+531
+532
+533
+534
+535
+536
+537
+538
+539
+
+
+
+                                                                   10
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+540
+541
+542
+543
+544
+545
+546
+547
+548
+549
+550
+551
+552
+553
+554
+555
+556
+557
+558                                           (a) Temporal parameters                                                (b) DiT training: loss ratios
+559                            100                                                                     100
+
+560
+561                             90                                                                      90
+       Mean success rate (%)
+
+
+
+
+                                                                               Mean success rate (%)
+
+
+
+
+562
+563
+                                80                                                                      80
+564
+565
+                                70                                                                      70
+566
+567                                       Past keyframes Hp
+
+568                             60        Recent observations To                                        60        Object state λM/λA
+                                          Future keyframes Hk                                                     TCP λE/λA
+569
+                                          Action horizon Ha                                                       Gripper λG/λA
+570                             50                                                                      50
+571                                  0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00                                 0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00
+572                                       Parameter value / reference value                                       Parameter value / reference value
+
+573
+      Figure 5: Hyperparameter sensitivity on RLBench2. (a) Past keyframes Hp , consecutive obser-
+574   vations To , future keyframes Hk , and predicted actions Ha . (b) Object-state, TCP, and gripper
+575   loss weights relative to the action loss. Each curve varies one parameter with all others fixed
+576   at their reference values. The reference values are Hp = To = Hk = 4, Ha = 16, and
+577   λM /λA = λE /λA = λG /λA = 1.
+578
+579
+580
+581
+582
+583
+584
+585
+586
+587
+588
+589
+590
+591
+592
+593
+
+
+
+                                                                           11
+

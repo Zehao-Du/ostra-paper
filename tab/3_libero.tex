@@ -1,0 +1,46 @@
+\begin{table*}[htbp]
+    \vspace{-6pt}
+    \centering
+\caption{\textbf{Quantitative results on LIBERO.}
+We report task success rate (\%), with 50 evaluation trials per task.
+\textbf{Bold} and \underline{underlining} denote the best and second-best results, respectively.}
+    \label{tab:libero_results}
+    \vspace{2pt}
+    \small
+    \setlength{\tabcolsep}{8pt}
+    \resizebox{1.0\textwidth}{!}{%
+    \begin{tabular}{lccccc}
+        \toprule
+        \rowcolor{tablehead}
+        Method
+        & LIBERO-Spatial
+        & LIBERO-Object
+        & LIBERO-Goal
+        & LIBERO-Long
+        & Avg. Success $\uparrow$ \\
+        \midrule
+        % Chronological order by the method's first publication/release year.
+        ACT~\citep{Zhao2023Learning} & 82.0 & 78.8 & 66.1 & 44.0 & 67.7 \\
+        GROOT~\citep{zhu2023learning} & 79.1 & 81.5 & 63.2 & 41.0 & 66.2 \\
+        % DP: Kim et al., OpenVLA, arXiv:2406.09246v3, Table 12.
+        Diffusion Policy~\citep{chi2024diffusionpolicy} & 78.3 & 92.5 & 68.3 & 50.5 & 72.4 \\
+        % Numerical provenance and average rounding: references/baseline_candidates.md.
+        BAKU~\citep{Haldar2025BAKU} & 94.0 & 95.0 & 96.0 & 87.0 & 93.0 \\
+        % MDT: arXiv:2407.05996, Table II, both auxiliary losses enabled.
+        MDT~\citep{reuss2024multimodal} & 78.5 & 87.5 & 73.5 & 64.8 & 76.1 \\
+        DP3~\citep{Ze2024DP3} & 86.5 & 84.0 & 71.5 & 50.0 & 73.0 \\
+        UWM~\citep{Zhu2025UWM} & 93.5 & 93.8 & 94.2 & 85.5 & 91.8 \\
+        % MemoryVLA: Tables 3 / 17(b). Long-10 and Long-90 jointly trained.
+        MemoryVLA~\citep{shi2025memoryvla}
+        & \underline{98.4} & \underline{98.4} & \underline{96.4}
+        & \underline{93.4} & \underline{96.7} \\
+        BPP~\citep{Mark2026BPP} & 92.0 & 94.5 & 93.0 & 84.0 & 90.9 \\
+        \midrule
+        \rowcolor{tablehead} \textbf{OSTRA (Ours)}
+        & \textbf{98.5} & \textbf{98.7} & \textbf{97.3}
+        & \textbf{95.0} & \textbf{97.4} \\
+        \bottomrule
+    \end{tabular}%
+    }
+    \vspace{-6pt}
+\end{table*}

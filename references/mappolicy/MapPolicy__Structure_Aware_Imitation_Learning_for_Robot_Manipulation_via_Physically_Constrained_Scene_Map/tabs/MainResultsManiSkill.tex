@@ -1,0 +1,28 @@
+\begin{table*}[t]
+\centering
+\caption{Main results on ManiSkill~\cite{Gu2023ManiSkill2}. We report success rate (\%) on six official tabletop manipulation tasks from the Table-Top 2 Finger Gripper category. Results are averaged over \textbf{5 random seeds} and shown as mean and standard deviation. Best results are in \textbf{bold}, and second best are \underline{underlined}.}
+\label{tab:main_results_maniskill}
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{adjustbox}{max width=0.95\textwidth}
+\begin{tabular}{l|c|cccccc}
+\toprule
+\rowcolor{tablehead}
+Method & Avg. &
+\shortstack{PegInsertion\\Side-v1} &
+\shortstack{Place\\Sphere-v1} &
+\shortstack{Plug\\Charger-v1} &
+\shortstack{PullCube\\Tool-v1} &
+\shortstack{Stack\\Cube-v1} &
+\shortstack{Stack\\Pyramid-v1} \\
+\midrule
+Diffusion Policy~\cite{chi2024diffusionpolicy} & $26.8\std{1.5}$ & $0\std{0.0}$ & $4\std{1.2}$ & $36\std{4.5}$ & $47\std{5.2}$ & $61\std{3.8}$ & $13\std{2.4}$ \\
+3D Diffusion Policy~\cite{Ze2024DP3} & $53.8\std{1.2}$ & $\underline{55\std{4.1}}$ & $62\std{3.5}$ & $\underline{58\std{4.8}}$ & $48\std{3.9}$ & $72\std{2.7}$ & $28\std{4.6}$ \\
+Octo~\cite{octo_2023} & $16.8\std{0.9}$ & $0\std{0.0}$ & $6\std{1.8}$ & $12\std{2.5}$ & $34\std{4.1}$ & $45\std{5.0}$ & $4\std{1.1}$ \\
+$\pi_0$~\cite{black2026pi0visionlanguageactionflowmodel} & $\underline{54.0\std{1.8}}$ & $35\std{5.2}$ & $\underline{70\std{4.3}}$ & $45\std{6.1}$ & $\underline{65\std{3.4}}$ & $\underline{75\std{2.9}}$ & $\underline{34\std{5.5}}$ \\
+\midrule
+MapPolicy (Ours) & $\mathbf{73.0\std{1.1}}$ & $\mathbf{68\std{3.2}}$ & $\mathbf{82\std{2.9}}$ & $\mathbf{74\std{3.7}}$ & $\mathbf{78\std{2.8}}$ & $\mathbf{88\std{1.5}}$ & $\mathbf{48\std{4.2}}$ \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table*}

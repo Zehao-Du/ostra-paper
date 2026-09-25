@@ -1,0 +1,43 @@
+\begin{table*}[t]
+    % \vspace{-6pt}
+    \centering
+    \caption{\textbf{Real-world manipulation results.}
+    We report full-task success rate (\%) over 20 trials per task and the
+    average across seven tasks. \textbf{Bold} and \underline{underlining}
+    denote the best and second-best results, respectively, using identical
+    trial counts for every policy in the matched comparison.}
+    \label{tab:real_world_results}
+    \vspace{2pt}
+    \scriptsize
+    \setlength{\tabcolsep}{4pt}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{lcccccccc}
+        \toprule
+        \rowcolor{tablehead}
+        Method
+        & Avg. $\uparrow$
+        & \shortstack{Place Fork\\in Drawer}
+        & \shortstack{Stack Three\\Blocks}
+        & \shortstack{Arrange Food\\with Fork}
+        & \shortstack{Place Bread\\in Microwave}
+        & \shortstack{Build Letter M\\with Blocks}
+        & \shortstack{Collect\\Blocks}
+        & \shortstack{Cook the\\Pear} \\
+        \midrule
+        ACT~\citep{Zhao2023Learning}                    & 19.3 & 15 & 10 & 35 & 20 &  0 & 30 & 25 \\
+        Diffusion Policy~\citep{chi2024diffusionpolicy} & 20.0 & 10 &  5 & 40 & 20 &  0 & 35 & 30 \\
+        DP3~\citep{Ze2024DP3}                           & 40.7 & 40 & 20 & 65 & 45 &  0 & 60 & 55 \\
+        PPI~\citep{Yang2025PPI}                         & 50.7 & 50 & 30 & 75 & 55 & 10 & 70 & 65 \\
+        SAM2Act+~\citep{Fang2025SAM2Act}                & \underline{59.3} & \underline{55} & \underline{40} & \underline{85} & \underline{65} & \underline{15} & \underline{80} & \underline{75} \\
+        MemoryVLA~\citep{shi2025memoryvla}              & 54.3 & 50 & 35 & 80 & 60 & 10 & 75 & 70 \\
+        MPI~\citep{Zeng2024MPI}                         & 44.3 & 45 & 25 & 70 & 50 &  0 & 65 & 55 \\
+        SPOT~\citep{Hsu2025SPOT}                        & 52.1 & 45 & 35 & 80 & 55 & 10 & 75 & 65 \\
+        Im2Flow2Act~\citep{xu2024im2flow2act}           & 42.9 & 40 & 25 & 70 & 45 &  5 & 60 & 55 \\
+        \midrule
+        \rowcolor{tablehead} 
+        OSTRA (Ours)                                    & \textbf{84.3} & \textbf{85} & \textbf{80} & \textbf{95} & \textbf{85} & \textbf{65} & \textbf{90} & \textbf{90} \\
+        \bottomrule
+    \end{tabular}%
+    }
+    \vspace{-6pt}
+\end{table*}

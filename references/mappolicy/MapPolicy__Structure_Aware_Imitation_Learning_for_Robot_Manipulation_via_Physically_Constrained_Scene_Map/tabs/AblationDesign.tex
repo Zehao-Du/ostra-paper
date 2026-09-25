@@ -1,0 +1,64 @@
+\begin{table*}[t]
+\centering
+% --- Left table: Scene Map contents ---
+\begin{minipage}[t]{0.52\textwidth}
+    \centering
+    \caption{Ablation study on Scene Map representation by varying node and edge attributes on MetaWorld~\cite{Yu2020Meta,mclean2025metaworld}.}
+    \label{tab:ablation_map_contents}
+    \scriptsize
+    \resizebox{\linewidth}{!}{
+        \begin{tabular}{c|cccc|cccc|c}
+        \hline
+         & \multicolumn{4}{c|}{Node} & \multicolumn{4}{c|}{Edge} &  \\
+        \hline
+         & Geo & Pose & Sem & Aff & Type & Param & Anchor & RelPose & \textbf{Mean} \\
+        \hline
+        Ex1 & $\checkmark$ & - & - & - & - & - & - & - & \cellcolor{blue1}\textbf{72.4} \\
+        Ex2 & $\checkmark$ & $\checkmark$ & - & - & - & - & - & - & \cellcolor{blue1}\textbf{78.1} \\
+        Ex3 & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & - & - & - & - & \cellcolor{blue2}\textbf{83.5} \\
+        Ex4 & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & - & - & - & \cellcolor{blue2}\textbf{86.7} \\
+        Ex5 & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & - & - & \cellcolor{blue3}\textbf{88.9} \\
+        Ex6 & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & - & \cellcolor{blue3}\textbf{91.4} \\
+        \textbf{\underline{Ex7}} & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & \cellcolor{blue4}\textbf{93.2} \\
+        \hline
+        \end{tabular}
+    }
+\end{minipage}
+\hfill
+% --- Right table: encoder and fusion ---
+\begin{minipage}[t]{0.46\textwidth}
+    \centering
+    \caption{Ablation study on map encoder and multimodal fusion design choices on MetaWorld~\cite{Yu2020Meta,mclean2025metaworld}.}
+    \label{tab:ablation_encoder_fusion}
+    \scriptsize
+    \resizebox{\linewidth}{!}{
+        \begin{tabular}{c|cccc|ccc|c}
+        \hline
+         & \multicolumn{4}{c|}{Map Encoder} & \multicolumn{3}{c|}{Fusion} &  \\
+        \hline
+         & Pool & PN & Trans. & Graph & Concat & MLP & Attn & \textbf{Mean} \\
+        \hline
+        Ex1 & $\checkmark$ & - & - & - & - & - & $\checkmark$ & \cellcolor{blue1}\textbf{75.6} \\
+        Ex2 & - & $\checkmark$ & - & - & - & - & $\checkmark$ & \cellcolor{blue2}\textbf{82.3} \\
+        Ex3 & - & - & $\checkmark$ & - & - & - & $\checkmark$ & \cellcolor{blue3}\textbf{89.1} \\
+        \textbf{\underline{Ex4}} & - & - & - & $\checkmark$ & - & - & $\checkmark$ & \cellcolor{blue4}\textbf{93.2} \\
+        \hline
+        Ex5 & - & - & - & $\checkmark$ & $\checkmark$ & - & - & \cellcolor{blue2}\textbf{84.2} \\
+        Ex6 & - & - & - & $\checkmark$ & - & $\checkmark$ & - & \cellcolor{blue3}\textbf{87.6} \\
+        \textbf{\underline{Ex7}} & - & - & - & $\checkmark$ & - & - & $\checkmark$ & \cellcolor{blue4}\textbf{93.2} \\
+        \hline
+        \end{tabular}
+    }
+\end{minipage}
+
+\par
+\begin{minipage}{0.98\textwidth}
+    \centering
+    \scriptsize
+    \textit{Note:}
+    Geo = part geometry, Sem = semantic identity, Aff = affordance attributes.
+    Param = continuous relation parameters, RelPose = relative pose.
+    PN = PointNet~\cite{Qi2017PointNet}, Trans. = Transformer, Graph = graph encoder, Attn = attention fusion.
+    Darker blue indicates better performance.
+\end{minipage}
+\end{table*}

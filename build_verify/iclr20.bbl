@@ -1,0 +1,501 @@
+\begin{thebibliography}{50}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Belkhale \& Sadigh(2023)Belkhale and Sadigh]{belkhale2023plato}
+Suneel Belkhale and Dorsa Sadigh.
+\newblock Plato: Predicting latent affordances through object-centric play.
+\newblock In Karen Liu, Dana Kulic, and Jeff Ichnowski (eds.),
+  \emph{Proceedings of The 6th Conference on Robot Learning}, volume 205 of
+  \emph{Proceedings of Machine Learning Research}, pp.\  1424--1434. PMLR,
+  14--18 Dec 2023.
+\newblock URL \url{https://proceedings.mlr.press/v205/belkhale23a.html}.
+
+\bibitem[Carion et~al.(2026)Carion, Gustafson, Hu, Debnath, Hu, Suris
+  Coll-Vinent, Ryali, Alwala, Khedr, Huang, Lei, Ma, Guo, Kalla, Marks, Greer,
+  Wang, Sun, R\"{a}dle, Afouras, Mavroudi, Xu, Wu, Zhou, Momeni, HAZRA, Ding,
+  Vaze, Porcher, Li, Li, Kamath, Cheng, Dollar, Ravi, Saenko, Zhang, and
+  Feichtenhofer]{sam3}
+Nicolas Carion, Laura Gustafson, Yuan-Ting Hu, Shoubhik Debnath, Ronghang Hu,
+  Didac Suris Coll-Vinent, Chaitanya Ryali, Kalyan~Vasudev Alwala, Haitham
+  Khedr, Andrew Huang, Jie Lei, Tengyu Ma, Baishan Guo, Arpit Kalla, Markus
+  Marks, Joseph Greer, Meng Wang, Peize Sun, Roman R\"{a}dle, Triantafyllos
+  Afouras, Effrosyni Mavroudi, Katherine Xu, Tsung-Han Wu, Yu~Zhou, Liliane
+  Momeni, RISHI HAZRA, Shuangrui Ding, Sagar Vaze, Francois Porcher, Feng Li,
+  Siyuan Li, Aishwarya Kamath, Ho~Kei Cheng, Piotr Dollar, Nikhila Ravi, Kate
+  Saenko, Pengchuan Zhang, and Christoph Feichtenhofer.
+\newblock Sam 3: Segment anything with concepts.
+\newblock In C.~Vondrick, B.~Hariharan, C.~Raffel, L.~Pinto, D.~Yang, and
+  A.~Faust (eds.), \emph{International Conference on Learning Representations},
+  volume 2026, pp.\  138846--138923, 2026.
+\newblock URL
+  \url{https://proceedings.iclr.cc/paper_files/paper/2026/file/e0982cbc81401df3430ee1ff780dc7a2-Paper-Conference.pdf}.
+
+\bibitem[Charles et~al.(2017)Charles, Su, Kaichun, and Guibas]{Qi2017PointNet}
+R.~Qi Charles, Hao Su, Mo~Kaichun, and Leonidas~J. Guibas.
+\newblock Pointnet: Deep learning on point sets for 3d classification and
+  segmentation.
+\newblock In \emph{2017 IEEE Conference on Computer Vision and Pattern
+  Recognition (CVPR)}, pp.\  77--85, 2017.
+\newblock \doi{10.1109/CVPR.2017.16}.
+
+\bibitem[Chen et~al.(2023)Chen, Wang, Fei-Fei, and Liu]{Chen2023Sequential}
+Yuanpei Chen, Chen Wang, Li~Fei-Fei, and Karen Liu.
+\newblock Sequential dexterity: Chaining dexterous policies for long-horizon
+  manipulation.
+\newblock In Jie Tan, Marc Toussaint, and Kourosh Darvish (eds.),
+  \emph{Proceedings of The 7th Conference on Robot Learning}, volume 229 of
+  \emph{Proceedings of Machine Learning Research}, pp.\  3809--3829. PMLR,
+  06--09 Nov 2023.
+\newblock URL \url{https://proceedings.mlr.press/v229/chen23e.html}.
+
+\bibitem[Chi et~al.(2025)Chi, Xu, Feng, Cousineau, Du, Burchfiel, Tedrake, and
+  Song]{chi2024diffusionpolicy}
+Cheng Chi, Zhenjia Xu, Siyuan Feng, Eric Cousineau, Yilun Du, Benjamin
+  Burchfiel, Russ Tedrake, and Shuran Song.
+\newblock Diffusion policy: Visuomotor policy learning via action diffusion.
+\newblock \emph{Int. J. Rob. Res.}, 44\penalty0 (10–11):\penalty0
+  1684–1704, 2025.
+\newblock ISSN 0278-3649.
+\newblock \doi{10.1177/02783649241273668}.
+\newblock URL \url{https://doi.org/10.1177/02783649241273668}.
+
+\bibitem[Fang et~al.(2025)Fang, Grotz, Pumacay, Wang, Fox, Krishna, and
+  Duan]{Fang2025SAM2Act}
+Haoquan Fang, Markus Grotz, Wilbert Pumacay, Yi~Ru Wang, Dieter Fox, Ranjay
+  Krishna, and Jiafei Duan.
+\newblock {SAM}2{A}ct: Integrating visual foundation model with a memory
+  architecture for robotic manipulation.
+\newblock In Aarti Singh, Maryam Fazel, Daniel Hsu, Simon Lacoste-Julien, Felix
+  Berkenkamp, Tegan Maharaj, Kiri Wagstaff, and Jerry Zhu (eds.),
+  \emph{Proceedings of the 42nd International Conference on Machine Learning},
+  volume 267 of \emph{Proceedings of Machine Learning Research}, pp.\
+  15925--15942. PMLR, 13--19 Jul 2025.
+\newblock URL \url{https://proceedings.mlr.press/v267/fang25c.html}.
+
+\bibitem[Feng et~al.(2025)Feng, Han, Yang, Yue, Levine, and
+  Luo]{Feng2025ReflectivePlanning}
+Yunhai Feng, Jiaming Han, Zhuoran Yang, Xiangyu Yue, Sergey Levine, and Jianlan
+  Luo.
+\newblock Reflective planning: Vision-language models for multi-stage
+  long-horizon robotic manipulation.
+\newblock In Joseph Lim, Shuran Song, and Hae-Won Park (eds.),
+  \emph{Proceedings of The 9th Conference on Robot Learning}, volume 305 of
+  \emph{Proceedings of Machine Learning Research}, pp.\  2038--2062. PMLR,
+  27--30 Sep 2025.
+\newblock URL \url{https://proceedings.mlr.press/v305/feng25b.html}.
+
+\bibitem[Ferraro et~al.(2025)Ferraro, Mazzaglia, Verbelen, and
+  Dhoedt]{ferraro2025focus}
+Stefano Ferraro, Pietro Mazzaglia, Tim Verbelen, and Bart Dhoedt.
+\newblock Focus: object-centric world models for robotic manipulation.
+\newblock \emph{Frontiers in Neurorobotics}, Volume 19 - 2025, 2025.
+\newblock ISSN 1662-5218.
+\newblock \doi{10.3389/fnbot.2025.1585386}.
+\newblock URL
+  \url{https://www.frontiersin.org/journals/neurorobotics/articles/10.3389/fnbot.2025.1585386}.
+
+\bibitem[Gu et~al.(2023)Gu, Xiang, Li, Ling, Liu, Mu, Tang, Tao, Wei, Yao,
+  Yuan, Xie, Huang, Chen, and Su]{Gu2023ManiSkill2}
+Jiayuan Gu, Fanbo Xiang, Xuanlin Li, Zhan Ling, Xiqiang Liu, Tongzhou Mu, Yihe
+  Tang, Stone Tao, Xinyue Wei, Yunchao Yao, Xiaodi Yuan, Pengwei Xie, Zhiao
+  Huang, Rui Chen, and Hao Su.
+\newblock {ManiSkill2}: A unified benchmark for generalizable manipulation
+  skills.
+\newblock In \emph{International Conference on Learning Representations}, 2023.
+
+\bibitem[Gupta et~al.(2020)Gupta, Kumar, Lynch, Levine, and
+  Hausman]{gupta2019relay}
+Abhishek Gupta, Vikash Kumar, Corey Lynch, Sergey Levine, and Karol Hausman.
+\newblock Relay policy learning: Solving long-horizon tasks via imitation and
+  reinforcement learning.
+\newblock In Leslie~Pack Kaelbling, Danica Kragic, and Komei Sugiura (eds.),
+  \emph{Proceedings of the Conference on Robot Learning}, volume 100 of
+  \emph{Proceedings of Machine Learning Research}, pp.\  1025--1037. PMLR, 30
+  Oct--01 Nov 2020.
+\newblock URL \url{https://proceedings.mlr.press/v100/gupta20a.html}.
+
+\bibitem[Haldar et~al.(2024)Haldar, Peng, and Pinto]{Haldar2025BAKU}
+Siddhant Haldar, Zhuoran Peng, and Lerrel Pinto.
+\newblock Baku: An efficient transformer for multi-task policy learning.
+\newblock In A.~Globerson, L.~Mackey, D.~Belgrave, A.~Fan, U.~Paquet,
+  J.~Tomczak, and C.~Zhang (eds.), \emph{Advances in Neural Information
+  Processing Systems}, volume~37, pp.\  141208--141239. Curran Associates,
+  Inc., 2024.
+\newblock \doi{10.52202/079017-4484}.
+\newblock URL
+  \url{https://proceedings.neurips.cc/paper_files/paper/2024/file/ff887781480973bd3cb6026feb378d1e-Paper-Conference.pdf}.
+
+\bibitem[Hsu et~al.(2025)Hsu, Wen, Xu, Narang, Wang, Zhu, Biswas, and
+  Birchfield]{Hsu2025SPOT}
+Cheng-Chun Hsu, Bowen Wen, Jie Xu, Yashraj Narang, Xiaolong Wang, Yuke Zhu,
+  Joydeep Biswas, and Stan Birchfield.
+\newblock Spot: Se(3) pose trajectory diffusion for object-centric
+  manipulation.
+\newblock In \emph{2025 IEEE International Conference on Robotics and
+  Automation (ICRA)}, pp.\  4853--4860, 2025.
+\newblock \doi{10.1109/ICRA55743.2025.11127562}.
+
+\bibitem[Hu et~al.(2025)Hu, Guo, Wang, Chen, Wang, Zhang, Sreenath, Lu, and
+  Chen]{Hu2025VPP}
+Yucheng Hu, Yanjiang Guo, Pengchao Wang, Xiaoyu Chen, Yen-Jen Wang, Jianke
+  Zhang, Koushil Sreenath, Chaochao Lu, and Jianyu Chen.
+\newblock Video prediction policy: A generalist robot policy with predictive
+  visual representations.
+\newblock In Aarti Singh, Maryam Fazel, Daniel Hsu, Simon Lacoste-Julien, Felix
+  Berkenkamp, Tegan Maharaj, Kiri Wagstaff, and Jerry Zhu (eds.),
+  \emph{Proceedings of the 42nd International Conference on Machine Learning},
+  volume 267 of \emph{Proceedings of Machine Learning Research}, pp.\
+  24328--24346. PMLR, 13--19 Jul 2025.
+\newblock URL \url{https://proceedings.mlr.press/v267/hu25g.html}.
+
+\bibitem[Jain et~al.(2025)Jain, Sachdeva, and Paul]{Jain2025LongerHorizon}
+Shivam Jain, Sachit Sachdeva, and Rohan Paul.
+\newblock Enabling long(er) horizon imitation for manipulation tasks by
+  modeling subgoal transitions.
+\newblock In Joseph Lim, Shuran Song, and Hae-Won Park (eds.),
+  \emph{Proceedings of The 9th Conference on Robot Learning}, volume 305 of
+  \emph{Proceedings of Machine Learning Research}, pp.\  2219--2238. PMLR,
+  27--30 Sep 2025.
+\newblock URL \url{https://proceedings.mlr.press/v305/jain25b.html}.
+
+\bibitem[James et~al.(2020)James, Ma, Arrojo, and Davison]{James2020RLBench}
+Stephen James, Zicong Ma, David~Rovick Arrojo, and Andrew~J. Davison.
+\newblock Rlbench: The robot learning benchmark \& learning environment.
+\newblock \emph{IEEE Robotics and Automation Letters}, 5\penalty0 (2):\penalty0
+  3019--3026, 2020.
+\newblock \doi{10.1109/LRA.2020.2974707}.
+
+\bibitem[Jeong et~al.(2025)Jeong, Chun, Cha, and Kim]{jeong2025ocwm}
+Youngjoon Jeong, Junha Chun, Soonwoo Cha, and Taesup Kim.
+\newblock {Object-Centric World Model for Language-Guided Manipulation}.
+\newblock In \emph{ICLR 2025 Workshops: World\_Models}, 2025.
+\newblock URL
+  \url{https://mlanthology.org/iclrw/2025/jeong2025iclrw-objectcentric/}.
+
+\bibitem[Ji et~al.(2026)Ji, Wang, Qian, Yu, Tian, Fei, Gong, and
+  Qiu]{Ji2026HiMe}
+Li~Ji, Siyin Wang, Pengfang Qian, Xiaopeng Yu, Yihai Tian, Zhaoye Fei, Jingjing
+  Gong, and Xipeng Qiu.
+\newblock Hime: Hierarchical embodied memory for long-horizon
+  vision-language-action control.
+\newblock In \emph{Proceedings of the 43rd International Conference on Machine
+  Learning}, 2026.
+
+\bibitem[Kang \& Kuo(2025)Kang and Kuo]{Kang2025Incorporating}
+Xuhui Kang and Yen-Ling Kuo.
+\newblock Incorporating task progress knowledge for subgoal generation in
+  robotic manipulation through image edits.
+\newblock In \emph{2025 IEEE/CVF Winter Conference on Applications of Computer
+  Vision (WACV)}, pp.\  7490--7499, 2025.
+\newblock \doi{10.1109/WACV61041.2025.00728}.
+
+\bibitem[Ke et~al.(2025)Ke, Gkanatsios, and Fragkiadaki]{ke2024diffuseractor}
+Tsung-Wei Ke, Nikolaos Gkanatsios, and Katerina Fragkiadaki.
+\newblock ke2024diffuseractor.
+\newblock In Pulkit Agrawal, Oliver Kroemer, and Wolfram Burgard (eds.),
+  \emph{Proceedings of The 8th Conference on Robot Learning}, volume 270 of
+  \emph{Proceedings of Machine Learning Research}, pp.\  1949--1974. PMLR,
+  06--09 Nov 2025.
+\newblock URL \url{https://proceedings.mlr.press/v270/ke25a.html}.
+
+\bibitem[Lee \& Fazeli(2025)Lee and Fazeli]{Lee2025ViTaSCOPE}
+Jayjun Lee and Nima Fazeli.
+\newblock {ViTaSCOPE: Visuo-tactile Implicit Representation for In-hand Pose
+  and Extrinsic Contact Estimation}.
+\newblock In \emph{Proceedings of Robotics: Science and Systems}, LosAngeles,
+  CA, USA, June 2025.
+\newblock \doi{10.15607/RSS.2025.XXI.054}.
+
+\bibitem[Li et~al.(2026)Li, Hu, Shao, Chen, Jiang, Xie, Hao, and
+  Nie]{Li2026OptimusVLA}
+Zaijing Li, Bing Hu, Rui Shao, Gongwei Chen, Dongmei Jiang, Pengwei Xie, Jianye
+  Hao, and Liqiang Nie.
+\newblock Global prior meets local consistency: Dual-memory augmented
+  vision-language-action model for efficient robotic manipulation.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision
+  and Pattern Recognition (CVPR)}, pp.\  35135--35145, June 2026.
+
+\bibitem[Liang \& Boularias(2021)Liang and Boularias]{Liang2021Finite}
+Junchi Liang and Abdeslam Boularias.
+\newblock Self-supervised learning of long-horizon manipulation tasks with
+  finite-state task machines.
+\newblock In Ali Jadbabaie, John Lygeros, George~J. Pappas, Pablo~A. Parrilo,
+  Benjamin Recht, Claire~J. Tomlin, and Melanie~N. Zeilinger (eds.),
+  \emph{Proceedings of the 3rd Conference on Learning for Dynamics and
+  Control}, volume 144 of \emph{Proceedings of Machine Learning Research}, pp.\
+   484--497. PMLR, 07 -- 08 June 2021.
+\newblock URL \url{https://proceedings.mlr.press/v144/liang21a.html}.
+
+\bibitem[Liu et~al.(2023)Liu, Zhu, Gao, Feng, Liu, Zhu, and
+  Stone]{liu2023libero}
+Bo~Liu, Yifeng Zhu, Chongkai Gao, Yihao Feng, Qiang Liu, Yuke Zhu, and Peter
+  Stone.
+\newblock Libero: Benchmarking knowledge transfer for lifelong robot learning.
+\newblock In A.~Oh, T.~Naumann, A.~Globerson, K.~Saenko, M.~Hardt, and
+  S.~Levine (eds.), \emph{Advances in Neural Information Processing Systems},
+  volume~36, pp.\  44776--44791. Curran Associates, Inc., 2023.
+\newblock \doi{10.52202/075280-1939}.
+\newblock URL
+  \url{https://proceedings.neurips.cc/paper_files/paper/2023/file/8c3c666820ea055a77726d66fc7d447f-Paper-Datasets_and_Benchmarks.pdf}.
+
+\bibitem[Liu et~al.(2026)Liu, Zhu, Mo, Li, Cao, Jin, Shen, Li, Yu, Yuan, Ding,
+  and Lourentzou]{Liu2026PALM}
+Yuanzhe Liu, Jingyuan Zhu, Yuchen Mo, Gen Li, Xu~Cao, Jin Jin, Yifan Shen,
+  Zhengyuan Li, Tianjiao Yu, Wenzhen Yuan, Fangqiang Ding, and Ismini
+  Lourentzou.
+\newblock Palm: Progress-aware policy learning via affordance reasoning for
+  long-horizon robotic manipulation.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision
+  and Pattern Recognition (CVPR)}, pp.\  28096--28110, June 2026.
+
+\bibitem[Lynch et~al.(2020)Lynch, Khansari, Xiao, Kumar, Tompson, Levine, and
+  Sermanet]{lynch2020play}
+Corey Lynch, Mohi Khansari, Ted Xiao, Vikash Kumar, Jonathan Tompson, Sergey
+  Levine, and Pierre Sermanet.
+\newblock Learning latent plans from play.
+\newblock In Leslie~Pack Kaelbling, Danica Kragic, and Komei Sugiura (eds.),
+  \emph{Proceedings of the Conference on Robot Learning}, volume 100 of
+  \emph{Proceedings of Machine Learning Research}, pp.\  1113--1132. PMLR, 30
+  Oct--01 Nov 2020.
+\newblock URL \url{https://proceedings.mlr.press/v100/lynch20a.html}.
+
+\bibitem[Mandlekar et~al.(2020)Mandlekar, Xu, Martín-Martín, Savarese, and
+  Fei-Fei]{Mandlekar2020Learning}
+Ajay Mandlekar, Danfei Xu, Roberto Martín-Martín, Silvio Savarese, and
+  Li~Fei-Fei.
+\newblock {GTI: Learning to Generalize across Long-Horizon Tasks from Human
+  Demonstrations}.
+\newblock In \emph{Proceedings of Robotics: Science and Systems}, Corvalis,
+  Oregon, USA, July 2020.
+\newblock \doi{10.15607/RSS.2020.XVI.061}.
+
+\bibitem[Mark et~al.(2026)Mark, Attarian, Fu, Dwibedi, Liang, Shah, and
+  Kumar]{Mark2026BPP}
+Max~Sobol Mark, Maria Attarian, Chuyuan Fu, Debidatta Dwibedi, Jacky Liang,
+  Dhruv Shah, and Aviral Kumar.
+\newblock {Long-Context Robot Imitation Learning by Focusing on Key History
+  Frames}.
+\newblock In \emph{Proceedings of Robotics: Science and Systems}, Sydney,
+  Australia, July 2026.
+\newblock \doi{10.15607/RSS.2026.XXII.201}.
+
+\bibitem[Reuss et~al.(2024)Reuss, Ömer Erdinç~Yağmurlu, Wenzel, and
+  Lioutikov]{reuss2024multimodal}
+Moritz Reuss, Ömer Erdinç~Yağmurlu, Fabian Wenzel, and Rudolf Lioutikov.
+\newblock {Multimodal Diffusion Transformer: Learning Versatile Behavior from
+  Multimodal Goals}.
+\newblock In \emph{Proceedings of Robotics: Science and Systems}, Delft,
+  Netherlands, July 2024.
+\newblock \doi{10.15607/RSS.2024.XX.121}.
+
+\bibitem[Shi et~al.(2026)Shi, Xie, Liu, Sun, Liu, Wang, Zhou, Fan, Zhang, and
+  Huang]{shi2025memoryvla}
+Hao Shi, Bin Xie, Yingfei Liu, Lin Sun, Fengrong Liu, Tiancai Wang, Erjin Zhou,
+  Haoqiang Fan, Xiangyu Zhang, and Gao Huang.
+\newblock Memoryvla: Perceptual-cognitive memory in vision-language-action
+  models for robotic manipulation.
+\newblock In C.~Vondrick, B.~Hariharan, C.~Raffel, L.~Pinto, D.~Yang, and
+  A.~Faust (eds.), \emph{International Conference on Learning Representations},
+  volume 2026, pp.\  18567--18602, 2026.
+\newblock URL
+  \url{https://proceedings.iclr.cc/paper_files/paper/2026/file/1fa3d6ccbcd15f7285fee666b2bd57be-Paper-Conference.pdf}.
+
+\bibitem[Shiarlis et~al.(2018)Shiarlis, Wulfmeier, Salter, Whiteson, and
+  Posner]{shiarlis2018taco}
+Kyriacos Shiarlis, Markus Wulfmeier, Sasha Salter, Shimon Whiteson, and Ingmar
+  Posner.
+\newblock {TACO}: Learning task decomposition via temporal alignment for
+  control.
+\newblock In Jennifer Dy and Andreas Krause (eds.), \emph{Proceedings of the
+  35th International Conference on Machine Learning}, volume~80 of
+  \emph{Proceedings of Machine Learning Research}, pp.\  4654--4663. PMLR,
+  10--15 Jul 2018.
+\newblock URL \url{https://proceedings.mlr.press/v80/shiarlis18a.html}.
+
+\bibitem[Shridhar et~al.(2023)Shridhar, Manuelli, and Fox]{shridhar2022peract}
+Mohit Shridhar, Lucas Manuelli, and Dieter Fox.
+\newblock Perceiver-actor: A multi-task transformer for robotic manipulation.
+\newblock In Karen Liu, Dana Kulic, and Jeff Ichnowski (eds.),
+  \emph{Proceedings of The 6th Conference on Robot Learning}, volume 205 of
+  \emph{Proceedings of Machine Learning Research}, pp.\  785--799. PMLR, 14--18
+  Dec 2023.
+\newblock URL \url{https://proceedings.mlr.press/v205/shridhar23a.html}.
+
+\bibitem[Tang et~al.(2026)Tang, Gao, Pan, Wang, Li, Liu, Ding, Heng, and
+  Fu]{Tang2026SEAM}
+Weiliang Tang, Jialin Gao, Jia-Hui Pan, Gang Wang, Li~Erran Li, Yun-Hui Liu,
+  Mingyu Ding, Pheng-Ann Heng, and Chi-Wing Fu.
+\newblock Rethinking intermediate representation for vlm-based robot
+  manipulation.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision
+  and Pattern Recognition (CVPR)}, pp.\  29652--29662, June 2026.
+
+\bibitem[Wei et~al.(2026)Wei, Li, Lu, and Sun]{Wei2026PhysicalConcepts}
+Jiude Wei, Yuxuan Li, Cewu Lu, and Jianhua Sun.
+\newblock Physically ground commonsense knowledge for articulated object
+  manipulation with analytic concepts.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision
+  and Pattern Recognition (CVPR)}, pp.\  13519--13528, June 2026.
+
+\bibitem[Wen et~al.(2024)Wen, Yang, Kautz, and
+  Birchfield]{foundationposewen2024}
+Bowen Wen, Wei Yang, Jan Kautz, and Stan Birchfield.
+\newblock Foundationpose: Unified 6d pose estimation and tracking of novel
+  objects.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision
+  and Pattern Recognition (CVPR)}, pp.\  17868--17879, June 2024.
+
+\bibitem[Xiao et~al.(2026)Xiao, Li, Gao, Ye, Jin, Qian, Zhang, Wu, and
+  Yu]{Xiao2026AVAVLA}
+Lei Xiao, Jifeng Li, Juntao Gao, Feiyang Ye, Yan Jin, Jingjing Qian, Jing
+  Zhang, Yong Wu, and Xiaoyuan Yu.
+\newblock Ava-vla: Improving vision-language-action models with active visual
+  attention.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision
+  and Pattern Recognition (CVPR)}, pp.\  13453--13463, June 2026.
+
+\bibitem[Xu et~al.(2025)Xu, Xu, Xu, Chi, Wetzstein, Veloso, and
+  Song]{xu2024im2flow2act}
+Mengda Xu, Zhenjia Xu, Yinghao Xu, Cheng Chi, Gordon Wetzstein, Manuela Veloso,
+  and Shuran Song.
+\newblock Flow as the cross-domain manipulation interface.
+\newblock In Pulkit Agrawal, Oliver Kroemer, and Wolfram Burgard (eds.),
+  \emph{Proceedings of The 8th Conference on Robot Learning}, volume 270 of
+  \emph{Proceedings of Machine Learning Research}, pp.\  2475--2499. PMLR,
+  06--09 Nov 2025.
+\newblock URL \url{https://proceedings.mlr.press/v270/xu25a.html}.
+
+\bibitem[Yang et~al.(2025)Yang, Cai, Tian, Zeng, and Pang]{Yang2025PPI}
+Yuyin Yang, Zetao Cai, Yang Tian, Jia Zeng, and Jiangmiao Pang.
+\newblock {Gripper Pose and Object Pointflow as Interfaces for Robotic Bimanual
+  Manipulation}.
+\newblock In \emph{Proceedings of Robotics: Science and Systems}, LosAngeles,
+  CA, USA, June 2025.
+\newblock \doi{10.15607/RSS.2025.XXI.160}.
+
+\bibitem[Zare et~al.(2024)Zare, Kebria, Khosravi, and
+  Nahavandi]{Zare2024Survey}
+Maryam Zare, Parham~M. Kebria, Abbas Khosravi, and Saeid Nahavandi.
+\newblock A survey of imitation learning: Algorithms, recent developments, and
+  challenges.
+\newblock \emph{IEEE Transactions on Cybernetics}, 54\penalty0 (12):\penalty0
+  7173--7186, 2024.
+\newblock \doi{10.1109/TCYB.2024.3395626}.
+
+\bibitem[Ze et~al.(2024)Ze, Zhang, Zhang, Hu, Wang, and Xu]{Ze2024DP3}
+Yanjie Ze, Gu~Zhang, Kangning Zhang, Chenyuan Hu, Muhan Wang, and Huazhe Xu.
+\newblock {3D Diffusion Policy: Generalizable Visuomotor Policy Learning via
+  Simple 3D Representations}.
+\newblock In \emph{Proceedings of Robotics: Science and Systems}, Delft,
+  Netherlands, July 2024.
+\newblock \doi{10.15607/RSS.2024.XX.067}.
+
+\bibitem[Zeng et~al.(2024)Zeng, Bu, Wang, Xia, Chen, Dong, Song, Wang, Hu, Luo,
+  Cui, Zhao, Li, Qiao, and Li]{Zeng2024MPI}
+Jia Zeng, Qingwen Bu, Bangjun Wang, Wenke Xia, Li~Chen, Hao Dong, Haoming Song,
+  Dong Wang, Di~Hu, Ping Luo, Heming Cui, Bin Zhao, Xuelong Li, Yu~Qiao, and
+  Hongyang Li.
+\newblock {Learning Manipulation by Predicting Interaction}.
+\newblock In \emph{Proceedings of Robotics: Science and Systems}, Delft,
+  Netherlands, July 2024.
+\newblock \doi{10.15607/RSS.2024.XX.123}.
+
+\bibitem[Zhang et~al.(2026{\natexlab{a}})Zhang, Hu, Huang, Ju, Xue, and
+  Xu]{Zhang2026AffordGen}
+Jiawei Zhang, Kaizhe Hu, Yingqian Huang, Yuanchen Ju, Zhengrong Xue, and Huazhe
+  Xu.
+\newblock Affordgen: Generating diverse demonstrations for generalizable object
+  manipulation with affordance correspondence.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision
+  and Pattern Recognition (CVPR)}, pp.\  15966--15975, June 2026{\natexlab{a}}.
+
+\bibitem[Zhang et~al.(2026{\natexlab{b}})Zhang, Tang, Zhan, Chen, Chen, Han,
+  Zhu, Xu, Xu, Wu, Lin, and Liang]{Zhang2026AtomicVLA}
+Likui Zhang, Tao Tang, Zhihao Zhan, Xiuwei Chen, Zisheng Chen, Jianhua Han,
+  Jiangtong Zhu, Pei Xu, Hang Xu, Hefeng Wu, Liang Lin, and Xiaodan Liang.
+\newblock Atomicvla: Unlocking the potential of atomic skill learning in
+  robots.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision
+  and Pattern Recognition (CVPR)}, pp.\  20743--20754, June 2026{\natexlab{b}}.
+
+\bibitem[Zhang et~al.(2025)Zhang, Liu, Fan, Liu, Zeng, and
+  Liu]{zhang2024flowpolicy}
+Qinglun Zhang, Zhen Liu, Haoqiang Fan, Guanghui Liu, Bing Zeng, and Shuaicheng
+  Liu.
+\newblock Flowpolicy: enabling fast and robust 3d flow-based policy via
+  consistency flow matching for robot manipulation.
+\newblock In \emph{Proceedings of the Thirty-Ninth AAAI Conference on
+  Artificial Intelligence and Thirty-Seventh Conference on Innovative
+  Applications of Artificial Intelligence and Fifteenth Symposium on
+  Educational Advances in Artificial Intelligence}, AAAI'25/IAAI'25/EAAI'25.
+  AAAI Press, 2025.
+\newblock ISBN 978-1-57735-897-8.
+\newblock \doi{10.1609/aaai.v39i14.33617}.
+\newblock URL \url{https://doi.org/10.1609/aaai.v39i14.33617}.
+
+\bibitem[Zhao et~al.(2023)Zhao, Kumar, Levine, and Finn]{Zhao2023Learning}
+Tony~Z. Zhao, Vikash Kumar, Sergey Levine, and Chelsea Finn.
+\newblock {Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware}.
+\newblock In \emph{Proceedings of Robotics: Science and Systems}, Daegu,
+  Republic of Korea, July 2023.
+\newblock \doi{10.15607/RSS.2023.XIX.016}.
+
+\bibitem[Zhou et~al.(2026)Zhou, Chen, Chen, Chen, Zhao, Jin, Ren, and
+  Luo]{Zhou2026Act2Goal}
+Pengfei Zhou, Liliang Chen, Shengcong Chen, Di~Chen, Wenzhi Zhao, Rongjun Jin,
+  Guanghui Ren, and Jianlan Luo.
+\newblock Act2goal: From world model to general goal-conditioned policy.
+\newblock In \emph{Proceedings of Robotics: Science and Systems}, Sydney,
+  Australia, July 2026.
+\newblock \doi{10.15607/RSS.2026.XXII.015}.
+
+\bibitem[Zhou et~al.(2018)Zhou, Park, and Koltun]{Zhou2018Open3D}
+Qian-Yi Zhou, Jaesik Park, and Vladlen Koltun.
+\newblock {Open3D}: {A} modern library for {3D} data processing.
+\newblock \emph{arXiv:1801.09847}, 2018.
+
+\bibitem[Zhu et~al.(2025)Zhu, Yu, Feng, Burchfiel, Shah, and Gupta]{Zhu2025UWM}
+Chuning Zhu, Raymond Yu, Siyuan Feng, Benjamin Burchfiel, Paarth Shah, and
+  Abhishek Gupta.
+\newblock {Unified World Models: Coupling Video and Action Diffusion for
+  Pretraining on Large Robotic Datasets}.
+\newblock In \emph{Proceedings of Robotics: Science and Systems}, LosAngeles,
+  CA, USA, June 2025.
+\newblock \doi{10.15607/RSS.2025.XXI.015}.
+
+\bibitem[Zhu et~al.(2023{\natexlab{a}})Zhu, Jiang, Stone, and
+  Zhu]{zhu2023learning}
+Yifeng Zhu, Zhenyu Jiang, Peter Stone, and Yuke Zhu.
+\newblock Learning generalizable manipulation policies with object-centric 3d
+  representations.
+\newblock In Jie Tan, Marc Toussaint, and Kourosh Darvish (eds.),
+  \emph{Proceedings of The 7th Conference on Robot Learning}, volume 229 of
+  \emph{Proceedings of Machine Learning Research}, pp.\  3418--3433. PMLR,
+  06--09 Nov 2023{\natexlab{a}}.
+\newblock URL \url{https://proceedings.mlr.press/v229/zhu23b.html}.
+
+\bibitem[Zhu et~al.(2023{\natexlab{b}})Zhu, Joshi, Stone, and
+  Zhu]{zhu2022viola}
+Yifeng Zhu, Abhishek Joshi, Peter Stone, and Yuke Zhu.
+\newblock Viola: Imitation learning for vision-based manipulation with object
+  proposal priors.
+\newblock In Karen Liu, Dana Kulic, and Jeff Ichnowski (eds.),
+  \emph{Proceedings of The 6th Conference on Robot Learning}, volume 205 of
+  \emph{Proceedings of Machine Learning Research}, pp.\  1199--1210. PMLR,
+  14--18 Dec 2023{\natexlab{b}}.
+\newblock URL \url{https://proceedings.mlr.press/v205/zhu23a.html}.
+
+\bibitem[Zhu et~al.(2026)Zhu, Lim, Stone, and Zhu]{zhu2026orion}
+Yifeng Zhu, Arisrei Lim, Peter Stone, and Yuke Zhu.
+\newblock Vision-based manipulation from single human video with open-world
+  object graphs.
+\newblock \emph{Auton. Robots}, 50\penalty0 (2), 2026.
+\newblock ISSN 0929-5593.
+\newblock \doi{10.1007/s10514-026-10253-8}.
+\newblock URL \url{https://doi.org/10.1007/s10514-026-10253-8}.
+
+\end{thebibliography}

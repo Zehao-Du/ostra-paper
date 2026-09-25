@@ -1,0 +1,58 @@
+\begin{table}[t]
+    \vspace{-10pt}
+    \centering
+    \caption{\textbf{Summary of the main simulation results.}
+    We report average task success rate (\%) on each benchmark.
+    Full per-task results are in Appendix~\ref{app:full_sim_results}.
+    \textbf{Bold} and \underline{underlining} denote the best and second-best
+    results, respectively, under the benchmark-specific evaluation protocols.}
+    \label{tab:main_results_summary}
+    \vspace{2pt}
+    \small
+    \setlength{\tabcolsep}{6pt}
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{lc|lc|lc}
+        \toprule
+        \rowcolor{tablehead}
+        \multicolumn{2}{c|}{RLBench2~\citep{James2020RLBench} (7 tasks)} &
+        \multicolumn{2}{c|}{ManiSkill~\citep{Gu2023ManiSkill2} (6 tasks)} &
+        \multicolumn{2}{c}{LIBERO~\citep{liu2023libero} (40 tasks)} \\
+        \rowcolor{tablehead}
+        Method & Mean S.R. (\%) & Method & Mean S.R. (\%) & Method & Mean S.R. (\%) \\
+        \midrule
+        ACT~\citep{Zhao2023Learning} & 15.5 &
+        ACT~\citep{Zhao2023Learning} & 21.3 &
+        ACT~\citep{Zhao2023Learning} & 67.7 \\
+        DP3~\citep{Ze2024DP3} & 26.0 &
+        Diffusion Policy~\citep{chi2024diffusionpolicy} & 26.8 &
+        GROOT~\citep{zhu2023learning} & 66.2 \\
+        3D Diffuser Actor~\citep{ke2024diffuseractor} & 64.7 &
+        DP3~\citep{Ze2024DP3} & 53.8 &
+        Diffusion Policy~\citep{chi2024diffusionpolicy} & 72.4 \\
+        PerAct$^2$~\citep{shridhar2022peract} & 40.0 &
+        3D Diffuser Actor~\citep{ke2024diffuseractor} & 51.5 &
+        BAKU~\citep{Haldar2025BAKU} & 93.0 \\
+        PPI~\citep{Yang2025PPI} & 80.8 &
+        \underline{PPI~\citep{Yang2025PPI}} & \underline{56.8} &
+        MDT~\citep{reuss2024multimodal} & 76.1 \\
+        Diffusion Policy~\citep{chi2024diffusionpolicy} & 42.6 &
+        BAKU~\citep{Haldar2025BAKU} & 43.0 &
+        DP3~\citep{Ze2024DP3} & 73.0 \\
+        \underline{SAM2Act+~\citep{Fang2025SAM2Act}} & \underline{84.5} &
+        FlowPolicy~\citep{zhang2024flowpolicy} & 39.5 &
+        UWM~\citep{Zhu2025UWM} & 91.8 \\
+        GROOT~\citep{zhu2023learning} & 45.2 &
+        SPOT~\citep{Hsu2025SPOT} & 47.5 &
+        \underline{MemoryVLA~\citep{shi2025memoryvla}} & \underline{96.7} \\
+        SPOT~\citep{Hsu2025SPOT} & 82.3 &
+        Im2Flow2Act~\citep{xu2024im2flow2act} & 45.7 &
+        BPP~\citep{Mark2026BPP} & 90.9 \\
+        \rowcolor{tablehead}
+        \textbf{OSTRA (Ours)} & \textbf{89.8} &
+        \textbf{OSTRA (Ours)} & \textbf{74.5} &
+        \textbf{OSTRA (Ours)} & \textbf{97.4} \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \vspace{-8pt}
+\end{table}

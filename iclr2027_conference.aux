@@ -1,0 +1,329 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
+\HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
+\global\let\oldcontentsline\contentsline
+\gdef\contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
+\global\let\oldnewlabel\newlabel
+\gdef\newlabel#1#2{\newlabelxx{#1}#2}
+\gdef\newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
+\AtEndDocument{\ifx\hyper@anchor\@undefined
+\let\contentsline\oldcontentsline
+\let\newlabel\oldnewlabel
+\fi}
+\fi}
+\global\let\hyper@last\relax 
+\gdef\HyperFirstAtBeginDocument#1{#1}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{Zare2024Survey,Mandlekar2020Learning,Chen2023Sequential,Jain2025LongerHorizon}
+\citation{Kang2025Incorporating,Mark2026BPP}
+\citation{Zhao2023Learning,chi2024diffusionpolicy}
+\citation{Liang2021Finite,shi2025memoryvla,Mark2026BPP}
+\citation{lynch2020play,Mandlekar2020Learning,belkhale2023plato}
+\providecommand \oddpage@label [2]{}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\newlabel{sec:introduction}{{1}{1}{Introduction}{section.1}{}}
+\newlabel{sec:introduction@cref}{{[section][1][]1}{[1][1][]1}}
+\citation{Zhao2023Learning,chi2024diffusionpolicy,Haldar2025BAKU,reuss2024multimodal}
+\citation{shiarlis2018taco,gupta2019relay,Chen2023Sequential,Kang2025Incorporating,Jain2025LongerHorizon,Liu2026PALM,Zhang2026AtomicVLA,Feng2025ReflectivePlanning,Zhou2026Act2Goal}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces \textbf  {Overview of OSTRA.} Multi-stage manipulation requires resolving the object-state transition supervision gap: the policy must infer the correct transition chain from historical object changes. OSTRA combines historical OST-Maps, a dense Semantic Field, and the robot state to predict future object states, TCP keyposes, and continuous actions, and is evaluated across simulation and real-world tasks, where explicit transition supervision supports long-horizon control.}}{2}{figure.1}\protected@file@percent }
+\newlabel{fig:teaser}{{1}{2}{\textbf {Overview of OSTRA.} Multi-stage manipulation requires resolving the object-state transition supervision gap: the policy must infer the correct transition chain from historical object changes. OSTRA combines historical OST-Maps, a dense Semantic Field, and the robot state to predict future object states, TCP keyposes, and continuous actions, and is evaluated across simulation and real-world tasks, where explicit transition supervision supports long-horizon control}{figure.1}{}}
+\newlabel{fig:teaser@cref}{{[figure][1][]1}{[1][1][]2}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{2}{section.2}\protected@file@percent }
+\newlabel{sec:related_work}{{2}{2}{Related Work}{section.2}{}}
+\newlabel{sec:related_work@cref}{{[section][2][]2}{[1][2][]2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Long-Horizon Visuomotor Imitation Learning}{2}{subsection.2.1}\protected@file@percent }
+\citation{Liang2021Finite,Fang2025SAM2Act,shi2025memoryvla,Mark2026BPP}
+\citation{Ji2026HiMe,Xiao2026AVAVLA,Li2026OptimusVLA}
+\citation{lynch2020play,Mandlekar2020Learning}
+\citation{Hu2025VPP,Zhu2025UWM}
+\citation{Zeng2024MPI}
+\citation{zhu2022viola,zhu2023learning}
+\citation{belkhale2023plato,xu2024im2flow2act,Zhang2026AffordGen,Lee2025ViTaSCOPE}
+\citation{Hsu2025SPOT,Yang2025PPI}
+\citation{Wei2026PhysicalConcepts,Tang2026SEAM}
+\citation{ferraro2025focus,jeong2025ocwm}
+\citation{zhu2026orion}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Temporal Modeling in Robot Policies}{3}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Object-Centric Representations for Manipulation}{3}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Method}{3}{section.3}\protected@file@percent }
+\newlabel{sec:method}{{3}{3}{Method}{section.3}{}}
+\newlabel{sec:method@cref}{{[section][3][]3}{[1][3][]3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Overview}{3}{subsection.3.1}\protected@file@percent }
+\newlabel{sec:method_overview}{{3.1}{3}{Overview}{subsection.3.1}{}}
+\newlabel{sec:method_overview@cref}{{[subsection][1][3]3.1}{[1][3][]3}}
+\citation{sam3}
+\citation{foundationposewen2024}
+\citation{Qi2017PointNet}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces  \textbf  {Overview of OSTRA.} \textbf  {(a) OST-Map Constructor:} RGB-D observations are converted into identity-consistent object-centric maps by estimating task-relevant object masks, structural parameters, and 6-DoF poses. \textbf  {(b) Object-State Transition Modeling:} temporally aligned historical OST-Maps provide explicit object-state transition context and are used to query future object states. \textbf  {(c) Transition-Guided Action Generation:} historical OST-Map tokens, future object-state queries, dense Semantic Field tokens, robot states, and the diffusion timestep are processed by OSTRA, which progressively predicts future object states, TCP keyposes, and continuous actions following the hierarchy \emph  {object state $\rightarrow $ TCP subgoal $\rightarrow $ action} for structured multi-stage control. }}{4}{figure.2}\protected@file@percent }
+\newlabel{fig:ostra_pipeline}{{2}{4}{\textbf {Overview of OSTRA.} \textbf {(a) OST-Map Constructor:} RGB-D observations are converted into identity-consistent object-centric maps by estimating task-relevant object masks, structural parameters, and 6-DoF poses. \textbf {(b) Object-State Transition Modeling:} temporally aligned historical OST-Maps provide explicit object-state transition context and are used to query future object states. \textbf {(c) Transition-Guided Action Generation:} historical OST-Map tokens, future object-state queries, dense Semantic Field tokens, robot states, and the diffusion timestep are processed by OSTRA, which progressively predicts future object states, TCP keyposes, and continuous actions following the hierarchy \emph {object state $\rightarrow $ TCP subgoal $\rightarrow $ action} for structured multi-stage control}{figure.2}{}}
+\newlabel{fig:ostra_pipeline@cref}{{[figure][2][]2}{[1][3][]4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}OST-Map: Object-State Transition Map}{4}{subsection.3.2}\protected@file@percent }
+\newlabel{sec:ost_map}{{3.2}{4}{OST-Map: Object-State Transition Map}{subsection.3.2}{}}
+\newlabel{sec:ost_map@cref}{{[subsection][2][3]3.2}{[1][3][]4}}
+\newlabel{eq:ost_node}{{1}{4}{OST-Map: Object-State Transition Map}{equation.3.1}{}}
+\newlabel{eq:ost_node@cref}{{[equation][1][]1}{[1][4][]4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}OSTRA: Object-State Transition Reasoning Architecture}{4}{subsection.3.3}\protected@file@percent }
+\newlabel{sec:ostra}{{3.3}{4}{OSTRA: Object-State Transition Reasoning Architecture}{subsection.3.3}{}}
+\newlabel{sec:ostra@cref}{{[subsection][3][3]3.3}{[1][4][]4}}
+\newlabel{eq:future_map_target}{{2}{4}{OSTRA: Object-State Transition Reasoning Architecture}{equation.3.2}{}}
+\newlabel{eq:future_map_target@cref}{{[equation][2][]2}{[1][4][]4}}
+\citation{James2020RLBench}
+\citation{Gu2023ManiSkill2}
+\citation{liu2023libero}
+\citation{Zhao2023Learning}
+\citation{Zhao2023Learning}
+\citation{Zhao2023Learning}
+\citation{Ze2024DP3}
+\citation{chi2024diffusionpolicy}
+\citation{zhu2023learning}
+\citation{ke2024diffuseractor}
+\citation{Ze2024DP3}
+\citation{chi2024diffusionpolicy}
+\citation{shridhar2022peract}
+\citation{ke2024diffuseractor}
+\citation{Haldar2025BAKU}
+\citation{Yang2025PPI}
+\citation{Yang2025PPI}
+\citation{reuss2024multimodal}
+\citation{chi2024diffusionpolicy}
+\citation{Haldar2025BAKU}
+\citation{Ze2024DP3}
+\citation{Fang2025SAM2Act}
+\citation{zhang2024flowpolicy}
+\citation{Zhu2025UWM}
+\citation{zhu2023learning}
+\citation{Hsu2025SPOT}
+\citation{shi2025memoryvla}
+\citation{Hsu2025SPOT}
+\citation{xu2024im2flow2act}
+\citation{Mark2026BPP}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces  \textbf  {Representation of OST-Map.} Parameterized structure primitives are composed into object parts and further assembled into task-relevant objects. Each object is represented by identity-consistent structural nodes and their relations, while node poses evolve with manipulation. The resulting OST-Map provides a compact object-centric representation of scene structure and object-state transitions for temporally grounded, multi-stage action generation. }}{5}{figure.3}\protected@file@percent }
+\newlabel{fig:ost_map}{{3}{5}{\textbf {Representation of OST-Map.} Parameterized structure primitives are composed into object parts and further assembled into task-relevant objects. Each object is represented by identity-consistent structural nodes and their relations, while node poses evolve with manipulation. The resulting OST-Map provides a compact object-centric representation of scene structure and object-state transitions for temporally grounded, multi-stage action generation}{figure.3}{}}
+\newlabel{fig:ost_map@cref}{{[figure][3][]3}{[1][3][]5}}
+\newlabel{eq:tga}{{3}{5}{OSTRA: Object-State Transition Reasoning Architecture}{equation.3.3}{}}
+\newlabel{eq:tga@cref}{{[equation][3][]3}{[1][5][]5}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Staged Action Generation in OSTRA}}{5}{algorithm.1}\protected@file@percent }
+\newlabel{alg:ostra_generation}{{1}{5}{OSTRA: Object-State Transition Reasoning Architecture}{algorithm.1}{}}
+\newlabel{alg:ostra_generation@cref}{{[algorithm][1][]1}{[1][5][]5}}
+\citation{James2020RLBench}
+\citation{Gu2023ManiSkill2}
+\citation{liu2023libero}
+\citation{James2020RLBench}
+\citation{Gu2023ManiSkill2}
+\citation{liu2023libero}
+\citation{Zhao2023Learning}
+\citation{chi2024diffusionpolicy}
+\citation{Ze2024DP3}
+\citation{Yang2025PPI}
+\citation{Fang2025SAM2Act}
+\citation{shi2025memoryvla}
+\citation{Zeng2024MPI}
+\citation{Hsu2025SPOT}
+\citation{xu2024im2flow2act}
+\citation{James2020RLBench}
+\citation{Gu2023ManiSkill2}
+\citation{liu2023libero}
+\citation{Zhao2023Learning,chi2024diffusionpolicy,Ze2024DP3,Fang2025SAM2Act,Yang2025PPI,zhu2023learning,Hsu2025SPOT}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces \textbf  {Summary of the main simulation results.} We report average task success rate (\%) on each benchmark. Full per-task results are in Appendix\nobreakspace  {}\ref  {app:full_sim_results}. \textbf  {Bold} and \underline  {underlining} denote the best and second-best results, respectively, under the benchmark-specific evaluation protocols.}}{6}{table.1}\protected@file@percent }
+\newlabel{tab:main_results_summary}{{1}{6}{\textbf {Summary of the main simulation results.} We report average task success rate (\%) on each benchmark. Full per-task results are in Appendix~\ref {app:full_sim_results}. \textbf {Bold} and \underline {underlining} denote the best and second-best results, respectively, under the benchmark-specific evaluation protocols}{table.1}{}}
+\newlabel{tab:main_results_summary@cref}{{[table][1][]1}{[1][5][]6}}
+\newlabel{eq:total_loss}{{4}{6}{OSTRA: Object-State Transition Reasoning Architecture}{equation.3.4}{}}
+\newlabel{eq:total_loss@cref}{{[equation][4][]4}{[1][6][]6}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Experiments}{6}{section.4}\protected@file@percent }
+\newlabel{sec:experiments}{{4}{6}{Experiments}{section.4}{}}
+\newlabel{sec:experiments@cref}{{[section][4][]4}{[1][6][]6}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Simulation Experiments}{6}{subsection.4.1}\protected@file@percent }
+\newlabel{sec:simulation_experiments}{{4.1}{6}{Simulation Experiments}{subsection.4.1}{}}
+\newlabel{sec:simulation_experiments@cref}{{[subsection][1][4]4.1}{[1][6][]6}}
+\citation{Zhou2018Open3D}
+\citation{chi2024diffusionpolicy}
+\citation{Ze2024DP3}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Task demonstrations from initial state to task completion. The seven real-world tasks are \textit  {Place Fork in Drawer}, \textit  {Stack Three Blocks}, \textit  {Collect Blocks}, \textit  {Place Bread in Microwave}, \textit  {Build Letter M with Blocks}, \textit  {Cook the Pear}, and \textit  {Arrange Food with Fork}. The figure also shows representative tasks from the three simulation benchmarks: \textit  {Push the Box} from RLBench2\nobreakspace  {}\citep  {James2020RLBench}, \textit  {Place Sphere} from ManiSkill\nobreakspace  {}\citep  {Gu2023ManiSkill2}, and \textit  {Hang the Wine Bottle} from LIBERO\nobreakspace  {}\citep  {liu2023libero}, together spanning articulated, contact-rich, and long-horizon robot manipulation challenges.}}{7}{figure.4}\protected@file@percent }
+\newlabel{fig:demonstration}{{4}{7}{Task demonstrations from initial state to task completion. The seven real-world tasks are \textit {Place Fork in Drawer}, \textit {Stack Three Blocks}, \textit {Collect Blocks}, \textit {Place Bread in Microwave}, \textit {Build Letter M with Blocks}, \textit {Cook the Pear}, and \textit {Arrange Food with Fork}. The figure also shows representative tasks from the three simulation benchmarks: \textit {Push the Box} from RLBench2~\citep {James2020RLBench}, \textit {Place Sphere} from ManiSkill~\citep {Gu2023ManiSkill2}, and \textit {Hang the Wine Bottle} from LIBERO~\citep {liu2023libero}, together spanning articulated, contact-rich, and long-horizon robot manipulation challenges}{figure.4}{}}
+\newlabel{fig:demonstration@cref}{{[figure][4][]4}{[1][6][]7}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces \textbf  {Real-world manipulation results.} We report full-task success rate (\%) over 20 trials per task and the average across seven tasks. \textbf  {Bold} and \underline  {underlining} denote the best and second-best results, respectively, using identical trial counts for every policy in the matched comparison.}}{7}{table.2}\protected@file@percent }
+\newlabel{tab:real_world_results}{{2}{7}{\textbf {Real-world manipulation results.} We report full-task success rate (\%) over 20 trials per task and the average across seven tasks. \textbf {Bold} and \underline {underlining} denote the best and second-best results, respectively, using identical trial counts for every policy in the matched comparison}{table.2}{}}
+\newlabel{tab:real_world_results@cref}{{[table][2][]2}{[1][6][]7}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Real-World Experiments}{7}{subsection.4.2}\protected@file@percent }
+\newlabel{sec:real_world_experiments}{{4.2}{7}{Real-World Experiments}{subsection.4.2}{}}
+\newlabel{sec:real_world_experiments@cref}{{[subsection][2][4]4.2}{[1][7][]7}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces System error breakdown for OSTRA. We use ground-truth replacements to identify the dominant bottleneck in OST-Map construction. Ground-truth quantities are used only for analysis and are not part of the inference interface. $\Delta $ reports the improvement over Full OSTRA.}}{8}{table.3}\protected@file@percent }
+\newlabel{tab:system_breakdown}{{3}{8}{System error breakdown for OSTRA. We use ground-truth replacements to identify the dominant bottleneck in OST-Map construction. Ground-truth quantities are used only for analysis and are not part of the inference interface. $\Delta $ reports the improvement over Full OSTRA}{table.3}{}}
+\newlabel{tab:system_breakdown@cref}{{[table][3][]3}{[1][6][]8}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces \textbf  {Inference latency (ms) and throughput.} We report mean component and end-to-end latency for the first frame and subsequent frames at batch size one. The first frame initializes OST-Map. Subsequent frames track objects and update the map for end-to-end comparison.}}{8}{table.4}\protected@file@percent }
+\newlabel{tab:latency}{{4}{8}{\textbf {Inference latency (ms) and throughput.} We report mean component and end-to-end latency for the first frame and subsequent frames at batch size one. The first frame initializes OST-Map. Subsequent frames track objects and update the map for end-to-end comparison}{table.4}{}}
+\newlabel{tab:latency@cref}{{[table][4][]4}{[1][6][]8}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}System Error Breakdown}{8}{subsection.4.3}\protected@file@percent }
+\newlabel{sec:system_error_breakdown}{{4.3}{8}{System Error Breakdown}{subsection.4.3}{}}
+\newlabel{sec:system_error_breakdown@cref}{{[subsection][3][4]4.3}{[1][8][]8}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Latency}{8}{subsection.4.4}\protected@file@percent }
+\newlabel{sec:latency}{{4.4}{8}{Latency}{subsection.4.4}{}}
+\newlabel{sec:latency@cref}{{[subsection][4][4]4.4}{[1][8][]8}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Ablation Studies}{8}{subsection.4.5}\protected@file@percent }
+\newlabel{sec:ablation_studies}{{4.5}{8}{Ablation Studies}{subsection.4.5}{}}
+\newlabel{sec:ablation_studies@cref}{{[subsection][5][4]4.5}{[1][8][]8}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces \textbf  {OST-Map ablations on RLBench2.} We vary temporal supervision and map attributes under a fixed graph encoder. Ex11 is OSTRA.}}{9}{table.5}\protected@file@percent }
+\newlabel{tab:ablation_transition_design}{{5}{9}{\textbf {OST-Map ablations on RLBench2.} We vary temporal supervision and map attributes under a fixed graph encoder. Ex11 is OSTRA}{table.5}{}}
+\newlabel{tab:ablation_transition_design@cref}{{[table][5][]5}{[1][6][]9}}
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces \textbf  {OSTRA ablations on RLBench2.} We vary attention order, prediction stages, and stop-gradient boundaries. Ex12 is OSTRA.}}{9}{table.6}\protected@file@percent }
+\newlabel{tab:ablation_architecture}{{6}{9}{\textbf {OSTRA ablations on RLBench2.} We vary attention order, prediction stages, and stop-gradient boundaries. Ex12 is OSTRA}{table.6}{}}
+\newlabel{tab:ablation_architecture@cref}{{[table][6][]6}{[1][6][]9}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Hyperparameter sensitivity on RLBench2. (a) Past keyframes $H_p$, consecutive observations $T_o$, future keyframes $H_k$, and predicted actions $H_a$. (b) Object-state, TCP, and gripper loss weights relative to the action loss. Each curve varies one parameter with all others fixed at their reference values. The reference values are $H_p=T_o=H_k=4$, $H_a=16$, and $\lambda _M/\lambda _A=\lambda _E/\lambda _A=\lambda _G/\lambda _A=1$. All sweeps use the same evaluation protocol.}}{9}{figure.5}\protected@file@percent }
+\newlabel{fig:hyperparameter_sensitivity}{{5}{9}{Hyperparameter sensitivity on RLBench2. (a) Past keyframes $H_p$, consecutive observations $T_o$, future keyframes $H_k$, and predicted actions $H_a$. (b) Object-state, TCP, and gripper loss weights relative to the action loss. Each curve varies one parameter with all others fixed at their reference values. The reference values are $H_p=T_o=H_k=4$, $H_a=16$, and $\lambda _M/\lambda _A=\lambda _E/\lambda _A=\lambda _G/\lambda _A=1$. All sweeps use the same evaluation protocol}{figure.5}{}}
+\newlabel{fig:hyperparameter_sensitivity@cref}{{[figure][5][]5}{[1][6][]9}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Conclusion}{9}{section.5}\protected@file@percent }
+\bibdata{iclr2027_conference}
+\bibcite{belkhale2023plato}{{1}{2023}{{Belkhale \& Sadigh}}{{Belkhale and Sadigh}}}
+\bibcite{sam3}{{2}{2026}{{Carion et~al.}}{{Carion, Gustafson, Hu, Debnath, Hu, Suris Coll-Vinent, Ryali, Alwala, Khedr, Huang, Lei, Ma, Guo, Kalla, Marks, Greer, Wang, Sun, R\"{a}dle, Afouras, Mavroudi, Xu, Wu, Zhou, Momeni, HAZRA, Ding, Vaze, Porcher, Li, Li, Kamath, Cheng, Dollar, Ravi, Saenko, Zhang, and Feichtenhofer}}}
+\bibcite{Qi2017PointNet}{{3}{2017}{{Charles et~al.}}{{Charles, Su, Kaichun, and Guibas}}}
+\bibcite{Chen2023Sequential}{{4}{2023}{{Chen et~al.}}{{Chen, Wang, Fei-Fei, and Liu}}}
+\bibcite{chi2024diffusionpolicy}{{5}{2025}{{Chi et~al.}}{{Chi, Xu, Feng, Cousineau, Du, Burchfiel, Tedrake, and Song}}}
+\bibcite{Fang2025SAM2Act}{{6}{2025}{{Fang et~al.}}{{Fang, Grotz, Pumacay, Wang, Fox, Krishna, and Duan}}}
+\bibcite{Feng2025ReflectivePlanning}{{7}{2025}{{Feng et~al.}}{{Feng, Han, Yang, Yue, Levine, and Luo}}}
+\bibcite{ferraro2025focus}{{8}{2025}{{Ferraro et~al.}}{{Ferraro, Mazzaglia, Verbelen, and Dhoedt}}}
+\bibcite{Gu2023ManiSkill2}{{9}{2023}{{Gu et~al.}}{{Gu, Xiang, Li, Ling, Liu, Mu, Tang, Tao, Wei, Yao, Yuan, Xie, Huang, Chen, and Su}}}
+\bibcite{gupta2019relay}{{10}{2020}{{Gupta et~al.}}{{Gupta, Kumar, Lynch, Levine, and Hausman}}}
+\bibcite{Haldar2025BAKU}{{11}{2024}{{Haldar et~al.}}{{Haldar, Peng, and Pinto}}}
+\bibcite{Hsu2025SPOT}{{12}{2025}{{Hsu et~al.}}{{Hsu, Wen, Xu, Narang, Wang, Zhu, Biswas, and Birchfield}}}
+\bibcite{Hu2025VPP}{{13}{2025}{{Hu et~al.}}{{Hu, Guo, Wang, Chen, Wang, Zhang, Sreenath, Lu, and Chen}}}
+\bibcite{Jain2025LongerHorizon}{{14}{2025}{{Jain et~al.}}{{Jain, Sachdeva, and Paul}}}
+\bibcite{James2020RLBench}{{15}{2020}{{James et~al.}}{{James, Ma, Arrojo, and Davison}}}
+\bibcite{jeong2025ocwm}{{16}{2025}{{Jeong et~al.}}{{Jeong, Chun, Cha, and Kim}}}
+\bibcite{Ji2026HiMe}{{17}{2026}{{Ji et~al.}}{{Ji, Wang, Qian, Yu, Tian, Fei, Gong, and Qiu}}}
+\bibcite{Kang2025Incorporating}{{18}{2025}{{Kang \& Kuo}}{{Kang and Kuo}}}
+\bibcite{ke2024diffuseractor}{{19}{2025}{{Ke et~al.}}{{Ke, Gkanatsios, and Fragkiadaki}}}
+\bibcite{Lee2025ViTaSCOPE}{{20}{2025}{{Lee \& Fazeli}}{{Lee and Fazeli}}}
+\bibcite{Li2026OptimusVLA}{{21}{2026}{{Li et~al.}}{{Li, Hu, Shao, Chen, Jiang, Xie, Hao, and Nie}}}
+\bibcite{Liang2021Finite}{{22}{2021}{{Liang \& Boularias}}{{Liang and Boularias}}}
+\bibcite{liu2023libero}{{23}{2023}{{Liu et~al.}}{{Liu, Zhu, Gao, Feng, Liu, Zhu, and Stone}}}
+\bibcite{Liu2026PALM}{{24}{2026}{{Liu et~al.}}{{Liu, Zhu, Mo, Li, Cao, Jin, Shen, Li, Yu, Yuan, Ding, and Lourentzou}}}
+\bibcite{lynch2020play}{{25}{2020}{{Lynch et~al.}}{{Lynch, Khansari, Xiao, Kumar, Tompson, Levine, and Sermanet}}}
+\bibcite{Mandlekar2020Learning}{{26}{2020}{{Mandlekar et~al.}}{{Mandlekar, Xu, Martín-Martín, Savarese, and Fei-Fei}}}
+\bibcite{Mark2026BPP}{{27}{2026}{{Mark et~al.}}{{Mark, Attarian, Fu, Dwibedi, Liang, Shah, and Kumar}}}
+\bibcite{reuss2024multimodal}{{28}{2024}{{Reuss et~al.}}{{Reuss, Ömer Erdinç~Yağmurlu, Wenzel, and Lioutikov}}}
+\bibcite{shi2025memoryvla}{{29}{2026}{{Shi et~al.}}{{Shi, Xie, Liu, Sun, Liu, Wang, Zhou, Fan, Zhang, and Huang}}}
+\bibcite{shiarlis2018taco}{{30}{2018}{{Shiarlis et~al.}}{{Shiarlis, Wulfmeier, Salter, Whiteson, and Posner}}}
+\bibcite{shridhar2022peract}{{31}{2023}{{Shridhar et~al.}}{{Shridhar, Manuelli, and Fox}}}
+\bibcite{Tang2026SEAM}{{32}{2026}{{Tang et~al.}}{{Tang, Gao, Pan, Wang, Li, Liu, Ding, Heng, and Fu}}}
+\bibcite{Wei2026PhysicalConcepts}{{33}{2026}{{Wei et~al.}}{{Wei, Li, Lu, and Sun}}}
+\bibcite{foundationposewen2024}{{34}{2024}{{Wen et~al.}}{{Wen, Yang, Kautz, and Birchfield}}}
+\bibcite{Xiao2026AVAVLA}{{35}{2026}{{Xiao et~al.}}{{Xiao, Li, Gao, Ye, Jin, Qian, Zhang, Wu, and Yu}}}
+\bibcite{xu2024im2flow2act}{{36}{2025}{{Xu et~al.}}{{Xu, Xu, Xu, Chi, Wetzstein, Veloso, and Song}}}
+\bibcite{Yang2025PPI}{{37}{2025}{{Yang et~al.}}{{Yang, Cai, Tian, Zeng, and Pang}}}
+\bibcite{Zare2024Survey}{{38}{2024}{{Zare et~al.}}{{Zare, Kebria, Khosravi, and Nahavandi}}}
+\bibcite{Ze2024DP3}{{39}{2024}{{Ze et~al.}}{{Ze, Zhang, Zhang, Hu, Wang, and Xu}}}
+\bibcite{Zeng2024MPI}{{40}{2024}{{Zeng et~al.}}{{Zeng, Bu, Wang, Xia, Chen, Dong, Song, Wang, Hu, Luo, Cui, Zhao, Li, Qiao, and Li}}}
+\bibcite{Zhang2026AffordGen}{{41}{2026{a}}{{Zhang et~al.}}{{Zhang, Hu, Huang, Ju, Xue, and Xu}}}
+\bibcite{Zhang2026AtomicVLA}{{42}{2026{b}}{{Zhang et~al.}}{{Zhang, Tang, Zhan, Chen, Chen, Han, Zhu, Xu, Xu, Wu, Lin, and Liang}}}
+\bibcite{zhang2024flowpolicy}{{43}{2025}{{Zhang et~al.}}{{Zhang, Liu, Fan, Liu, Zeng, and Liu}}}
+\bibcite{Zhao2023Learning}{{44}{2023}{{Zhao et~al.}}{{Zhao, Kumar, Levine, and Finn}}}
+\bibcite{Zhou2026Act2Goal}{{45}{2026}{{Zhou et~al.}}{{Zhou, Chen, Chen, Chen, Zhao, Jin, Ren, and Luo}}}
+\bibcite{Zhou2018Open3D}{{46}{2018}{{Zhou et~al.}}{{Zhou, Park, and Koltun}}}
+\bibcite{Zhu2025UWM}{{47}{2025}{{Zhu et~al.}}{{Zhu, Yu, Feng, Burchfiel, Shah, and Gupta}}}
+\bibcite{zhu2023learning}{{48}{2023{a}}{{Zhu et~al.}}{{Zhu, Jiang, Stone, and Zhu}}}
+\bibcite{zhu2022viola}{{49}{2023{b}}{{Zhu et~al.}}{{Zhu, Joshi, Stone, and Zhu}}}
+\bibcite{zhu2026orion}{{50}{2026}{{Zhu et~al.}}{{Zhu, Lim, Stone, and Zhu}}}
+\bibstyle{iclr2027_conference}
+\@writefile{toc}{\contentsline {section}{\numberline {A}Appendix}{14}{appendix.A}\protected@file@percent }
+\newlabel{app}{{A}{14}{Appendix}{appendix.A}{}}
+\newlabel{app@cref}{{[appendix][1][2147483647]A}{[1][14][]14}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.1}Implementation Details}{14}{subsection.A.1}\protected@file@percent }
+\newlabel{app:implementation_details}{{A.1}{14}{Implementation Details}{subsection.A.1}{}}
+\newlabel{app:implementation_details@cref}{{[subappendix][1][2147483647,1]A.1}{[1][14][]14}}
+\@writefile{toc}{\contentsline {paragraph}{Perception and map construction.}{14}{section*.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Policy inputs and outputs.}{14}{section*.4}\protected@file@percent }
+\citation{James2020RLBench}
+\citation{Yang2025PPI}
+\citation{Gu2023ManiSkill2}
+\citation{liu2023libero}
+\citation{shi2025memoryvla}
+\citation{Zhao2023Learning}
+\citation{chi2024diffusionpolicy}
+\citation{Ze2024DP3}
+\citation{ke2024diffuseractor}
+\citation{shridhar2022peract}
+\citation{Haldar2025BAKU}
+\citation{zhang2024flowpolicy}
+\citation{reuss2024multimodal}
+\citation{Fang2025SAM2Act}
+\citation{shi2025memoryvla}
+\citation{Mark2026BPP}
+\citation{Yang2025PPI}
+\citation{Zhu2025UWM}
+\citation{Zeng2024MPI}
+\citation{zhu2023learning}
+\citation{Hsu2025SPOT}
+\citation{xu2024im2flow2act}
+\citation{Zhao2023Learning}
+\citation{Ze2024DP3}
+\citation{ke2024diffuseractor}
+\citation{shridhar2022peract}
+\citation{Yang2025PPI}
+\citation{chi2024diffusionpolicy}
+\citation{Fang2025SAM2Act}
+\citation{zhu2023learning}
+\citation{Hsu2025SPOT}
+\@writefile{toc}{\contentsline {paragraph}{Training and inference.}{15}{section*.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.2}Benchmarks and Baseline Details}{15}{subsection.A.2}\protected@file@percent }
+\newlabel{app:benchmarks}{{A.2}{15}{Benchmarks and Baseline Details}{subsection.A.2}{}}
+\newlabel{app:benchmarks@cref}{{[subappendix][2][2147483647,1]A.2}{[1][15][]15}}
+\@writefile{toc}{\contentsline {paragraph}{Simulation benchmarks.}{15}{section*.6}\protected@file@percent }
+\newlabel{app:baseline_details}{{A.2}{15}{Baseline details}{section*.7}{}}
+\newlabel{app:baseline_details@cref}{{[subappendix][2][2147483647,1]A.2}{[1][15][]15}}
+\@writefile{toc}{\contentsline {paragraph}{Baseline details.}{15}{section*.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Action-generation policies.}{15}{section*.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{History and memory policies.}{15}{section*.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Future-prediction methods.}{15}{section*.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Object-centric perception and motion methods.}{15}{section*.11}\protected@file@percent }
+\citation{Zhao2023Learning}
+\citation{chi2024diffusionpolicy}
+\citation{Ze2024DP3}
+\citation{ke2024diffuseractor}
+\citation{Yang2025PPI}
+\citation{Haldar2025BAKU}
+\citation{zhang2024flowpolicy}
+\citation{Hsu2025SPOT}
+\citation{xu2024im2flow2act}
+\citation{Zhao2023Learning}
+\citation{zhu2023learning}
+\citation{chi2024diffusionpolicy}
+\citation{Haldar2025BAKU}
+\citation{reuss2024multimodal}
+\citation{Ze2024DP3}
+\citation{Zhu2025UWM}
+\citation{shi2025memoryvla}
+\citation{Mark2026BPP}
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.3}Detailed Simulation Benchmark Scores}{16}{subsection.A.3}\protected@file@percent }
+\newlabel{app:full_sim_results}{{A.3}{16}{Detailed Simulation Benchmark Scores}{subsection.A.3}{}}
+\newlabel{app:full_sim_results@cref}{{[subappendix][3][2147483647,1]A.3}{[1][15][]16}}
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces \textbf  {Quantitative results on RLBench2.} We report task success rate (\%) as mean $\pm $ standard deviation over three checkpoints, with 100 evaluation rollouts per task for each checkpoint. \textbf  {Bold} and \underline  {underlining} denote the best and second-best results, respectively, across all seven tasks.}}{16}{table.7}\protected@file@percent }
+\newlabel{tab:rlbench2_results}{{7}{16}{\textbf {Quantitative results on RLBench2.} We report task success rate (\%) as mean $\pm $ standard deviation over three checkpoints, with 100 evaluation rollouts per task for each checkpoint. \textbf {Bold} and \underline {underlining} denote the best and second-best results, respectively, across all seven tasks}{table.7}{}}
+\newlabel{tab:rlbench2_results@cref}{{[table][7][2147483647]7}{[1][15][]16}}
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces \textbf  {Quantitative results on ManiSkill.} We report success (\%) over 100 episodes per task and the six-task mean. A dagger marks an unmatched published score, ``--'' an unavailable result, and \textbf  {bold} the best result under the official ManiSkill protocol.}}{16}{table.8}\protected@file@percent }
+\newlabel{tab:maniskill_results}{{8}{16}{\textbf {Quantitative results on ManiSkill.} We report success (\%) over 100 episodes per task and the six-task mean. A dagger marks an unmatched published score, ``--'' an unavailable result, and \textbf {bold} the best result under the official ManiSkill protocol}{table.8}{}}
+\newlabel{tab:maniskill_results@cref}{{[table][8][2147483647]8}{[1][16][]16}}
+\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces \textbf  {Quantitative results on LIBERO.} We report task success rate (\%), with 50 evaluation trials per task. \textbf  {Bold} and \underline  {underlining} denote the best and second-best results, respectively.}}{16}{table.9}\protected@file@percent }
+\newlabel{tab:libero_results}{{9}{16}{\textbf {Quantitative results on LIBERO.} We report task success rate (\%), with 50 evaluation trials per task. \textbf {Bold} and \underline {underlining} denote the best and second-best results, respectively}{table.9}{}}
+\newlabel{tab:libero_results@cref}{{[table][9][2147483647]9}{[1][16][]16}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.4}Real-World Details}{16}{subsection.A.4}\protected@file@percent }
+\newlabel{app:real_world_details}{{A.4}{16}{Real-World Details}{subsection.A.4}{}}
+\newlabel{app:real_world_details@cref}{{[subappendix][4][2147483647,1]A.4}{[1][16][]16}}
+\@writefile{toc}{\contentsline {paragraph}{Hardware and perception.}{16}{section*.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Tasks and protocol.}{16}{section*.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.5}Detailed Setups for Ablations and Diagnostic Experiments}{17}{subsection.A.5}\protected@file@percent }
+\newlabel{app:additional_experiment_details}{{A.5}{17}{Detailed Setups for Ablations and Diagnostic Experiments}{subsection.A.5}{}}
+\newlabel{app:additional_experiment_details@cref}{{[subappendix][5][2147483647,1]A.5}{[1][16][]17}}
+\@writefile{toc}{\contentsline {paragraph}{System error breakdown.}{17}{section*.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{System error analysis.}{17}{section*.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Latency profiling.}{17}{section*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Latency analysis.}{17}{section*.17}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Ablations.}{17}{section*.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Historical and future OST-Maps.}{17}{section*.19}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{OST-Map attributes.}{17}{section*.20}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Map--visual attention order.}{18}{section*.21}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Staged prediction and gradient boundaries.}{18}{section*.22}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Hyperparameter sensitivity.}{18}{section*.23}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Hyperparameter analysis.}{18}{section*.24}\protected@file@percent }
+\gdef \@abspage@last{18}

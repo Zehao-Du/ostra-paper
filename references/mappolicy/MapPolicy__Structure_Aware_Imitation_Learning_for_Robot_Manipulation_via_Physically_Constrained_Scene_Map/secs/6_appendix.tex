@@ -1,0 +1,233 @@
+\section{Technical appendices and supplementary material}
+\paragraph{Appendix organization.}
+This appendix follows the order of the main paper. Appendix~\ref{app:scene_map_constraint} details the Scene Map representation and physical constraint loss used in sec.~\ref{sec:method_scene_map} and sec.~\ref{sec:loss_functions}. Appendix~\ref{app:complexity} discusses computational complexity, Appendix~\ref{app:mappolicy_procedure} summarizes the full MapPolicy procedure, and Appendix~\ref{app:implementation_details} provides implementation details for the method. Appendix~\ref{app:experimental_protocols} and Appendix~\ref{app:full_sim_results} provide experimental protocols and full per-task simulation results. Appendix~\ref{app:limitations} and Appendix~\ref{app:broader_impact} discuss limitations, future work, and broader impact.
+
+The supplementary archive \texttt{supp\_mappolicy.tar} contains a \texttt{supp/code/} directory with the released MapPolicy code, README, dependency list, Hydra configurations, Scene Map templates, dataset/environment wrappers, model implementations, and reproduction scripts, together with a \texttt{supp/demo/} directory containing five real-world demonstration videos.
+
+\subsection{Scene Map Representation and Constraint Loss}
+\label{app:scene_map_constraint}
+
+\paragraph{Scene Map representation.}
+Scene Map represents each manipulation scene as a graph $\mathcal{G}=(\mathcal{V},\mathcal{E})$ built from task-relevant geometric primitives and their relations. Each object is represented as an object-level subgraph, and the complete scene map is formed by composing object subgraphs and cross-object relations. Each node stores a primitive-level descriptor
+\begin{equation}
+v_i = \langle \mathbf{p}_i, \mathbf{r}_i, X_i^{pos}, s_i, X_i^{aff} \rangle ,
+\end{equation}
+where $\mathbf{p}_i$ and $\mathbf{r}_i$ denote the primitive position and orientation, $X_i^{pos}$ is a point set sampled from the primitive geometry, $s_i$ is a semantic descriptor, and $X_i^{aff}$ is an affordance point set sampled from manipulation-relevant regions. This representation keeps pose, geometry, semantics, and affordance information separate before they are embedded by the map encoder.
+
+Each edge stores a relation between two primitives,
+\begin{equation}
+e_{ij}=\langle c_{ij}, \boldsymbol{\eta}_{ij}, a_{ij}, T_{ij} \rangle .
+\end{equation}
+Here $c_{ij}$ is the relation type, $\boldsymbol{\eta}_{ij}=(\delta,\alpha,\phi)$ contains continuous relation parameters, $a_{ij}$ selects the geometric anchors used by the relation, and $T_{ij}$ is the relative pose between the two primitives. We use six standard relation types: \textit{Fixed}, \textit{Revolute}, \textit{Prismatic}, \textit{Cylindrical}, \textit{Planar-Contact}, and \textit{Alignment}. These relations cover rigid attachment, common kinematic pairs, and spatial contact or alignment constraints.
+
+\paragraph{Primitive definitions.}
+Primitives provide a compact geometric basis for object structure. A cuboid primitive is parameterized by a pose and three side lengths, and it provides six face anchors whose centers, normals, tangents, and bitangents are determined by the local cuboid frame. A cylinder primitive is parameterized by a pose, radius, and height, and it provides an axis anchor along the cylinder center line as well as circular or side-surface contact regions when needed. A sphere primitive is parameterized by a pose and radius, and its geometry is sampled on the spherical surface. A ring primitive is parameterized by a pose, major radius, minor radius, and thickness, and it provides an axis anchor through the ring center together with surface samples around the annulus. Other task-specific primitives follow the same interface: they provide sampled geometry points, optional affordance samples, and the local anchors required by their incident edges.
+
+\paragraph{Geometric anchors.}
+Relations are expressed through local geometric anchors attached to primitives. A face anchor is represented by a local coordinate frame
+\begin{equation}
+a^{F}=\langle \mathbf{p},\mathbf{n},\mathbf{t},\mathbf{b}\rangle ,
+\end{equation}
+where $\mathbf{p}$ is the face center, $\mathbf{n}$ is the normal direction, $\mathbf{t}$ is a tangent direction, and $\mathbf{b}=\mathbf{n}\times\mathbf{t}$ is the bitangent direction. An axis anchor is represented as
+\begin{equation}
+a^{A}=\langle \mathbf{p},\mathbf{d}\rangle ,
+\end{equation}
+where $\mathbf{p}$ is a point on the axis and $\mathbf{d}$ is the axis direction. The anchor reference $a_{ij}$ specifies which face or axis should be extracted from each endpoint primitive. This design makes each edge geometrically concrete, since relation parameters are evaluated in the coordinate frames of the referenced anchors.
+
+\paragraph{Constraint types.}
+The six constraint types describe which relative degrees of freedom between two primitives are restricted. \textit{Fixed} represents rigid attachment and locks the relative pose between two anchors. \textit{Revolute} aligns two axes and preserves only rotation around the shared axis, as in a hinge. \textit{Prismatic} preserves the contact orientation and normal offset while allowing translation along a sliding direction. \textit{Cylindrical} aligns two axes and removes radial displacement, while allowing both axial translation and rotation around the axis. \textit{Planar-Contact} keeps two faces in contact by constraining the normal direction and normal offset, while leaving in-plane translation and in-plane rotation free. \textit{Alignment} only enforces parallel directions and does not constrain relative position. These definitions correspond to the constrained and free translational and rotational degrees of freedom shown in fig.~\ref{fig:scenemap}.
+
+\paragraph{Auxiliary constraint prediction.}
+The physical constraint loss is applied during training as an auxiliary regularizer on the map encoder. Before graph readout, a lightweight constraint head decodes edge-conditioned features into predicted anchor states for both endpoints. For face-based constraints, the predicted state is $\hat{a}^{F}=\langle \hat{\mathbf{p}},\hat{\mathbf{n}},\hat{\mathbf{t}},\hat{\mathbf{b}}\rangle$. For axis-based constraints, the predicted state is $\hat{a}^{A}=\langle \hat{\mathbf{p}},\hat{\mathbf{d}}\rangle$. We first enforce validity of the predicted face frames with
+\begin{equation}
+\begin{aligned}
+\mathcal{L}_{ortho}
+= \sum_{k\in\{i,j\}} \Bigg[
+&\sum_{\mathbf{u}\in\{\hat{\mathbf{n}}_k,\hat{\mathbf{t}}_k,\hat{\mathbf{b}}_k\}}
+(\|\mathbf{u}\|_2^2-1)^2 \\
+&+(\hat{\mathbf{n}}_k^\top\hat{\mathbf{t}}_k)^2
++(\hat{\mathbf{t}}_k^\top\hat{\mathbf{b}}_k)^2
++(\hat{\mathbf{b}}_k^\top\hat{\mathbf{n}}_k)^2 \\
+&+\|\hat{\mathbf{n}}_k\times\hat{\mathbf{t}}_k-\hat{\mathbf{b}}_k\|_2^2
+\Bigg].
+\end{aligned}
+\end{equation}
+This term encourages the decoded normal, tangent, and bitangent vectors to form a unit, orthogonal local frame.
+
+\paragraph{Relation-specific residuals.}
+Let $\Delta\hat{\mathbf{p}}=\hat{\mathbf{p}}_j-\hat{\mathbf{p}}_i$. For each edge, the relation type determines which residuals are active. Fixed relations lock relative orientation and position:
+\begin{equation}
+\mathcal{R}_{fixed}=
+\left\{
+\hat{\mathbf{n}}_i^\top\hat{\mathbf{n}}_j+1,
+\hat{\mathbf{t}}_i^\top\hat{\mathbf{t}}_j-\cos\phi,
+\hat{\mathbf{t}}_i^\top\hat{\mathbf{b}}_j+\sin\phi,
+\Delta\hat{\mathbf{p}}^\top\hat{\mathbf{n}}_i-\delta,
+\Delta\hat{\mathbf{p}}^\top\hat{\mathbf{t}}_i,
+\Delta\hat{\mathbf{p}}^\top\hat{\mathbf{b}}_i
+\right\}.
+\end{equation}
+Revolute relations align two axes and constrain their centers to lie on the same hinge line:
+\begin{equation}
+\mathcal{R}_{rev}=
+\left\{
+\hat{\mathbf{d}}_i\times\hat{\mathbf{d}}_j,
+\Delta\hat{\mathbf{p}}\times\hat{\mathbf{d}}_i,
+\Delta\hat{\mathbf{p}}^\top\hat{\mathbf{d}}_i
+\right\}.
+\end{equation}
+Prismatic relations preserve face orientation and normal contact while leaving motion along the sliding direction free:
+\begin{equation}
+\mathcal{R}_{pris}=
+\left\{
+\hat{\mathbf{n}}_i^\top\hat{\mathbf{n}}_j+1,
+\hat{\mathbf{t}}_i^\top\hat{\mathbf{t}}_j-1,
+\Delta\hat{\mathbf{p}}^\top\hat{\mathbf{n}}_i-\delta,
+\Delta\hat{\mathbf{p}}^\top\hat{\mathbf{b}}_i
+\right\}.
+\end{equation}
+Cylindrical relations align two axes and constrain radial displacement while leaving axial translation and twist free:
+\begin{equation}
+\mathcal{R}_{cyl}=
+\left\{
+\hat{\mathbf{d}}_i\times\hat{\mathbf{d}}_j,
+\Delta\hat{\mathbf{p}}\times\hat{\mathbf{d}}_i
+\right\}.
+\end{equation}
+Planar-contact relations enforce opposing normals and a fixed normal offset, while in-plane translation and in-plane rotation remain unconstrained:
+\begin{equation}
+\mathcal{R}_{planar}=
+\left\{
+\hat{\mathbf{n}}_i^\top\hat{\mathbf{n}}_j+1,
+\Delta\hat{\mathbf{p}}^\top\hat{\mathbf{n}}_i-\delta
+\right\}.
+\end{equation}
+Alignment relations only constrain directions:
+\begin{equation}
+\mathcal{R}_{align}=
+\left\{
+\hat{\mathbf{d}}_i\times\hat{\mathbf{d}}_j
+\right\}.
+\end{equation}
+The final physical regularizer sums squared residuals over valid edges:
+\begin{equation}
+\mathcal{L}_{phys}
+= \lambda_{ortho}\mathcal{L}_{ortho}
++ \sum_{(i,j)\in\mathcal{E}}
+\lambda_{c_{ij}}
+\sum_{\mathbf{r}\in\mathcal{R}_{c_{ij}}}
+\|\mathbf{r}\|_2^2 .
+\end{equation}
+Only the residuals associated with the edge type are evaluated. Free degrees of freedom are intentionally omitted from the residual set, which lets Scene Map encode both hard geometric constraints and allowable relative motion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Complexity Discussion}
+\label{app:complexity}
+For an instantiated scene-map graph with $N$ nodes and hidden width $d$, one attention layer costs $\mathcal{O}(N^2 d)$. Over $L$ layers, the total complexity is
+\begin{equation}
+\mathcal{O}(L N^2 d).
+\end{equation}
+In practice, $N$ is determined by the task-specific structural template and remains moderate for the manipulation tasks considered in this work, making the additional structural reasoning cost practical.
+
+\subsection{MapPolicy Procedure}
+\label{app:mappolicy_procedure}
+
+\begin{algorithm}[t]
+\caption{MapPolicy training and inference pipeline}
+\label{alg:mappolicy_procedure}
+\small
+\begin{algorithmic}[1]
+\State \textbf{Stage 1: Map Constructor Training}
+\State Input RGB-D demonstrations with object masks, object poses, and structural targets
+\State Project depth and masks into object-level masked point clouds
+\State Predict structural parameters with the structural parameter estimator
+\State Combine pose and structural parameters to instantiate Scene Map
+\State Optimize the constructor with point-cloud supervision and structural-parameter MSE
+\State \textbf{Stage 2: Policy Training}
+\State Freeze the trained Map Constructor
+\For{each demonstration step}
+    \State Construct Scene Map from RGB-D observations
+    \State Encode Scene Map into map features with the Map Encoder
+    \State Extract visual features from RGB observations and robot state features from proprioception
+    \State Fuse map, visual, and robot state features, then predict the action with the policy head
+    \State Optimize action imitation loss together with the physical constraint loss
+\EndFor
+\State \textbf{Inference}
+\While{the task is not finished}
+    \State Obtain object masks, object poses, and masked point clouds from the current RGB-D observation
+    \State Instantiate Scene Map and encode it into map features
+    \State Fuse map features with visual and robot state features
+    \State Execute the predicted action
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Implementation Details}
+\label{app:implementation_details}
+
+\paragraph{Map Constructor.}
+The structural parameter estimator operates on object-level masked point clouds. Each object point cloud is sampled to 1024 points and encoded by a PointNet encoder with input channels for point coordinates and normal-related attributes. The PointNet stem applies shared one-dimensional layers with widths 64, 128, and 1024, followed by max pooling over points. The pooled feature is passed through fully connected layers of widths 512 and 256 with batch normalization and ReLU activations, producing a 256-dimensional object feature. A task-specific linear prediction head maps this feature to the structural parameters required by the Scene Map template. The output is split into primitive sizes, primitive positions, and primitive rotations according to the task-specific template dimensions.
+
+\paragraph{Map Encoder.}
+The Map Encoder uses a graph hidden width of 768. For each node, the primitive geometry point set and affordance point set are separately encoded by PointNet-style point-wise MLPs with hidden width 64 and output width 768. The semantic descriptor is a 512-dimensional object-level feature projected to 768 dimensions. These three node streams are concatenated and fused by a linear layer followed by layer normalization and ReLU, yielding a 768-dimensional node embedding.
+
+For each edge, the relation type is embedded with a 10-entry embedding table of width 768. Continuous relation parameters of dimension 3, anchor descriptors of dimension 24, and relative pose descriptors of dimension 9 are each projected to 768 dimensions. The four edge streams are concatenated and fused by a linear layer followed by layer normalization and ReLU, yielding a 768-dimensional edge embedding.
+
+The graph backbone contains 6 Graphormer-style layers with 24 attention heads and dropout 0.1. Each layer first updates edge embeddings with endpoint node features, projects the updated edge embedding into a head-specific attention bias, and applies biased multi-head self-attention over nodes. The feed-forward block expands the hidden width by a factor of 4, uses GELU activation, and projects back to 768 dimensions. The final graph representation is produced by gated readout: a linear gate scores each node, softmax normalizes node weights, and the weighted sum gives a 768-dimensional map feature.
+
+\paragraph{Policy Backbone.}
+The visual encoder is a frozen DINO v3 image encoder~\cite{simeoni2025dinov3} that extracts the visual feature used by the policy. Scene Map text semantics are encoded separately with a frozen CLIP text encoder. RGB observations are resized to the visual encoder input resolution before feature extraction. The map feature has dimension 768. The map feature, visual feature, and robot state feature are separately projected into modality tokens and fused by self-attention. The fused tokens are pooled and passed to an MLP policy head with hidden widths 1024, 512, and 256. The policy head uses SELU activations and orthogonal initialization, with the final layer scaled by 0.01, and outputs a 7-dimensional action.
+
+\paragraph{Training and inference.}
+Training is performed in two stages. The first stage trains the structural parameter estimator with point-cloud supervision and structural-parameter supervision. The predicted parameters and object poses instantiate a Scene Map, from which a scene point cloud is rendered and projected into the camera frame. The point-cloud loss $\mathcal{L}_{pcd}$ compares this projected point cloud with the observed masked point cloud, while $\mathcal{L}_{struct}$ is a mean-squared error between predicted and ground-truth structural parameters. The first-stage objective is $\mathcal{L}_{ctor} = \mathcal{L}_{pcd} + \lambda_{struct}\mathcal{L}_{struct}$.
+The second stage freezes the trained constructor and optimizes the Map Encoder and Policy Backbone. For each demonstration step, RGB observations, canonical object point clouds, and object poses instantiate a Scene Map, which is encoded into map features and used for action prediction. The policy training objective is $\mathcal{L} = \mathcal{L}_{act} + \lambda_{phys}\mathcal{L}_{phys}$, where $\mathcal{L}_{act}$ supervises the predicted action and $\mathcal{L}_{phys}$ regularizes the learned map features with physical constraints. At inference time, foreground object masks, object poses, and masked point clouds are extracted from RGB-D observations to instantiate the Scene Map. For later frames, tracked masks and tracked object poses provide the object-level evidence, and the same map construction, map encoding, and action prediction pipeline is applied.
+
+\subsection{Experimental Protocols}
+\label{app:experimental_protocols}
+
+\paragraph{Task suites and metrics.}
+For MetaWorld, we follow the evaluation metric of Lift3D and use task success rate as the main metric. Each task uses a dataset of 30 episodes, split into 25 training episodes and 5 validation episodes. We train each model for 300 epochs, perform rollout evaluation every 25 epochs with 25 test rollouts, and save the checkpoint with the best rollout success rate. Results are reported as mean and standard deviation across five random seeds.
+
+For RLBench, we follow the task selection and evaluation metric of PDFactor. Each task uses a dataset of 100 demonstrations, and task success rate is reported under the benchmark's official success conditions. Each task is evaluated with 25 episodes per seed, and results are reported as mean and standard deviation across five random seeds.
+
+For ManiSkill, we follow the same evaluation protocol as RLBench. Each task uses a dataset of 100 demonstrations, and task success rate is computed with the official success condition of each environment. We evaluate six official tasks from the \textit{Table-Top 2 Finger Gripper Tasks} category. Results are reported as mean and standard deviation across five random seeds.
+
+For real-world experiments, each method is executed for 100 trials on each task, and success rate is computed with the task-level completion criteria used to annotate the real-robot trials.
+
+\paragraph{Training protocol.}
+MapPolicy is trained in two stages. The first stage trains the structural parameter estimator used by the Map Constructor, and the second stage trains the Map Encoder and Policy Backbone with the constructor fixed. For both stages, we use Adam-style optimization with gradient clipping, cosine learning-rate decay, and a 20-epoch warmup. Unless otherwise stated, training runs use 300 epochs and seed 0. The map-constructor stage uses learning rate $4\times10^{-4}$, weight decay $10^{-4}$, and batch size 512. The policy stage uses learning rate $2\times10^{-4}$ and batch size 24 for MetaWorld, learning rate $2\times10^{-4}$ and batch size 128 for RLBench, and learning rate $4\times10^{-4}$, weight decay $10^{-4}$, and batch size 256 for ManiSkill. We set the map loss weight and physical constraint loss weight to 1 unless otherwise specified by an ablation.
+
+\paragraph{Inputs and model selection.}
+RGB observations are resized before being passed to the visual encoder. We use $224\times224$ images for MetaWorld and RLBench policy training and $128\times128$ images for ManiSkill policy training. The structural estimator receives object-level point clouds derived from RGB-D observations and masks, as described in sec.~\ref{sec:map_constructor}. For simulation experiments, checkpoints are selected by validation success or rollout success on the corresponding benchmark split. For ablations, we keep the policy backbone, optimizer, training schedule, and evaluation protocol fixed, changing only the ablated representation, encoder, fusion strategy, or loss term.
+
+\paragraph{Baselines.}
+For MetaWorld and ManiSkill, diffusion-based and 3D policy baselines are trained and evaluated under the same task suites and success-rate metric whenever reproducible implementations are available. For RLBench, we use the published numbers of established baselines and match their reporting convention of task-level success rates with mean and standard deviation where available. In the real-world experiments, Diffusion Policy and 3D Diffusion Policy are directly deployed as the primary reproducible baselines using the same robot, camera, task definitions, and trial budget as MapPolicy, while $\pi_0$ and Lift3D are included as additional reference points for method positioning.
+
+\paragraph{Compute resources.}
+Simulation experiments are run on local GPU servers equipped with NVIDIA RTX 4090 and NVIDIA H200 GPUs. Each training run uses one GPU and approximately 20 CPU cores. On an H200 GPU, a single task-seed run takes approximately 4--8 GPU-hours for MetaWorld, RLBench, and ManiSkill. The main MapPolicy simulation results cover 49 tasks across five random seeds, corresponding to roughly 980--1960 GPU-hours, with an approximate midpoint of 1.5k GPU-hours. Baseline, ablation, and system-breakdown experiments use the same per-run resource allocation, but their total compute was not logged separately. Real-world data collection takes approximately 20 robot-hours, and the reported real-world evaluations take approximately 50 robot-hours in total.
+
+\subsection{Full Per-Task Simulation Results}
+\label{app:full_sim_results}
+
+This section provides the full per-task results summarized in tab.~\ref{tab:main_results_summary}.
+
+\input{tabs/MainResultsMetaWorld.tex}
+\input{tabs/MainResultsRLBench.tex}
+\input{tabs/MainResultsManiSkill.tex}
+
+\subsection{Limitation and Future Work}
+\label{app:limitations}
+
+\paragraph{Limitation}
+MapPolicy relies on the quality of Scene Map construction. Errors in object segmentation, pose estimation, depth projection, or structural parameter estimation can propagate to the map encoder and degrade downstream policy execution, especially with reflective surfaces or noisy RGB-D observations. In addition, the current Scene Map uses a predefined primitive vocabulary and a fixed set of physical constraint types, which makes it suitable for rigid and articulated manipulation but less expressive for deformable objects, fluids, ropes, cloth, or objects with unknown topology. Finally, although we evaluate on 49 simulation tasks and five real-world tasks, the experiments still focus on structured manipulation settings, and broader open-world deployment remains future work.
+
+\paragraph{Future Work}
+Future work should improve Scene Map construction under challenging sensing conditions and reduce the dependence on predefined object templates. One direction is to learn more adaptive primitive and constraint vocabularies that can expand beyond the current rigid and articulated settings. Another direction is to combine Scene Map with long-horizon memory and online map refinement, so that the robot can update structural beliefs during execution and handle more open-ended manipulation environments.
+
+\subsection{Broader Impact}
+\label{app:broader_impact}
+
+MapPolicy aims to improve the reliability of robot manipulation under partial observability by making object structure and physical relations explicit. Potential positive impacts include more robust robotic assistance in controlled household, warehouse, manufacturing, and laboratory environments, as well as improved interpretability through the intermediate Scene Map representation. At the same time, stronger manipulation policies may create risks if they are deployed without appropriate safeguards. Errors in perception, Scene Map construction, or policy prediction can lead to unsafe actions, and improved manipulation capability could be misused outside controlled settings. We therefore view MapPolicy as suitable for supervised and safety-constrained deployment, with standard robot safeguards such as workspace limits, speed and force limits, emergency stops, runtime monitoring, and human oversight.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

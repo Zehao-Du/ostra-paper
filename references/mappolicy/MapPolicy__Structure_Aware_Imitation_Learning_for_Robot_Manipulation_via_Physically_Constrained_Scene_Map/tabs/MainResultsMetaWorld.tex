@@ -1,0 +1,64 @@
+\begin{table*}[t]
+\centering
+\caption{Main results on MetaWorld~\cite{Yu2020Meta,mclean2025metaworld}. We report success rate (\%) on the full MetaWorld evaluation suite containing 25 tasks. Results are averaged over \textbf{5 random seeds} and shown as mean and standard deviation. Best results are in \textbf{bold}, and second best are \underline{underlined}.}
+\label{tab:main_results_metaworld}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{l|c|ccccccccccccc}
+\toprule
+\rowcolor{tablehead}
+Method & Avg. &
+\shortstack{Basket\\ball} &
+\shortstack{Bin\\Picking} &
+\shortstack{Box\\Close} &
+\shortstack{Coffee\\Pull} &
+\shortstack{Coffee\\Push} &
+\shortstack{Dis\\assemble} &
+Hammer &
+\shortstack{Hand\\Insert} &
+\shortstack{Handle\\Pull} &
+\shortstack{Handle\\Pull Side} &
+\shortstack{Lever\\Pull} &
+\shortstack{Peg Insert\\Side} &
+\shortstack{Peg Unplug\\Side} \\
+\midrule
+Diffusion Policy~\cite{chi2024diffusionpolicy} & $27.3\std{1.2}$ & $85\std{3.2}$ & $15\std{2.1}$ & $30\std{4.5}$ & $34\std{5.1}$ & $67\std{3.8}$ & $43\std{6.2}$ & $15\std{2.4}$ & $9\std{1.5}$ & $27\std{4.1}$ & $23\std{3.5}$ & $49\std{5.0}$ & $34\std{4.2}$ & $74\std{2.9}$ \\
+3D Diffusion Policy~\cite{Ze2024DP3} & $51.1\std{1.5}$ & $\mathbf{98\std{0.8}}$ & $34\std{4.5}$ & $42\std{5.2}$ & $87\std{2.4}$ & $\mathbf{94\std{1.2}}$ & $69\std{4.7}$ & $76\std{3.1}$ & $14\std{2.8}$ & $53\std{6.0}$ & $85\std{2.3}$ & $79\std{3.4}$ & $69\std{5.1}$ & $75\std{4.0}$ \\
+$\pi_0$~\cite{black2026pi0visionlanguageactionflowmodel} & $69.5\std{1.8}$ & $88\std{2.5}$ & $45\std{5.8}$ & $70\std{4.1}$ & $\underline{92\std{1.8}}$ & $85\std{3.2}$ & $65\std{5.5}$ & $80\std{2.9}$ & $40\std{6.4}$ & $\underline{88\std{2.1}}$ & $82\std{3.7}$ & $85\std{2.8}$ & $50\std{7.2}$ & $85\std{2.4}$ \\
+Lift3D~\cite{Jia_2025_CVPR} & $\underline{78.8\std{1.4}}$ & $\underline{96\std{1.5}}$ & $\underline{92\std{2.0}}$ & $\mathbf{92\std{1.4}}$ & $90\std{2.2}$ & $\underline{88\std{2.7}}$ & $\underline{80\std{3.6}}$ & $\underline{94\std{1.8}}$ & $\underline{64\std{5.1}}$ & $\mathbf{100\std{0.0}}$ & $\mathbf{96\std{1.1}}$ & $\underline{86\std{3.2}}$ & $\underline{84\std{4.0}}$ & $\underline{98\std{0.9}}$ \\
+\midrule
+MapPolicy (Ours) & $\mathbf{93.2\std{0.9}}$ & $\underline{96\std{1.2}}$ & $\mathbf{98\std{1.0}}$ & $\underline{82\std{3.5}}$ & $\mathbf{100\std{0.0}}$ & $74\std{6.2}$ & $\mathbf{100\std{0.0}}$ & $\mathbf{100\std{0.0}}$ & $\mathbf{100\std{0.0}}$ & $\mathbf{100\std{0.0}}$ & $\underline{94\std{2.1}}$ & $\mathbf{94\std{1.8}}$ & $\mathbf{100\std{0.0}}$ & $\mathbf{100\std{0.0}}$ \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{l|c|cccccccccccc}
+\toprule
+\rowcolor{tablehead}
+Method & Avg. &
+\shortstack{Pick Out\\of Hole} &
+\shortstack{Pick\\Place} &
+\shortstack{Pick Place\\Wall} &
+Push &
+\shortstack{Push\\Back} &
+\shortstack{Push\\Wall} &
+\shortstack{Reach\\Wall} &
+\shortstack{Shelf\\Place} &
+Soccer &
+\shortstack{Stick\\Pull} &
+Sweep &
+\shortstack{Sweep\\Into} \\
+\midrule
+Diffusion Policy~\cite{chi2024diffusionpolicy} & $27.3\std{1.2}$ & $0\std{0.0}$ & $0\std{0.0}$ & $5\std{1.2}$ & $30\std{4.8}$ & $0\std{0.0}$ & $20\std{3.5}$ & $59\std{6.1}$ & $11\std{2.4}$ & $14\std{3.1}$ & $11\std{2.9}$ & $18\std{4.5}$ & $10\std{2.2}$ \\
+3D Diffusion Policy~\cite{Ze2024DP3} & $51.1\std{1.5}$ & $14\std{2.5}$ & $12\std{2.8}$ & $35\std{5.4}$ & $51\std{4.2}$ & $0\std{0.0}$ & $49\std{5.1}$ & $68\std{3.3}$ & $17\std{3.8}$ & $18\std{2.9}$ & $27\std{5.0}$ & $\underline{96\std{1.4}}$ & $15\std{3.1}$ \\
+$\pi_0$~\cite{black2026pi0visionlanguageactionflowmodel} & $69.5\std{1.8}$ & $25\std{4.2}$ & $55\std{6.5}$ & $45\std{5.9}$ & $\underline{88\std{2.1}}$ & $60\std{7.2}$ & $\underline{65\std{4.8}}$ & $85\std{2.4}$ & $35\std{5.5}$ & $75\std{3.8}$ & $60\std{6.2}$ & $\mathbf{100\std{0.0}}$ & $\underline{90\std{1.9}}$ \\
+Lift3D~\cite{Jia_2025_CVPR} & $\underline{78.8\std{1.4}}$ & $\underline{60\std{5.8}}$ & $\underline{65\std{5.1}}$ & $\underline{62\std{4.9}}$ & $85\std{3.0}$ & $\underline{65\std{5.4}}$ & $44\std{6.2}$ & $\underline{88\std{2.1}}$ & $\underline{42\std{5.9}}$ & $\underline{76\std{4.2}}$ & $\underline{61\std{5.8}}$ & $90\std{3.2}$ & $72\std{4.1}$ \\
+\midrule
+MapPolicy (Ours) & $\mathbf{93.2\std{0.9}}$ & $\mathbf{94\std{1.8}}$ & $\mathbf{82\std{3.2}}$ & $\mathbf{94\std{2.0}}$ & $\mathbf{92\std{1.5}}$ & $\mathbf{84\std{3.9}}$ & $\mathbf{78\std{4.5}}$ & $\mathbf{96\std{1.2}}$ & $\mathbf{94\std{2.4}}$ & $\mathbf{80\std{3.5}}$ & $\mathbf{100\std{0.0}}$ & $\mathbf{100\std{0.0}}$ & $\mathbf{98\std{1.0}}$ \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table*}

@@ -1,0 +1,94 @@
+\section{Experiments}
+\label{sec:experiments}
+
+This section evaluates whether Scene Map improves downstream manipulation policy learning beyond raw visual or geometric input. We first report main results on simulation benchmarks in sec.~\ref{sec:main_experiments}, then evaluate sim-to-real transfer in sec.~\ref{sec:real_world_experiments}. We further analyze Scene Map construction bottlenecks in sec.~\ref{sec:system_breakdown} and validate key design choices through ablations in sec.~\ref{sec:ablation_studies}.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.95\linewidth]{figs/demonstration.pdf}
+    \caption{Demonstrations of the evaluation tasks. The figure shows all five real-world tasks and representative tasks from MetaWorld~\cite{Yu2020Meta,mclean2025metaworld}, RLBench~\cite{James2020RLBench}, and ManiSkill~\cite{Gu2023ManiSkill2}, illustrating the diversity of articulated interaction, object arrangement, and geometrically constrained manipulation considered in our experiments.}
+    \label{fig:demonstration}
+\end{figure}
+
+\subsection{Main Experiments in Simulation Benchmarks}
+\label{sec:main_experiments}
+
+We evaluate MapPolicy on three simulation benchmarks with complementary characteristics: MetaWorld~\cite{Yu2020Meta,mclean2025metaworld}, RLBench~\cite{James2020RLBench}, and ManiSkill~\cite{Gu2023ManiSkill2}. Together, they cover classical single-task manipulation, large-scale multi-task interaction, and tabletop manipulation.
+
+\textbf{Experiment Settings.}
+We benchmark MapPolicy on three suites.
+\textbf{MetaWorld}~\cite{Yu2020Meta,mclean2025metaworld} contains 25 tasks in our evaluation and is used to test whether Scene Map helps on diverse classical MuJoCo-based manipulation problems requiring part-level interaction and precise spatial reasoning~\cite{todorov2012mujoco}.
+\textbf{RLBench}~\cite{James2020RLBench} contains 18 tasks in our evaluation and is used to test whether the benefits of Scene Map persist in visually richer and more diverse multi-task settings.
+\textbf{ManiSkill}~\cite{Gu2023ManiSkill2} contains six tasks from the official \textit{Table-Top 2 Finger Gripper Tasks} category, including \textit{PegInsertionSide-v1}, \textit{PlaceSphere-v1}, \textit{PlugCharger-v1}, \textit{PullCubeTool-v1}, \textit{StackCube-v1}, and \textit{StackPyramid-v1}, and is used to test MapPolicy on tabletop RGB-D manipulation with strong geometric and contact constraints.
+Across all three benchmarks, the main metric is task success rate. We report mean and standard deviation across five random seeds for the main simulation results. Detailed training and evaluation protocols are provided in Appendix~\ref{app:experimental_protocols}.
+
+\textbf{Baselines.}
+We compare against strong baselines from three categories: diffusion-based policies, general-purpose visuomotor foundation policies, and 3D manipulation policies.
+On MetaWorld, we compare against \textit{Diffusion Policy}~\cite{chi2024diffusionpolicy}, \textit{3D Diffusion Policy}~\cite{Ze2024DP3}, \textit{$\pi_0$}~\cite{black2026pi0visionlanguageactionflowmodel}, and \textit{Lift3D}~\cite{Jia_2025_CVPR}.
+On RLBench, we compare against published baselines reported in prior work, including \textit{PerAct}~\cite{shridhar2022peract}, \textit{3D Diffuser Actor}~\cite{3d_diffuser_actor}, \textit{RVT-2}~\cite{goyal2024rvt2}, and the \textit{PDFactor} family~\cite{Tian_2025_CVPR}, using their reported numbers.
+On ManiSkill, we compare against \textit{Diffusion Policy}~\cite{chi2024diffusionpolicy}, \textit{3D Diffusion Policy}~\cite{Ze2024DP3}, \textit{Octo}~\cite{octo_2023}, and \textit{$\pi_0$}~\cite{black2026pi0visionlanguageactionflowmodel}.
+
+\input{tabs/MainResultsSummary.tex}
+
+\input{tabs/RealWorld.tex}
+
+
+\textbf{Results.}
+\textbf{MetaWorld}~\cite{Yu2020Meta,mclean2025metaworld} tests classical manipulation tasks requiring actionable-part identification and local spatial reasoning. As shown in tab.~\ref{tab:main_results_summary}, MapPolicy achieves 93.2\% average success rate, outperforming the strongest prior baseline Lift3D at 78.8\%. The gains are particularly meaningful on articulated interaction, contact-rich manipulation, and precise placement. Full per-task results are provided in Appendix~\ref{app:full_sim_results}.
+\textbf{RLBench}~\cite{James2020RLBench} evaluates larger-scale multi-task scenes with richer visual variation and multi-object interaction. MapPolicy reaches 94.8\% average success rate, improving over the strongest published baseline PDFactor at 87.3\%, indicating that Scene Map benefits extend beyond classical manipulation settings.
+\textbf{ManiSkill}~\cite{Gu2023ManiSkill2} focuses on tabletop tasks with strong geometric constraints such as insertion, plugging, stacking, and tool use. MapPolicy obtains 73.0\% average success rate, outperforming $\pi_0$ at 54.0\% and 3D Diffusion Policy at 53.8\%, with the largest gains on tasks where explicit structure is directly relevant to action success.
+
+\subsection{Real-World Experiments}
+\label{sec:real_world_experiments}
+
+We evaluate whether the Scene Map interface transfers from simulation to real RGB-D manipulation on a Realman 75-BF robot arm with 7 DoF and a pika gripper, running at 30 Hz. RGB-D observations are captured by an NVIDIA RealSense D415, and point clouds are constructed with Open3D~\cite{Zhou2018Open3D}. We reuse representative baselines from our simulation study for the real-world setting. In the current real-robot evaluation, we directly deploy \textit{Diffusion Policy}~\cite{chi2024diffusionpolicy} and \textit{3D Diffusion Policy}~\cite{Ze2024DP3} as the primary reproducible baselines, while \textit{$\pi_0$}~\cite{black2026pi0visionlanguageactionflowmodel} and \textit{Lift3D}~\cite{Jia_2025_CVPR} provide additional reference points for method positioning. For each real-world task, we execute each method for 100 trials and report task success rate as the main metric.
+
+
+\textbf{Task Suite.}
+We design five real-world tasks that cover articulated interaction, reflective-object grasping, multi-object spatial reasoning, and long-horizon arrangement.
+\textit{Place Fork in Drawer} consists of four stages: opening a closed drawer, picking up a fork placed on a block, placing it into the drawer, and closing the drawer. This task is challenging because it combines articulated-object manipulation with grasping a thin, irregular, and reflective metal object.
+\textit{Stack Three Blocks} requires first placing a green block on a red block and then placing a blue block on the green block. The main difficulty is maintaining the correct spatial relation across three objects during sequential stacking.
+\textit{Arrange Food with Fork} consists of placing bread on a plate, placing a pear on the plate, and then placing a fork on a block stand. Although this is a more common tabletop arrangement task, it still tests compositional multi-object placement in a cluttered real scene.
+\textit{Place Bread in Microwave} consists of opening the microwave door, transferring bread from a plate into the microwave, and closing the door. This task emphasizes articulated manipulation under partial occlusion and changing scene geometry.
+\textit{Build Letter M with Blocks} requires arranging five blocks into a specified global shape. Unlike local pick-and-place tasks, this setting tests whether the policy can reason about a target spatial pattern and adjust placements online to satisfy the final global arrangement.
+
+\textbf{Results.}
+As shown in tab.~\ref{tab:real_world_results}, we report success rate over 100 real-robot trials for each task and each method. MapPolicy transfers robustly to the real world and is particularly effective on tasks where success depends on understanding hidden structure, articulated state, or global spatial layout. Compared with Diffusion Policy~\cite{chi2024diffusionpolicy} and 3D Diffusion Policy~\cite{Ze2024DP3}, MapPolicy produces more stable multi-step behavior on drawer and microwave tasks and better preserves the required inter-object arrangement on stacking and shape-construction tasks. These results are consistent with our central claim: explicit Scene Map helps the policy maintain a manipulation-oriented representation of object structure and spatial relations even when raw observations are noisy, partially occluded, or insufficient to reveal the full scene state.
+
+\subsection{System Error Breakdown}
+\label{sec:system_breakdown}
+
+\input{tabs/SystemBreakdown.tex}
+
+\input{tabs/AblationDesign.tex}
+
+MapPolicy is a multi-stage system whose final performance depends not only on downstream policy learning, but also on the quality of Scene Map construction. To identify the dominant bottleneck, we perform a system error breakdown on MetaWorld~\cite{Yu2020Meta,mclean2025metaworld} using oracle replacements. Since several error sources in MapPolicy can be independently controlled, we use a combinatorial oracle analysis instead of a single sequential replacement protocol.
+
+\textbf{Setup.}
+We analyze three independent sources of structural error: object extraction, object-pose estimation, and structural-size estimation. For each source, we replace the predicted quantity with its ground-truth counterpart and evaluate the resulting average success rate. All oracle quantities in this subsection are used only for analysis and are not part of the inference interface of MapPolicy.
+
+\textbf{Results.}
+The main result is summarized in tab.~\ref{tab:system_breakdown}, formatted as a 2D oracle matrix. The table contains three oracle columns, \textit{GT Extraction}, \textit{GT Object Pose}, and \textit{GT Structural Size}, together with one performance column, \textit{Avg. Success}. The rows enumerate all combinations of the three oracle sources.
+This analysis should be read in two stages. First, the single-factor replacements reveal which structural error source is the dominant independent bottleneck. Second, the joint replacements reveal whether different error sources interact strongly or contribute largely independent errors. This subsection therefore identifies which part of the MapPolicy pipeline deserves the highest priority for improvement.
+
+
+\subsection{Ablation Studies}
+\label{sec:ablation_studies}
+
+
+
+\input{tabs/AblationLossPresence.tex}
+
+We design ablations to answer three questions: whether explicit Scene Map is necessary as a representation, how Scene Map should be encoded and fused with visual information, and which supervision terms make the learned map most useful for downstream control.
+
+\textbf{Scene Map Representation.}
+We first evaluate which contents inside Scene Map are most important for policy learning. We conduct this ablation on MetaWorld~\cite{Yu2020Meta,mclean2025metaworld} and keep the policy backbone and training recipe fixed, changing only the attributes included in the map representation. Table~\ref{tab:ablation_map_contents} progressively adds node attributes, including part geometry, pose, semantic identity, and affordance-related information, and then edge attributes, including relation type, continuous relation parameters, anchor references, and relative pose. This comparison separates the contribution of part-level node descriptors from the contribution of explicit cross-part relations. If edge attributes provide additional gains beyond node-only representations, the conclusion is that Scene Map helps not only by describing object parts, but also by modeling the structural and physical relations among them.
+
+
+
+\textbf{Structure-Aware Encoder and Fusion.}
+Given a Scene Map, the next question is how it should be encoded and fused with visual information. We therefore study both the choice of map encoder and the choice of fusion strategy. Table~\ref{tab:ablation_encoder_fusion} compares four encoders while keeping the Scene Map representation fixed: \textit{Pooling}, \textit{PointNet}~\cite{Qi2017PointNet}, \textit{Transformer}~\cite{Kim2021Transformer}, and \textit{Graph Encoder}. This comparison tests whether relation-aware graph encoding is necessary to fully exploit the node-edge structure of Scene Map. We then fix the best map encoder and compare three fusion strategies: \textit{Concat}, \textit{MLP fusion}, and \textit{Attention fusion}. These results show whether the information in Scene Map can be effectively used by naive concatenation or whether a stronger fusion mechanism is needed to integrate structural and visual cues for downstream action prediction.
+
+\textbf{Loss Design.}
+We keep action imitation enabled and ablate three auxiliary losses: map-attribute supervision, point-cloud Chamfer supervision, and physical constraint regularization. Table~\ref{tab:ablation_loss_presence} shows that each auxiliary loss improves over action imitation alone, while combining Chamfer supervision with physical constraints gives the strongest partial combination and using all three losses achieves the best performance.
+

@@ -1,0 +1,47 @@
+\paragraph{Baseline details.}
+\label{app:baseline_details}
+
+We compare OSTRA with benchmark-specific baselines from four categories.
+
+\paragraph{Action-generation policies.}
+ACT~\citep{Zhao2023Learning} uses a conditional variational transformer to
+predict temporally coherent action chunks.
+Diffusion Policy (DP)~\citep{chi2024diffusionpolicy} generates continuous
+action sequences through conditional denoising.
+DP3~\citep{Ze2024DP3} conditions action diffusion on compact 3D point-cloud
+representations.
+3D Diffuser Actor~\citep{ke2024diffuseractor} performs policy diffusion over
+actions using language-conditioned 3D scene features.
+PerAct$^2$~\citep{shridhar2022peract} predicts discretized 6-DoF actions from
+language-conditioned voxel observations with a Perceiver-based policy.
+BAKU~\citep{Haldar2025BAKU} is an efficient transformer policy designed for
+multi-task imitation learning.
+FlowPolicy~\citep{zhang2024flowpolicy} learns a fast 3D visuomotor policy
+through consistency flow matching.
+MDT~\citep{reuss2024multimodal} is a diffusion transformer conditioned on
+multiple forms of task-goal input.
+
+\paragraph{History and memory policies.}
+SAM2Act+~\citep{Fang2025SAM2Act} augments visual foundation-model features
+with a memory architecture for manipulation.
+MemoryVLA~\citep{shi2025memoryvla} equips a vision-language-action policy with
+perceptual and cognitive memory.
+BPP~\citep{Mark2026BPP} handles long observation histories by selecting and
+attending to key past frames.
+
+\paragraph{Future-prediction methods.}
+PPI~\citep{Yang2025PPI} represents manipulation through predicted gripper
+poses and object point flows.
+UWM~\citep{Zhu2025UWM} jointly models future video and actions with coupled
+diffusion objectives.
+MPI~\citep{Zeng2024MPI} pretrains manipulation representations by predicting
+interactions and therefore requires a separately specified downstream action
+head.
+
+\paragraph{Object-centric perception and motion methods.}
+GROOT~\citep{zhu2023learning} learns generalizable manipulation policies from
+object-centric 3D representations.
+SPOT~\citep{Hsu2025SPOT} generates object-centric
+$\mathrm{SE}(3)$ pose trajectories with diffusion.
+Im2Flow2Act~\citep{xu2024im2flow2act} uses predicted object flow as a
+cross-domain interface from videos to robot actions.

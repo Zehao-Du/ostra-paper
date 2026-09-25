@@ -1,0 +1,27 @@
+\begin{table}[t]
+\centering
+\caption{Real-world results. We report success rate (\%) over 100 trials for each real-world manipulation task. Best results are in \textbf{bold}, and second best are \underline{underlined}.}
+\label{tab:real_world_results}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{adjustbox}{max width=0.85\linewidth}
+\begin{tabular}{l|c|ccccc}
+\toprule
+\rowcolor{tablehead}
+Method & Avg. &
+\shortstack{Place Fork\\in Drawer} &
+\shortstack{Stack Three\\Blocks} &
+\shortstack{Arrange Food\\with Fork} &
+\shortstack{Place Bread\\in Microwave} &
+\shortstack{Build Letter M\\with Blocks} \\
+\midrule
+Diffusion Policy~\cite{chi2024diffusionpolicy} & 15.4 & 12 & 6 & 41 & 18 & 0 \\
+3D Diffusion Policy~\cite{Ze2024DP3} & 33.6 & 38 & 21 & 66 & 43 & 0 \\
+Lift3D~\cite{Jia_2025_CVPR} & 36.2 & 41 & 25 & 69 & 46 & 0 \\
+$\pi_0$~\cite{black2026pi0visionlanguageactionflowmodel} & \underline{49.8} & \underline{51} & \underline{39} & \underline{83} & \underline{61} & \underline{15} \\
+\midrule
+MapPolicy (Ours) & \textbf{81.4} & \textbf{87} & \textbf{78} & \textbf{95} & \textbf{84} & \textbf{63} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}

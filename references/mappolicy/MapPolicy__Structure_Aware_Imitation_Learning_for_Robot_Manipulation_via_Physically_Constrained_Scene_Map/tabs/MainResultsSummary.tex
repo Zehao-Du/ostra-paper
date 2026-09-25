@@ -1,0 +1,36 @@
+\begin{table*}[t]
+\centering
+\caption{Summary of main simulation results. We report average success rate (\%) across all evaluated tasks in each benchmark. Full per-task results are provided in Appendix~\ref{app:full_sim_results}.}
+\label{tab:main_results_summary}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lc|lc|lc}
+\toprule
+\rowcolor{tablehead}
+\multicolumn{2}{c|}{MetaWorld~\cite{Yu2020Meta,mclean2025metaworld} (25 tasks)} &
+\multicolumn{2}{c|}{RLBench~\cite{James2020RLBench} (18 tasks)} &
+\multicolumn{2}{c}{ManiSkill~\cite{Gu2023ManiSkill2} (6 tasks)} \\
+\rowcolor{tablehead}
+Method & Mean S.R. (\%) & Method & Mean S.R. (\%) & Method & Mean S.R. (\%) \\
+\midrule
+Diffusion Policy~\cite{chi2024diffusionpolicy} & 27.3 &
+PerAct~\cite{shridhar2022peract} & 49.4 &
+Diffusion Policy~\cite{chi2024diffusionpolicy} & 26.8 \\
+3D Diffusion Policy~\cite{Ze2024DP3} & 51.1 &
+3D Diffuser Actor~\cite{3d_diffuser_actor} & 81.4 &
+3D Diffusion Policy~\cite{Ze2024DP3} & 53.8 \\
+$\pi_0$~\cite{black2026pi0visionlanguageactionflowmodel} & 69.5 &
+RVT-2~\cite{goyal2024rvt2} & 81.4 &
+Octo~\cite{octo_2023} & 16.8 \\
+\underline{Lift3D~\cite{Jia_2025_CVPR}} & \underline{78.8} &
+\underline{PDFactor~\cite{Tian_2025_CVPR}} & \underline{87.3} &
+\underline{$\pi_0$~\cite{black2026pi0visionlanguageactionflowmodel}} & \underline{54.0} \\
+\rowcolor{tablehead}
+\textbf{MapPolicy} & \textbf{93.2} &
+\textbf{MapPolicy} & \textbf{94.8} &
+\textbf{MapPolicy} & \textbf{73.0} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table*}

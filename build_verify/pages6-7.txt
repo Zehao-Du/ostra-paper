@@ -1,0 +1,173 @@
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+270
+      Algorithm 1 Staged Action Generation in OSTRA
+271
+272
+      Require: Map context F M , scene context F S , robot state st
+273   Ensure: Action chunk A     bt
+       1: Construct future object queries Z M
+274
+       2: Initialize Y E,N , AN ∼ N (0, I)
+275
+       3: for n = N, . . . , 1 do
+276
+       4:    P M , YbnM ← O BJECT S TAGE(Z M , F M , F S , st , n)
+277
+       5:    P E, bϵE
+                    n ← TCPS TAGE (Y
+                                       E,n
+                                            , F M , F S , sg(P M ), st , n)
+278            A A b
+       6:    P ,b ϵn , Gn ← ACTION S TAGE(An , F M , F S , sg(P E ), st , n)
+279
+       7:    Y E,n−1 ← D ENOISE(Y E,n , b  ϵEn , n)
+280
+       8:    An−1 ← D ENOISE(An , b  ϵA
+                                      n , n)
+281    9: end for
+282   10: return A0 with predicted gripper states
+283
+284
+285   and gripper supervision:
+286
+287                                L = λM ∥Yb M − Y M ∥1 + λE ∥b
+                                                               ϵE − ϵE ∥1
+                                                                                                         (4)
+288                                    + λA ∥b                 b − G∥1 .
+                                              ϵA − ϵA ∥1 + λG ∥G
+289
+      The terms supervise object evolution, TCP subgoals, continuous control, and gripper state. Stop-
+290
+      gradient requires each stage to satisfy its own target.
+291
+292   At inference, map and field contexts are encoded once per replanning step. Each reverse step exe-
+293   cutes Algorithm 1; the policy then executes the first predicted actions and replans from the updated
+294
+      history.
+295
+296   4     E XPERIMENTS
+297
+298   Our experiments ask whether OSTRA improves simulation (Section 4.1) and real-world manipula-
+299   tion (Section 4.2); how foundation-model errors and cost affect it (Sections 4.3 and 4.4); and which
+300   designs and hyperparameters matter (Section 4.5).
+301
+302   4.1   S IMULATION E XPERIMENTS
+303
+304
+      Benchmarks and Experimental Setup. We benchmark OSTRA on three manipulation suites,
+      with representative task rollouts shown in Figure 4. RLBench2, based on RLBench (James
+305
+      et al., 2020), contains seven multi-stage tasks requiring long-horizon object-state reasoning. Man-
+306
+      iSkill (Gu et al., 2023) contains six contact-rich insertion, placement, tool-use, and stacking tasks.
+307   LIBERO (Liu et al., 2023) contains four ten-task suites—Spatial, Object, Goal, and Long—for
+308   diverse language-conditioned manipulation.
+309
+310
+      We use official datasets and protocols and report task success rate. Detailed settings are provided in
+      Appendix A.
+311
+312
+      Baselines. We compare OSTRA with benchmark-specific methods spanning action generation,
+313
+      history and memory, future prediction, and object-centric perception and motion (Zhao et al., 2023;
+314
+      Chi et al., 2025; Ze et al., 2024; Fang et al., 2025; Yang et al., 2025; Zhu et al., 2023a; Hsu et al.,
+315   2025). Detailed descriptions of all baselines are provided in Appendix A.1.
+316
+317   Simulation results. As summarized in Table 1, OSTRA achieves 89.8%, 74.5%, and 97.4% on
+318   RLBench2, ManiSkill, and LIBERO, improving over their strongest reported baselines by 5.3, 17.7,
+319   and 0.7 points. Appendix A.2 provides full per-task results.
+320
+321   4.2   R EAL -W ORLD E XPERIMENTS
+322
+323   We evaluate OSTRA on a 7-DoF Realman 75-BF arm with a Pika parallel gripper. An Intel Re-
+      alSense D415 captures RGB-D observations, and Open3D (Zhou et al., 2018) reconstructs point
+
+
+                                                        6
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+324       Initial State                  Task Progress                            End State           Initial State                     Task Progress                   End State
+
+325
+326
+                                Placing Fork in Drawer (Real World)                                                          Build Letter M with Blocks (Real World)
+327
+328
+329                               Stack Three Blocks (Real World)                                                                  Cook the Pear (Real World)
+330
+331
+332                                 Collect Blocks (Real World)                                                               Arrange Food with Fork (Real World)
+
+
+333
+334
+                               Place Bread in Microwave (Real World)                                                                Push the Box (RLBench2)
+335
+336
+337                               Hang the Wine Bottle (LIBERO)                                                                     Place Sphere (ManiSkill)
+
+338   Figure 4: Task demonstrations from initial state to task completion. The seven real-world tasks are
+339   Place Fork in Drawer, Stack Three Blocks, Collect Blocks, Place Bread in Microwave, Build Letter
+340   M with Blocks, Cook the Pear, and Arrange Food with Fork. The figure also shows representative
+341   tasks from the three simulation benchmarks: Push the Box from RLBench2 (James et al., 2020),
+342   Place Sphere from ManiSkill (Gu et al., 2023), and Hang the Wine Bottle from LIBERO (Liu et al.,
+343   2023).
+344
+      Table 1: Summary of the main simulation results. We report average task success rate (%) on
+      each benchmark. Full per-task results are provided in Appendix A.2. Best results are in bold, and
+345
+      second-best results are underlined.
+346
+            RLBench2 (James et al., 2020) (7 tasks)                             ManiSkill (Gu et al., 2023) (6 tasks)                      LIBERO (Liu et al., 2023) (40 tasks)
+347    Method                             Mean S.R. (%)                Method                                 Mean S.R. (%)       Method                               Mean S.R. (%)
+
+348    ACT (Zhao et al., 2023)                       15.5              ACT (Zhao et al., 2023)                        21.3        ACT (Zhao et al., 2023)                  67.7
+       DP3 (Ze et al., 2024)                         26.0              Diffusion Policy (Chi et al., 2025)            26.8        GROOT (Zhu et al., 2023a)                66.2
+349    3D Diffuser Actor (Ke et al., 2025)           64.7              DP3 (Ze et al., 2024)                          53.8        Diffusion Policy (Chi et al., 2025)      72.4
+       PerAct2 (Shridhar et al., 2023)               40.0              3D Diffuser Actor (Ke et al., 2025)            51.5        BAKU (Haldar et al., 2024)               93.0
+350    PPI (Yang et al., 2025)                       80.8              PPI (Yang et al., 2025)                        56.8        MDT (Reuss et al., 2024)                 76.1
+       Diffusion Policy (Chi et al., 2025)           42.6              BAKU (Haldar et al., 2024)                     43.0        DP3 (Ze et al., 2024)                    73.0
+351    SAM2Act+ (Fang et al., 2025)                  84.5              FlowPolicy (Zhang et al., 2025)                39.5        UWM (Zhu et al., 2025)                   91.8
+       GROOT (Zhu et al., 2023a)                     45.2              SPOT (Hsu et al., 2025)                        47.5        MemoryVLA (Shi et al., 2026)             96.7
+352    SPOT (Hsu et al., 2025)                       82.3              Im2Flow2Act (Xu et al., 2025)                  45.7        BPP (Mark et al., 2026)                  90.9
+353    OSTRA (Ours)                                  89.8              OSTRA (Ours)                                   74.5        OSTRA (Ours)                             97.4
+
+354   clouds. The map constructor uses predicted masks, poses, and structural parameters, evaluating
+355   reasoning under errors accumulated by the OST-Map perception pipeline.
+356
+357
+      Task suite. We consider seven tasks spanning articulated interaction, long-horizon rearrangement,
+358   thin or reflective objects, and global spatial constraints. They require opening and closing con-
+359   tainers, sequential stacking, cluttered placement, partial-occlusion reasoning, pattern construction,
+360   collection, and shared-workspace manipulation. As visualized in Figure 4, they cover articulated
+361   state, support, containment, occupancy, and multi-object layout transitions.
+362
+363   Real-world results. Across 20 trials per task (Table 2), OSTRA averages 84.3%, exceeds
+364   SAM2Act+ (59.3%) by 25.0 points, and ranks first on all tasks. It is more reliable on drawer and
+365   microwave tasks and better preserves relations in stacking and shape construction than Diffusion
+366   Policy (Chi et al., 2025) and DP3 (Ze et al., 2024). Its largest gain is on Build Letter M with Blocks
+367   (65% versus 15%), supporting object-state transition modeling under noisy, partially occluded ob-
+368   servations.
+369
+370   4.3       S YSTEM E RROR B REAKDOWN
+371
+372   We use ground-truth replacements to identify which OST-Map Constructor errors most affect task
+373   success.
+374
+375   Setup. We replace outputs of SAM 3 extraction, FoundationPose estimation and tracking, and
+376   PointNet–MLP structural estimation with ground-truth masks, poses, or sizes while fixing the policy
+377   and evaluation. We test all eight combinations: none, each single or pairwise replacement, and all
+      GT. Ground truth is used only for diagnosis.
+
+
+                                                                                                7
+

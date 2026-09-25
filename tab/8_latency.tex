@@ -1,0 +1,39 @@
+\begin{table}[t]
+    % \vspace{-6pt}
+    \centering
+    \caption{\textbf{Inference latency (ms) and throughput.}
+    We report mean component and end-to-end latency for the first frame and
+    subsequent frames at batch size one. The first frame initializes OST-Map.
+    Subsequent frames track objects and update the map for end-to-end comparison.}
+    \label{tab:latency}
+    \vspace{2pt}
+    \footnotesize
+    \renewcommand{\arraystretch}{1.22}
+    \setlength{\tabcolsep}{2pt}
+    \begin{adjustbox}{max width=1.0\columnwidth}
+    \begin{tabular}{lcccccc}
+        \toprule
+        \rowcolor{tablehead}
+        Stage
+        & Mask Seg. / Track. $\downarrow$
+        & Pose Reg. / Track. $\downarrow$
+        & Structure \& Map $\downarrow$
+        & Encoders \& Policy $\downarrow$
+        & Total (ms) $\downarrow$
+        & FPS $\uparrow$ \\
+        \midrule
+        First Frame (Initialization)
+        & 1412.350 & 1386.425 & 21.340 & 15.210 & \cellcolor{blue1}2835.325 & 0.353 \\
+        \addlinespace[3pt]
+        Later Frames (Tracking)
+        & 94.832 & 96.155 & 20.125 & 15.180 & \cellcolor{blue1}226.292 & 4.419 \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    % Feature/map encoding includes DINO, Semantic Field, and OST-Map encoding.
+    % Policy timing includes the complete denoising loop. Map update includes
+    % first-frame initialization and only invoked operations on later frames.
+    % FPS = 1000 / end-to-end latency in ms for sequential processing,
+    % not the robot control frequency. -- denotes an unmeasured value.
+    \vspace{-6pt}
+\end{table}

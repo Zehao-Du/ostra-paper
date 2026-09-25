@@ -1,0 +1,26 @@
+\begin{table*}[t]
+\centering
+\caption{Ablation study on training losses on MetaWorld~\cite{Yu2020Meta,mclean2025metaworld}. Map Attr. GT supervises the scene-dependent node and edge attributes used to instantiate Scene Map, Chamfer supervises map-induced point-cloud geometry, and Physical enforces relation-specific constraints.}
+\label{tab:ablation_loss_presence}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{c|cccc|c@{\hspace{12pt}}c|cccc|c}
+\toprule
+ & \multicolumn{4}{c|}{Loss Terms} &  &  & \multicolumn{4}{c|}{Loss Terms} &  \\
+\cmidrule(lr){2-5} \cmidrule(lr){8-11}
+Setting & Action & Map Attr. GT & Chamfer & Physical & Avg. Success &
+Setting & Action & Map Attr. GT & Chamfer & Physical & Avg. Success \\
+\midrule
+Ex1 & $\checkmark$ & - & - & - & \cellcolor{blue1}80.6 &
+Ex5 & $\checkmark$ & $\checkmark$ & $\checkmark$ & - & \cellcolor{blue2}88.7 \\
+Ex2 & $\checkmark$ & $\checkmark$ & - & - & \cellcolor{blue1}83.4 &
+Ex6 & $\checkmark$ & $\checkmark$ & - & $\checkmark$ & \cellcolor{blue3}89.5 \\
+Ex3 & $\checkmark$ & - & $\checkmark$ & - & \cellcolor{blue2}84.1 &
+Ex7 & $\checkmark$ & - & $\checkmark$ & $\checkmark$ & \cellcolor{blue4}\underline{92.4} \\
+Ex4 & $\checkmark$ & - & - & $\checkmark$ & \cellcolor{blue1}82.8 &
+\textbf{\underline{Ex8}} & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & \cellcolor{blue4}\textbf{93.2} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table*}

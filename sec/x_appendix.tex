@@ -1,0 +1,491 @@
+\section{Appendix}
+\label{app}
+
+\subsection{Implementation Details}
+\label{app:implementation_details}
+
+\paragraph{Perception and map construction.}
+OSTRA receives RGB-D observations and robot states. SAM 3 segments prompted
+task objects, FoundationPose registers and tracks their 6-DoF poses, and a
+PointNet encoder with object-specific MLPs estimates structural parameters
+from masked point clouds. Persistent object and structural-node identities
+align the resulting OST-Maps across the observation history. The dense
+Semantic Field pairs depth points with image-aligned pretrained DINO features
+and encodes them with PointNet++.
+
+\paragraph{Policy inputs and outputs.}
+Each policy input contains $T_o$ consecutive observations and $H_p$ historical
+OST-Map keyframes. The policy predicts $H_k$ future object-state keyframes, TCP
+subgoals, and an action chunk of length $H_a$. Unless varied in the sensitivity
+study, we use $H_p=T_o=H_k=4$ and $H_a=16$. Transition-Guided Attention first
+attends to graph-transformer OST-Map tokens and then to dense Semantic Field
+tokens. Relative 3D rotary encodings provide coordinate-aware cross-attention.
+
+\paragraph{Training and inference.}
+Training jointly supervises future structural-node positions, TCP diffusion,
+action diffusion, and gripper state. The reference loss ratios are
+$\lambda_M/\lambda_A=\lambda_E/\lambda_A=\lambda_G/\lambda_A=1$. Stop-gradient
+separates the object, TCP, and action stages. At inference, map and field
+contexts are encoded once per replanning step; TCP keyframes and action chunks
+are denoised from Gaussian noise, the first predicted actions are executed,
+and the policy replans from the updated history.
+
+\subsection{Benchmarks and Baseline Details}
+\label{app:benchmarks}
+
+\paragraph{Simulation benchmarks.}
+RLBench2 is based on RLBench~\citep{James2020RLBench} and contains seven
+multi-stage tasks requiring long-horizon object-state reasoning.
+\textbf{RLBench2 protocol.} We follow PPI~\citep{Yang2025PPI}, using its
+regenerated RLBench2 data for Box, Ball, Drawer, Laptop, Dustpan, Tray, and
+Handover Easy. Each task uses 100 demonstrations of approximately 150--250
+steps. Evaluation uses 100 rollouts per task with varying initial states. We
+report the mean and standard deviation over three checkpoints and average
+success across the seven tasks.
+
+\textbf{ManiSkill protocol.} ManiSkill~\citep{Gu2023ManiSkill2} contains the
+six contact-rich insertion, placement, tool-use, and stacking tasks used in our
+evaluation. Following the official imitation-learning setup, we train with 100
+successful motion-planning demonstrations per task. We retain each
+environment's official randomized initialization, episode horizon, and success
+condition, evaluate 100 episodes per task, and report task and average success
+rates.
+
+\textbf{LIBERO protocol.} LIBERO~\citep{liu2023libero} contains the Spatial,
+Object, Goal, and Long suites used in our evaluation. We follow
+MemoryVLA~\citep{shi2025memoryvla}: each task uses 50 demonstrations after
+failed trajectories are removed, and each task is evaluated for 50 trials from
+the official initial states. We use 10 initial no-op steps for object
+stabilization and maximum episode lengths of 220, 280, 300, and 520 steps for
+Spatial, Object, Goal, and Long, respectively. We use no action ensembling and
+report success rates at the best validation checkpoint.
+
+\input{sec/x_baseline_details}
+
+\subsection{Detailed Simulation Benchmark Scores}
+\label{app:full_sim_results}
+
+This section reports the full per-task results summarized in
+\cref{tab:main_results_summary}.
+
+\input{tab/1_rlbench2}
+
+\input{tab/2_maniskill}
+
+\input{tab/3_libero}
+
+\subsection{Real-World Details}
+\label{app:real_world_details}
+
+\paragraph{Hardware and perception.}
+The real-world platform consists of a 7-DoF Realman 75-BF arm, a Pika parallel
+gripper, and an Intel RealSense D415 RGB-D camera. Open3D reconstructs point
+clouds from the RGB-D stream. All reported evaluations use predicted masks,
+poses, and structural parameters rather than ground-truth map inputs.
+
+\paragraph{Tasks and protocol.}
+We evaluate seven tasks: \textit{Place Fork in Drawer},
+\textit{Stack Three Blocks}, \textit{Arrange Food with Fork},
+\textit{Place Bread in Microwave}, \textit{Build Letter M with Blocks},
+\textit{Collect Blocks}, and \textit{Cook the Pear}. Together they cover
+articulated interaction, sequential stacking, cluttered placement,
+partial-occlusion reasoning, pattern construction, collection, and
+shared-workspace manipulation. We run 20 trials per method and task and report
+full-task success rate.
+
+\subsection{Detailed Setups for Ablations and Diagnostic Experiments}
+\label{app:additional_experiment_details}
+
+\paragraph{System error breakdown.}
+We diagnose the OST-Map Constructor by replacing the outputs of SAM 3
+extraction, FoundationPose pose estimation and tracking, and PointNet--MLP
+structural estimation with ground-truth masks, poses, or sizes. We evaluate
+all eight combinations: no replacement, each of the three individual
+replacements, all three pairwise replacements, and replacement of all three
+components. The policy and Semantic Field encoder remain fixed, and
+ground-truth quantities are used only for this diagnostic experiment.
+
+\paragraph{System error analysis.}
+\Cref{tab:system_breakdown} shows that structural estimation is the largest
+individual source of recoverable error. Replacing structural sizes increases
+success from $89.8\%$ to $93.4\%$, a gain of $3.6$ points, compared with
+$2.1$ points from ground-truth object poses and $0.5$ points from
+ground-truth extraction. This ordering indicates that coarse object discovery
+is already relatively reliable, whereas errors in the geometric parameters
+used to instantiate OST-Map nodes more directly affect downstream state
+reasoning. The pairwise results reinforce this interpretation. Correcting pose
+and structural size together reaches $95.7\%$, which recovers $5.9$ points and
+outperforms either correction alone. Adding ground-truth extraction to all
+other corrections further raises success to $96.4\%$. The remaining
+$3.6\%$ failure rate under all ground-truth replacements cannot be attributed
+to these three constructor outputs. It instead reflects residual difficulty in
+the Semantic Field, policy prediction, control execution, or other unmodeled
+sources of variation.
+
+\paragraph{Latency profiling.}
+We profile batch-one inference on an NVIDIA GeForce RTX 4090. First-frame
+latency includes object segmentation, pose registration, structural
+estimation, OST-Map initialization, encoding, and policy inference. Later-frame
+latency replaces segmentation and registration with tracking and includes map
+updates, encoding, and policy inference. Throughput is computed from sequential
+end-to-end latency and does not denote the robot control frequency.
+
+\paragraph{Latency analysis.}
+\Cref{tab:latency} attributes nearly all initialization cost to the two
+foundation-model perception components. Segmentation and pose registration
+together require $2798.775$ ms, or $98.7\%$ of the $2835.325$ ms first-frame
+latency. In contrast, structure and map construction require $21.340$ ms, and
+the encoders and policy require $15.210$ ms. Temporal tracking reduces mask
+processing from $1412.350$ ms to $94.832$ ms and pose processing from
+$1386.425$ ms to $96.155$ ms. Meanwhile, structure and map processing changes
+by only $1.215$ ms, and encoder and policy latency is effectively unchanged.
+The resulting $226.292$ ms later-frame latency is $12.5\times$ lower than
+initialization latency. Perception still accounts for $84.4\%$ of later-frame
+latency, so faster segmentation and pose tracking offer substantially more
+headroom than simplifying OST-Map encoding or policy inference.
+
+\paragraph{Ablations.}
+All ablations use the same RLBench2 data, model capacity, training and
+evaluation budgets, and evaluation seeds. The OST-Map study varies historical
+and future transition supervision and progressively adds node geometry,
+semantics, affordances, and edge attributes under a fixed graph encoder and
+node correspondence. The architecture study varies map/visual attention,
+prediction stages, and object/TCP stop-gradient boundaries. Removed stages
+omit their prediction heads and losses; the flat variant retains all targets
+without hierarchical conditioning.
+
+\paragraph{Historical and future OST-Maps.}
+The temporal variants in \cref{tab:ablation_transition_design} isolate the two
+roles of OST-Map. Removing the map and future-state loss yields $69.4\%$.
+Using the complete map attributes only for history raises success to $84.5\%$,
+while using them only for future supervision reaches $85.8\%$. Thus, observed
+state history and predicted future states independently recover $15.1$ and
+$16.4$ points over the no-map variant. Combining both roles reaches $89.8\%$,
+adding $5.3$ points over history alone and $4.0$ points over future supervision
+alone. The gain from their combination supports using one identity-aligned
+representation on both sides of the current observation rather than treating
+history encoding and future prediction as separate auxiliary mechanisms.
+
+\paragraph{OST-Map attributes.}
+Ex4--Ex11 form a cumulative attribute study with temporal supervision and the
+graph encoder held fixed. Pose-only nodes obtain $75.1\%$. Adding node geometry
+raises success to $78.8\%$, and adding semantics then raises it to $82.5\%$.
+Affordances provide a further $2.7$-point gain to $85.2\%$. Collectively, these
+node attributes contribute $10.1$ points beyond pose alone, showing that object
+state cannot be represented adequately by rigid transforms without information
+about shape, identity, and interaction regions. Edge attributes add another
+$4.6$ points in total. Relation type, parameters, anchors, and relative pose
+progressively raise success from $85.2\%$ to $86.6\%$, $87.8\%$, $88.9\%$,
+and $89.8\%$. Because the attributes are added cumulatively, these increments
+measure marginal gains in this ordering rather than isolated importance.
+Nevertheless, the monotonic trend shows that each relation descriptor provides
+complementary information.
+
+\paragraph{Map--visual attention order.}
+The first four rows of \cref{tab:ablation_architecture} retain the full
+prediction hierarchy and stop-gradient boundaries while changing how map and
+visual tokens interact. Map-only and visual-only attention reach $76.5\%$ and
+$78.2\%$, respectively. Joint access to both modalities improves success to
+$85.4\%$, an $8.9$-point gain over map-only attention and a $7.2$-point gain
+over visual-only attention. Ordering the interaction also matters. Visual-first
+attention reaches $87.1\%$, whereas the map-first design used by OSTRA reaches
+$89.8\%$. The $2.7$-point advantage of map-first attention is consistent with
+first establishing a transition-conditioned object representation and then
+using dense visual tokens to recover local scene detail.
+
+\paragraph{Staged prediction and gradient boundaries.}
+With map-first attention fixed, action-only prediction reaches $75.8\%$.
+Introducing an object-state stage raises success to $83.4\%$, while introducing
+a TCP stage reaches $84.6\%$. A flat model that predicts object state, TCP, and
+actions without hierarchical conditioning reaches only $81.5\%$. The complete
+object-to-TCP-to-action hierarchy achieves $89.8\%$, improving over action-only
+prediction by $14.0$ points and over flat joint prediction by $8.3$ points.
+These comparisons show that the auxiliary targets are most useful when their
+predictions become ordered conditioning variables rather than parallel output
+heads. The stop-gradient variants further separate supervision between stages.
+Without either boundary, success is $85.9\%$. Applying only the object boundary
+raises it to $87.4\%$, applying only the TCP boundary raises it to $88.3\%$,
+and applying both reaches $89.8\%$. The two individual gains sum to the
+$3.9$-point improvement of the complete design, indicating complementary
+protection against later-stage action losses overriding intermediate
+object-state and subgoal supervision.
+
+\paragraph{Hyperparameter sensitivity.}
+We vary one parameter at a time around the full-model reference while fixing
+all others. The temporal study varies $H_p$, $T_o$, $H_k$, and $H_a$; the loss
+study varies $\lambda_M/\lambda_A$, $\lambda_E/\lambda_A$, and
+$\lambda_G/\lambda_A$. The reference configuration is
+$H_p=T_o=H_k=4$, $H_a=16$, and
+$\lambda_M/\lambda_A=\lambda_E/\lambda_A=\lambda_G/\lambda_A=1$.
+
+\paragraph{Hyperparameter analysis.}
+\Cref{fig:hyperparameter_sensitivity} shows a consistent maximum at the
+reference configuration, with different sensitivities across parameter groups.
+Reducing the number of past keyframes to one quarter of the reference produces
+the largest temporal drop, from $89.8\%$ to $70.2\%$. Reducing future
+keyframes to the same ratio reaches $75.6\%$, while reducing recent
+observations reaches $82.4\%$. This gap suggests that sparse keyframe history
+contains information that cannot be replaced by a similarly short window of
+consecutive observations. Action horizon is asymmetric. A quarter-length
+horizon reaches $79.8\%$, and doubling the horizon reaches $78.2\%$, whereas
+doubling the other temporal contexts retains at least $86.8\%$. The policy
+therefore benefits from enough action context to represent a coherent subgoal,
+but long open-loop chunks make control substantially harder.
+
+The loss-weight sweeps show the same ordering as the prediction hierarchy.
+At one quarter of the reference weight, object-state, TCP, and gripper
+supervision reach $74.3\%$, $81.2\%$, and $85.1\%$, respectively. Object-state
+supervision is therefore the most sensitive because errors at the first
+prediction stage propagate to both TCP and action generation. TCP weighting is
+moderately sensitive, while gripper weighting remains comparatively stable.
+Moderate over-weighting is less damaging than severe under-weighting. At
+$1.5\times$ the reference, the three loss sweeps remain between $87.7\%$ and
+$88.8\%$, while at $0.25\times$ they lose between $4.7$ and $15.5$ points.
+This pattern supports balanced supervision at the reference setting without
+requiring precise tuning of the lower-level gripper loss.
+
+\section{OST-Map Representation Details}
+\label{app:ost_map_representation}
+
+This section specifies the concrete OST-Map representation used by OSTRA. The
+implementation follows the 4D-map codebase\footnote{\url{https://github.com/Zehao-Du/4dmap_v1}},
+whose representation module defines the scene, object, primitive-node, and
+relation-edge abstractions described below. We use the name OST-Map to
+emphasize how this representation is temporally aligned and used to supervise
+object-state transitions.
+
+\subsection{Hierarchical Scene Representation}
+\label{app:ost_map_hierarchy}
+
+At time $t$, the scene is represented by
+\begin{equation}
+    \mathcal{M}_t
+    =
+    \bigl(
+    \mathcal{O},
+    \mathcal{V}_t,
+    \mathcal{E}_t,
+    \Pi
+    \bigr),
+    \label{eq:ost_map_concrete}
+\end{equation}
+where $\mathcal{O}$ is the set of task-relevant objects,
+$\mathcal{V}_t$ and $\mathcal{E}_t$ are the flattened structural nodes and
+edges, and $\Pi$ maps each node and edge back to its parent object. The
+implementation stores this hierarchy as a scene-level \texttt{Map\_4d}
+containing multiple \texttt{Object} instances. Each object owns a list of
+primitive nodes and internal relation edges. The scene container additionally
+records object-specific node and edge slices, object names, and text prompts.
+This preserves object grouping while exposing one graph to the map encoder.
+
+An object is not restricted to one node. It is decomposed into the minimum set
+of parameterized geometric primitives needed to expose task-relevant
+structure. For example, a charger contains one body node and two prong nodes,
+while a receptacle contains a divider node and a rectangular-ring node.
+Primitive decomposition makes articulated parts, interaction regions, and
+geometric relations explicit without requiring a dense mesh in the policy
+input.
+
+\subsection{Structural Nodes}
+\label{app:ost_map_nodes}
+
+Each structural node is implemented by a geometry primitive such as a cuboid
+or rectangular ring. Its complete representation is
+\begin{equation}
+    v_{t,i}
+    =
+    \bigl(
+    o_i,
+    c_i,
+    \tau_i,
+    \theta_i,
+    \mathcal{P}_i,
+    \mathcal{A}_i,
+    \mathcal{F}_i,
+    \mathcal{D}_i,
+    p_{t,i},
+    q_{t,i}
+    \bigr).
+    \label{eq:ost_map_node_full}
+\end{equation}
+Here, $o_i$ is the persistent parent-object identity, $c_i$ is a semantic
+label, $\tau_i$ is the primitive type, and $\theta_i$ contains its structural
+parameters, such as cuboid height, length, and width. The set
+$\mathcal{P}_i$ contains points sampled from the primitive surface, and
+$\mathcal{A}_i$ contains task-relevant affordance points when they are
+available. The optional sets $\mathcal{F}_i$ and $\mathcal{D}_i$ describe
+primitive faces and axes. They provide candidate reference anchors for
+relations. Finally, $(p_{t,i},q_{t,i})$ is the node pose, represented by a
+3D position and a unit quaternion in the implementation.
+
+The code exposes these quantities as \texttt{Node\_Position},
+\texttt{Node\_Semantic}, \texttt{Node\_Affordance},
+\texttt{Node\_Face}, \texttt{Node\_Axis}, \texttt{position}, and
+\texttt{rotation}. Structural parameters determine the local primitive
+geometry. An object pose then places its primitive nodes in the scene. This
+factorization separates episode-level geometry from time-varying state.
+Semantic identity, primitive type, structural parameters, and local
+affordances remain fixed within an episode, while node poses change as the
+robot manipulates the scene.
+
+\subsection{Relation Edges}
+\label{app:ost_map_edges}
+
+An edge connects two structural nodes and is represented as
+\begin{equation}
+    e_{t,ij}
+    =
+    \bigl(
+    i,j,
+    r_{ij},
+    \eta_{ij},
+    a_{ij}^{i},
+    a_{ij}^{j},
+    \Delta p_{t,ij},
+    \Delta q_{t,ij}
+    \bigr).
+    \label{eq:ost_map_edge_full}
+\end{equation}
+The relation type $r_{ij}$ belongs to the implementation vocabulary
+\{\textit{Free}, \textit{Fixed}, \textit{Revolute}, \textit{Prismatic},
+\textit{Cylindrical}, \textit{Planar-Contact}, \textit{Alignment}\}.
+The vector $\eta_{ij}$ stores relation-specific geometric parameters.
+The endpoint anchors $a_{ij}^{i}$ and $a_{ij}^{j}$ select a face or axis from
+the corresponding nodes. Each anchor is represented by a local frame
+containing a normal, tangent, bitangent, and position. The relative pose
+$(\Delta p_{t,ij},\Delta q_{t,ij})$ captures the current displacement and
+relative orientation between the endpoints.
+
+Task templates specify edges with known physical or functional relations. For
+all remaining node pairs, the implementation can complete the graph with
+\textit{Free} edges. These edges use zero relation parameters and anchors but
+retain the measured relative pose. Consequently, the encoder receives both
+explicit task constraints and unconstrained spatial relations through one
+uniform edge interface.
+
+\subsection{Tensor Interface to the Map Encoder}
+\label{app:ost_map_tensor_interface}
+
+The scene hierarchy is converted into a batched graph before encoding.
+\Cref{tab:ost_map_tensor_layout} lists the exact model-facing fields. Primitive
+surface and affordance points are flattened across nodes and accompanied by
+index vectors that assign every point to a graph node. This preserves
+variable-size point sets without padding every primitive to the same size.
+Text semantics are mapped to semantic IDs or replaced by precomputed semantic
+embeddings. Edges are flattened in the same order as their source and
+destination indices.
+
+\begin{table}[t]
+    \centering
+    \caption{\textbf{OST-Map tensor layout.}
+    $N$, $M$, $P$, and $K$ denote the numbers of nodes, edges, structural
+    points, and affordance points in one graph.}
+    \label{tab:ost_map_tensor_layout}
+    \vspace{2pt}
+    \small
+    \setlength{\tabcolsep}{5pt}
+    \begin{adjustbox}{max width=\columnwidth}
+    \begin{tabular}{lll}
+        \toprule
+        Field & Shape & Content \\
+        \midrule
+        \texttt{node\_pos} & $N\times3$ & Node positions \\
+        \texttt{node\_rot} & $N\times4$ & Quaternion rotations \\
+        \texttt{x\_sem\_id} or \texttt{x\_sem} & $N$ or $N\times D_s$
+        & Semantic IDs or embeddings \\
+        \texttt{x\_pos}, \texttt{pos\_batch\_idx} & $P\times3$, $P$
+        & Primitive surface points and node assignments \\
+        \texttt{x\_aff}, \texttt{aff\_batch\_idx} & $K\times3$, $K$
+        & Affordance points and node assignments \\
+        \texttt{edge\_index} & $2\times M$ & Directed graph connectivity \\
+        \texttt{edge\_type} & $M\times1$ & Relation type \\
+        \texttt{edge\_param} & $M\times3$ & Relation parameters \\
+        \texttt{edge\_anchor} & $M\times24$ & Two 12D endpoint frames \\
+        \texttt{edge\_pose} & $M\times7$ & Relative position and quaternion \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+The encoder applies PointNet-style aggregation to
+\texttt{x\_pos} and \texttt{x\_aff}, combines the resulting structural and
+affordance features with semantics and node pose, and embeds relation type,
+parameters, anchors, and relative pose on each edge. A graph transformer then
+propagates information between structural nodes. The resulting node tokens
+retain their 3D coordinates and persistent node indices, which allows OSTRA to
+apply temporal and spatial positional encoding before Transition-Guided
+Attention.
+
+\subsection{Task Templates}
+\label{app:ost_map_templates}
+
+Each task provides a template that determines object identities, primitive
+decomposition, structural-parameter slices, and relation-parameter slices.
+The same template is instantiated at every time step. Only the estimated
+object and node poses are updated during tracking. The metadata file also
+defines the actor names used to retrieve task states and fixes the ordering of
+objects and nodes presented to the policy.
+
+\Cref{tab:ost_map_templates} gives representative templates from the
+implementation. In \textit{Stack Cube}, the two cubes are each represented by
+one cuboid node. In \textit{Plug Charger}, the two task objects expand into
+five structural nodes. The charger body pose anchors two prongs whose
+dimensions and separation are specified by structural and relation
+parameters. The receptacle is decomposed into its center divider and face
+loop, making the insertion geometry explicit. In RLBench2 \textit{Push Box},
+one cuboid node represents the manipulated box.
+
+\begin{table}[t]
+    \centering
+    \caption{\textbf{Representative task-specific OST-Map templates.}
+    The listed dimensions are fixed episode-level structural and relation
+    parameters, while node poses vary over time.}
+    \label{tab:ost_map_templates}
+    \vspace{2pt}
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{adjustbox}{max width=\columnwidth}
+    \begin{tabular}{lcccl}
+        \toprule
+        Task & Objects & Nodes & Parameters & Primitive decomposition \\
+        \midrule
+        Stack Cube & 2 & 2 & 6 size
+        & red cuboid, green cuboid \\
+        Plug Charger & 2 & 5 & 14 size + 1 relation
+        & body, two prongs, divider, ring \\
+        RLBench2 Push Box & 1 & 1 & 3 size
+        & box cuboid \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\subsection{Temporal Alignment and Transition Targets}
+\label{app:ost_map_temporal_alignment}
+
+OST-Map turns the per-frame structure graph into a transition representation
+by preserving the template, object ordering, and node ordering across time.
+For an observation window, OSTRA therefore receives
+\begin{equation}
+    \mathcal{H}_t^M
+    =
+    \left[
+    \mathcal{M}_{t-T_o+1},
+    \ldots,
+    \mathcal{M}_{t}
+    \right],
+    \label{eq:ost_map_history_full}
+\end{equation}
+where the $i$-th node always refers to the same structural part. Tracking
+updates $p_{t,i}$ and $q_{t,i}$ while leaving the node identity and graph
+schema unchanged. Differences across aligned node poses directly expose
+object-state evolution, including rigid motion, articulated displacement, and
+changes in inter-object configuration.
+
+Future transition supervision uses the same node ordering. At each selected
+future keyframe, the target contains the future pose of every structural node.
+The object-state prediction head thus estimates a sequence in the same
+structured space as the history rather than predicting an unrelated latent
+vector. This shared representation is what allows the predicted future
+OST-Map to condition TCP-subgoal generation and, subsequently, continuous
+action generation.

@@ -1,0 +1,253 @@
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+378
+379   Table 2: Real-world manipulation results. We report full-task success rate (%) over 20 trials per
+380   task and the average across seven tasks. Best results are shown in bold, and second-best results are
+381   underlined.
+382                                                   Place Fork   Stack Three   Arrange Food    Place Bread   Build Letter M   Collect   Cook the
+       Method                                Avg. ↑   in Drawer      Blocks       with Fork     in Microwave    with Blocks     Blocks      Pear
+383
+       ACT (Zhao et al., 2023)                19.3       15            10            35             20               0            30        25
+384    Diffusion Policy (Chi et al., 2025)    20.0       10             5            40             20               0            35        30
+385    DP3 (Ze et al., 2024)                  40.7       40            20            65             45               0            60        55
+       PPI (Yang et al., 2025)                50.7       50            30            75             55              10            70        65
+386    SAM2Act+ (Fang et al., 2025)           59.3       55            40            85             65              15            80        75
+387    MemoryVLA (Shi et al., 2026)           54.3       50            35            80             60              10            75        70
+       MPI (Zeng et al., 2024)                44.3       45            25            70             50               0            65        55
+388    SPOT (Hsu et al., 2025)                52.1       45            35            80             55              10            75        65
+389    Im2Flow2Act (Xu et al., 2025)          42.9       40            25            70             45               5            60        55
+
+390    OSTRA (Ours)                           84.3       85            80            95             85              65            90        90
+
+391
+392   Analysis. Table 3 reports average success relative to Full OSTRA. Single and joint replacements
+393   reveal individual and interacting errors. The Semantic Field encoder and policy remain unchanged,
+394   so all-GT residual failures are not solely due to map construction.
+395
+396   4.4     L ATENCY
+397
+398   Setup. We profile batch-one inference on an NVIDIA GeForce RTX 4090. The first frame seg-
+399   ments masks, registers poses, estimates structure, and initializes OST-Map; later frames track objects
+400   and update the map. Both include encoding and policy inference.
+401
+402   Results. Table 4 reports 2835.325 ms for initialization and 226.292 ms (4.419 FPS) thereafter,
+403
+      a 12.5× speedup. Segmentation and pose estimation dominate; map construction, encoding, and
+      policy inference add little overhead.
+404
+405
+406
+      4.5     A BLATION S TUDIES
+407
+      We ablate OST-Map temporal roles and attributes, map–visual attention order, staged denoising and
+408   stop-gradient, and temporal and loss hyperparameters. All variants use the same RLBench2 data,
+409   capacity, budget, and evaluation seeds.
+410
+411   OST-Map. Table 5 compares no map or future loss (Ex1), history only (Ex2), future supervision
+412   from the latest map (Ex3), and the full model (Ex11). Ex4–Ex11 progressively add geometry, se-
+413   mantics, affordances, and edge attributes to pose-only nodes under the same graph encoder and node
+414   correspondence. Full OST-Map reaches 89.8%, 20.4 points above no map; history-only and future-
+415   only reach 84.5% and 85.8%. Their combination and the Ex4–Ex11 trend show that both temporal
+416   roles and attribute groups help.
+417
+418   Transition-Guided Attention. Ex1–Ex4 in Table 6 test map-only, visual-only, joint, and visual-
+419
+      first attention against map-first (Ex12), with the full hierarchy and stop-gradient boundaries. Map-
+      first reaches 89.8%, exceeding these variants by 13.3, 11.6, 4.4, and 2.7 points, respectively.
+420
+421
+      Staged Denoising. With map-first attention fixed, Ex5–Ex8 test action-only, object-to-action,
+422
+      TCP-to-action, and flat joint prediction; Ex9–Ex12 test object/TCP stop-gradient combinations. Re-
+423
+      moved stages omit their heads and losses, while the flat variant retains all targets without hierarchical
+424   conditioning. The full hierarchy exceeds action-only by 14.0 points and flat prediction by 8.3; both
+425   stop-gradient boundaries add 3.9 points over neither.
+426
+427   Hyperparameter sensitivity. Figure 5 varies four temporal counts—past keyframes Hp , obser-
+428   vations To , future keyframes Hk , and actions Ha —and three loss ratios: λM /λA , λE /λA , and
+429   λG /λA . Each curve varies one parameter around the 89.8% full-model reference. Performance is
+430   stable nearby but falls at short or long horizons; Ha , Hp , and object-state loss are most sensitive,
+431   while gripper loss is stable.
+
+
+
+                                                                             8
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+432
+433   Table 3: System error breakdown for OSTRA. We use ground-truth replacements to identify the
+434   dominant bottleneck in OST-Map construction. Ground-truth quantities are used only for analysis
+435   and are not part of the inference interface. ∆ reports the improvement over Full OSTRA.
+436                              Setting                                                  GT Extraction                        GT Object Pose    GT Structural Size      Avg. Success       ∆
+
+437                              Full OSTRA                                                                                                                                   89.8          0.0
+                                 + GT Extraction                                               ✓                                                                              90.3         +0.5
+438                              + GT Object Pose                                                                                     ✓                                       91.9         +2.1
+                                 + GT Structural Size                                                                                                   ✓                     93.4         +3.6
+439                              + GT Extraction + GT Object Pose                              ✓                                      ✓                                       92.1         +2.3
+                                 + GT Extraction + GT Structural Size                          ✓                                                        ✓                     94.2         +4.4
+440                              + GT Object Pose + GT Structural Size                                                                ✓                 ✓                     95.7         +5.9
+441                              + GT Extraction + GT Object Pose + GT Structural Size         ✓                                      ✓                 ✓                     96.4         +6.6
+
+442
+443   Table 4: Inference latency (ms) and throughput. We report mean component and end-to-end
+444
+      latency for the first frame and subsequent frames at batch size one. The first frame initializes OST-
+      Map; subsequent frames track objects and update the map.
+445
+446   Stage                                             Mask Seg. / Track. ↓ Pose Reg. / Track. ↓ Structure & Map ↓ Encoders & Policy ↓ Total (ms) ↓ FPS ↑
+447   First Frame (Initialization)                              1412.350                 1386.425                                    21.340                     15.210               2835.325     0.353
+448   Later Frames (Tracking)                                    94.832                   96.155                                     20.125                     15.180               226.292      4.419
+449
+450
+451   Table 5: OST-Map ablations on RLBench2. We Table 6: OSTRA ablations on RLBench2.
+452   vary temporal supervision and map attributes with a We vary attention order, prediction stages, and
+453
+      fixed graph encoder. Mean is average success (%); stop-gradient boundaries. Mean is average
+      Ex11 is the full model.                             success (%); Ex12 is the full model.
+454
+455                             Temporal         Node                 Edge                                                                   Attention      Denoising    Stop-Grad.
+                                Hist. Fut. Geo Pose Sem Aff Type Param Anchor RelPose Mean                                           Map Vis. M → V V → M Obj. TCP Hier. Obj. TCP Mean
+456
+      Ex1                       –     –    –     –     –    –     –       –     –         –        69.4                       Ex1    ✓    –      –        –         ✓     ✓     ✓      ✓    ✓     76.5
+457                                                                                                                           Ex2    –    ✓      –        –         ✓     ✓     ✓      ✓    ✓     78.2
+      Ex2                       ✓     –    ✓     ✓     ✓    ✓     ✓       ✓     ✓         ✓        84.5
+458   Ex3                       –     ✓    ✓     ✓     ✓    ✓     ✓       ✓     ✓         ✓        85.8                       Ex3    ✓    ✓      –        –         ✓     ✓     ✓      ✓    ✓     85.4
+                                                                                                                              Ex4    ✓    ✓      –        ✓         ✓     ✓     ✓      ✓    ✓     87.1
+459   Ex4                       ✓     ✓    –     ✓     –    –     –       –     –         –        75.1
+                                                                                                                              Ex5    ✓    ✓      ✓          –       –     –     –      –    –     75.8
+460   Ex5                       ✓     ✓    ✓     ✓     –    –     –       –     –         –        78.8
+                                                                                                                              Ex6    ✓    ✓      ✓          –       ✓     –     ✓      ✓    –     83.4
+      Ex6                       ✓     ✓    ✓     ✓     ✓    –     –       –     –         –        82.5                       Ex7    ✓    ✓      ✓          –       –     ✓     ✓      –    ✓     84.6
+461   Ex7                       ✓     ✓    ✓     ✓     ✓    ✓     –       –     –         –        85.2                       Ex8    ✓    ✓      ✓          –       ✓     ✓     –      –    –     81.5
+462   Ex8                       ✓     ✓    ✓     ✓     ✓    ✓     ✓       –     –         –        86.6                       Ex9    ✓    ✓      ✓          –       ✓     ✓     ✓      –    –     85.9
+463   Ex9                       ✓     ✓    ✓     ✓     ✓    ✓     ✓       ✓     –         –        87.8                       Ex10   ✓    ✓      ✓          –       ✓     ✓     ✓      ✓    –     87.4
+      Ex10                      ✓     ✓    ✓     ✓     ✓    ✓     ✓       ✓     ✓         –        88.9                       Ex11   ✓    ✓      ✓          –       ✓     ✓     ✓      –    ✓     88.3
+464   Ex11                      ✓     ✓    ✓     ✓     ✓    ✓     ✓       ✓     ✓         ✓        89.8                       Ex12   ✓    ✓      ✓          –       ✓     ✓     ✓      ✓    ✓     89.8
+465
+466
+467                                              (a) Temporal parameters                                                                        (b) DiT training: loss ratios
+468                            100                                                                                            100
+
+469
+470                             90                                                                                             90
+       Mean success rate (%)
+
+
+
+
+                                                                                                      Mean success rate (%)
+
+
+
+
+471
+472
+                                80                                                                                             80
+473
+474
+                                70                                                                                             70
+475
+476                                         Past keyframes Hp
+
+477                             60          Recent observations To                                                             60         Object state λM/λA
+                                            Future keyframes Hk                                                                           TCP λE/λA
+478
+                                            Action horizon Ha                                                                             Gripper λG/λA
+479                             50                                                                                             50
+480                                  0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00                                                         0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00
+481                                       Parameter value / reference value                                                               Parameter value / reference value
+
+482   Figure 5: Hyperparameter sensitivity on RLBench2. (a) Past keyframes Hp , consecutive obser-
+483   vations To , future keyframes Hk , and predicted actions Ha . (b) Object-state, TCP, and gripper
+484   loss weights relative to the action loss. Each curve varies one parameter with all others fixed
+485   at their reference values. The reference values are Hp = To = Hk = 4, Ha = 16, and
+      λM /λA = λE /λA = λG /λA = 1.
+
+                                                                                                    9
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+486
+      5   C ONCLUSION
+487
+488
+      We presented OSTRA, a framework for multi-stage manipulation that represents historical and fu-
+489
+      ture object states in a shared Object-State Transition Map. Transition-Guided Attention and Staged
+490   Action Generation progressively translate object-state changes into TCP subgoals and executable
+491   actions. Across RLBench2, ManiSkill, LIBERO, and seven real-world tasks, OSTRA consistently
+492   outperforms representative imitation-learning baselines, while the ablations validate the contribu-
+493   tions of OST-Map and the proposed architectural designs. Future work will improve map con-
+494   struction under perception errors and extend object-state reasoning to less structured, open-world
+495   manipulation.
+496
+497
+      R EFERENCES
+498
+499   Suneel Belkhale and Dorsa Sadigh. Plato: Predicting latent affordances through object-centric play.
+500     In Karen Liu, Dana Kulic, and Jeff Ichnowski (eds.), Proceedings of The 6th Conference on Robot
+501     Learning, volume 205 of Proceedings of Machine Learning Research, pp. 1424–1434. PMLR,
+502
+        14–18 Dec 2023. URL https://proceedings.mlr.press/v205/belkhale23a.
+        html.
+503
+504
+      Nicolas Carion, Laura Gustafson, Yuan-Ting Hu, Shoubhik Debnath, Ronghang Hu, Didac Suris
+505     Coll-Vinent, Chaitanya Ryali, Kalyan Vasudev Alwala, Haitham Khedr, Andrew Huang, Jie
+506     Lei, Tengyu Ma, Baishan Guo, Arpit Kalla, Markus Marks, Joseph Greer, Meng Wang, Peize
+507     Sun, Roman Rädle, Triantafyllos Afouras, Effrosyni Mavroudi, Katherine Xu, Tsung-Han Wu,
+508     Yu Zhou, Liliane Momeni, RISHI HAZRA, Shuangrui Ding, Sagar Vaze, Francois Porcher,
+509     Feng Li, Siyuan Li, Aishwarya Kamath, Ho Kei Cheng, Piotr Dollar, Nikhila Ravi, Kate
+510     Saenko, Pengchuan Zhang, and Christoph Feichtenhofer. Sam 3: Segment anything with
+511     concepts. In C. Vondrick, B. Hariharan, C. Raffel, L. Pinto, D. Yang, and A. Faust (eds.),
+512     International Conference on Learning Representations, volume 2026, pp. 138846–138923,
+513
+        2026. URL https://proceedings.iclr.cc/paper_files/paper/2026/file/
+        e0982cbc81401df3430ee1ff780dc7a2-Paper-Conference.pdf.
+514
+515   R. Qi Charles, Hao Su, Mo Kaichun, and Leonidas J. Guibas. Pointnet: Deep learning on point sets
+516     for 3d classification and segmentation. In 2017 IEEE Conference on Computer Vision and Pattern
+517     Recognition (CVPR), pp. 77–85, 2017. doi: 10.1109/CVPR.2017.16.
+518
+519   Yuanpei Chen, Chen Wang, Li Fei-Fei, and Karen Liu. Sequential dexterity: Chaining dexter-
+520     ous policies for long-horizon manipulation. In Jie Tan, Marc Toussaint, and Kourosh Darvish
+521     (eds.), Proceedings of The 7th Conference on Robot Learning, volume 229 of Proceedings
+522
+        of Machine Learning Research, pp. 3809–3829. PMLR, 06–09 Nov 2023. URL https:
+        //proceedings.mlr.press/v229/chen23e.html.
+523
+524   Cheng Chi, Zhenjia Xu, Siyuan Feng, Eric Cousineau, Yilun Du, Benjamin Burchfiel, Russ Tedrake,
+525     and Shuran Song. Diffusion policy: Visuomotor policy learning via action diffusion. Int. J. Rob.
+526     Res., 44(10–11):1684–1704, 2025. ISSN 0278-3649. doi: 10.1177/02783649241273668. URL
+527     https://doi.org/10.1177/02783649241273668.
+528
+529   Haoquan Fang, Markus Grotz, Wilbert Pumacay, Yi Ru Wang, Dieter Fox, Ranjay Krishna, and
+530     Jiafei Duan. SAM2Act: Integrating visual foundation model with a memory architecture for
+531
+        robotic manipulation. In Aarti Singh, Maryam Fazel, Daniel Hsu, Simon Lacoste-Julien, Felix
+        Berkenkamp, Tegan Maharaj, Kiri Wagstaff, and Jerry Zhu (eds.), Proceedings of the 42nd In-
+532
+        ternational Conference on Machine Learning, volume 267 of Proceedings of Machine Learning
+533
+        Research, pp. 15925–15942. PMLR, 13–19 Jul 2025. URL https://proceedings.mlr.
+534     press/v267/fang25c.html.
+535
+536   Yunhai Feng, Jiaming Han, Zhuoran Yang, Xiangyu Yue, Sergey Levine, and Jianlan Luo. Reflective
+537     planning: Vision-language models for multi-stage long-horizon robotic manipulation. In Joseph
+538     Lim, Shuran Song, and Hae-Won Park (eds.), Proceedings of The 9th Conference on Robot Learn-
+539     ing, volume 305 of Proceedings of Machine Learning Research, pp. 2038–2062. PMLR, 27–30
+        Sep 2025. URL https://proceedings.mlr.press/v305/feng25b.html.
+
+
+                                                      10
+

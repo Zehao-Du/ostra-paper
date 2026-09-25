@@ -1,0 +1,59 @@
+\section{Related Work}
+\label{sec:related_work}
+
+\subsection{Long-Horizon Visuomotor Imitation Learning}
+
+Long-horizon manipulation requires coherent behavior over extended execution.
+Existing methods shorten the control horizon through action chunking,
+autoregressive prediction, or diffusion-based
+action generation~\citep{Zhao2023Learning,chi2024diffusionpolicy,
+Haldar2025BAKU,reuss2024multimodal}. Other approaches introduce higher-level
+task structure through subgoals, skill composition, progress estimation, or
+planning~\citep{shiarlis2018taco,gupta2019relay,Chen2023Sequential,
+Kang2025Incorporating,Jain2025LongerHorizon,Liu2026PALM,
+Zhang2026AtomicVLA,Feng2025ReflectivePlanning,Zhou2026Act2Goal}.
+These methods organize actions or task stages over time, but generally do not
+supervise how task-relevant objects evolve from historical to target states.
+
+\subsection{Temporal Modeling in Robot Policies}
+
+Temporal context is commonly incorporated through observation histories,
+latent memories, recurrent features, or retrieved past
+frames~\citep{Liang2021Finite,Fang2025SAM2Act,shi2025memoryvla,
+Mark2026BPP}. Recent policies further maintain recurrent or hierarchical
+memory to capture dependencies beyond the current
+observation~\citep{Ji2026HiMe,Xiao2026AVAVLA,Li2026OptimusVLA}.
+
+A complementary direction uses future information as guidance.
+Existing methods condition policies on goal observations or latent plans
+~\citep{lynch2020play,Mandlekar2020Learning}, predict future visual states or
+joint video-action trajectories~\citep{Hu2025VPP,Zhu2025UWM}, or learn
+predictive representations from future transitions and interaction targets
+~\citep{Zeng2024MPI}. Despite using historical and future context, these
+approaches represent time through holistic observations, latent memories,
+predicted frames, or task-level targets rather than identity-consistent state
+transitions of individual objects.
+
+\subsection{Object-Centric Representations for Manipulation}
+
+Object-centric policies organize perception and action around manipulable
+entities. Existing approaches use object
+proposals or 3D object features as policy inputs
+~\citep{zhu2022viola,zhu2023learning}, learn affordance-, flow-, or
+contact-based interaction representations
+~\citep{belkhale2023plato,xu2024im2flow2act,Zhang2026AffordGen,
+Lee2025ViTaSCOPE}, or represent manipulation through explicit object motion,
+including SE(3) pose trajectories and object pointflow
+~\citep{Hsu2025SPOT,Yang2025PPI}. Recent work also introduces structured
+object-level representations based on physical concepts or
+semantic operations~\citep{Wei2026PhysicalConcepts,Tang2026SEAM}.
+
+Object-centric world models use entity-level representations for dynamics and
+future prediction
+~\citep{ferraro2025focus,jeong2025ocwm}, while graph-based
+approaches preserve explicit objects and relations for manipulation planning
+~\citep{zhu2026orion}. These methods typically represent objects as perceptual
+units, interaction interfaces, motion variables, or future prediction targets.
+In contrast, OST-Map maintains identity-consistent structural states across
+observed and future task stages, making past-to-future object-state transitions
+explicit supervision for action generation.

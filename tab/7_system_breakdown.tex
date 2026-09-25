@@ -1,0 +1,34 @@
+\begin{table}[t]
+\vspace{-6pt}
+\centering
+\caption{System error breakdown for OSTRA. We use ground-truth replacements to
+identify the dominant bottleneck in OST-Map construction. Ground-truth quantities
+are used only for analysis and are not part of the inference interface.
+$\Delta$ reports the improvement over Full OSTRA.}
+\label{tab:system_breakdown}
+\vspace{2pt}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{adjustbox}{max width=0.9\columnwidth}
+\begin{tabular}{l|ccc|>{\columncolor{white}}c|c}
+\toprule
+Setting & GT Extraction & GT Object Pose & GT Structural Size & Avg. Success & $\Delta$ \\
+\midrule
+Full OSTRA & & & & \cellcolor{blue1}89.8 & 0.0 \\
++ GT Extraction & $\checkmark$ & & & \cellcolor{blue1}90.3 & +0.5 \\
++ GT Object Pose & & $\checkmark$ & & \cellcolor{blue2}91.9 & +2.1 \\
++ GT Structural Size & & & $\checkmark$ & \cellcolor{blue2}93.4 & +3.6 \\
++ GT Extraction + GT Object Pose & $\checkmark$ & $\checkmark$ & &
+\cellcolor{blue2}92.1 & +2.3 \\
++ GT Extraction + GT Structural Size & $\checkmark$ & & $\checkmark$ &
+\cellcolor{blue3}94.2 & +4.4 \\
++ GT Object Pose + GT Structural Size & & $\checkmark$ & $\checkmark$ &
+\cellcolor{blue4}95.7 & +5.9 \\
++ GT Extraction + GT Object Pose + GT Structural Size
+& $\checkmark$ & $\checkmark$ & $\checkmark$
+& \cellcolor{blue4}96.4 & +6.6 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\vspace{-8pt}
+\end{table}

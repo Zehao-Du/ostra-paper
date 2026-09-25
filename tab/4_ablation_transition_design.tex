@@ -1,0 +1,72 @@
+\begin{minipage}[t]{0.5185\textwidth}
+    \centering
+    \caption{\textbf{OST-Map ablations on RLBench2.}
+    We vary temporal supervision and map attributes under a fixed graph encoder.
+    Ex11 is OSTRA.}
+    \label{tab:ablation_transition_design}
+    \vspace{2pt}
+    \scriptsize
+    \renewcommand{\arraystretch}{1.12}
+    \setlength{\tabcolsep}{2pt}
+    \raisebox{-\height}{\resizebox{\linewidth}{!}{%
+    \begin{tabular}{c|cc|cccc|cccc|c}
+        \toprule
+        \rowcolor{tablehead}
+        & \multicolumn{2}{c|}{Temporal}
+        & \multicolumn{4}{c|}{Node}
+        & \multicolumn{4}{c|}{Edge}
+        & \\
+        \rowcolor{tablehead}
+        & Hist. & Fut.
+        & Geo & Pose & Sem & Aff
+        & Type & Param & Anchor & RelPose
+        & \textbf{Mean} \\
+        \midrule
+        Ex1 & -- & --
+        & -- & -- & -- & -- & -- & -- & -- & --
+        & \cellcolor{blue1}69.4 \\
+        Ex2 & $\checkmark$ & --
+        & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$
+        & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$
+        & \cellcolor{blue3}84.5 \\
+        Ex3 & -- & $\checkmark$
+        & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$
+        & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$
+        & \cellcolor{blue3}85.8 \\
+        \midrule
+        Ex4 & $\checkmark$ & $\checkmark$
+        & -- & $\checkmark$ & -- & -- & -- & -- & -- & --
+        & \cellcolor{blue1}75.1 \\
+        Ex5 & $\checkmark$ & $\checkmark$
+        & $\checkmark$ & $\checkmark$ & -- & -- & -- & -- & -- & --
+        & \cellcolor{blue2}78.8 \\
+        Ex6 & $\checkmark$ & $\checkmark$
+        & $\checkmark$ & $\checkmark$ & $\checkmark$ & --
+        & -- & -- & -- & --
+        & \cellcolor{blue2}82.5 \\
+        Ex7 & $\checkmark$ & $\checkmark$
+        & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$
+        & -- & -- & -- & --
+        & \cellcolor{blue3}85.2 \\
+        \midrule
+        Ex8 & $\checkmark$ & $\checkmark$
+        & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$
+        & $\checkmark$ & -- & -- & --
+        & \cellcolor{blue3}86.6 \\
+        Ex9 & $\checkmark$ & $\checkmark$
+        & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$
+        & $\checkmark$ & $\checkmark$ & -- & --
+        & \cellcolor{blue4}87.8 \\
+        Ex10 & $\checkmark$ & $\checkmark$
+        & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$
+        & $\checkmark$ & $\checkmark$ & $\checkmark$ & --
+        & \cellcolor{blue4}88.9 \\
+        \rowcolor{tablehead}
+        \textbf{Ex11} & $\checkmark$ & $\checkmark$
+        & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$
+        & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$
+        & \cellcolor{blue4}\textbf{89.8} \\
+        \bottomrule
+    \end{tabular}%
+    }}
+\end{minipage}

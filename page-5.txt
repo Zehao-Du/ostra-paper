@@ -1,0 +1,89 @@
+      Under review as a conference paper at ICLR 2027
+
+
+
+
+216
+                           𝐻                  𝑊
+217                                                     Cabinet Top
+218        𝑂𝑊      𝐼𝑊 𝐼
+                       𝐿          𝐻
+
+219                     𝑂𝐿                        𝐿     Cabinet Back           Cabinet
+
+220             Arch Box                Cuboid
+       𝑰𝑳 : Length of Inner Box   𝑯: Height of Cuboid
+                                  𝑾: Width of Cuboid
+221    𝑰𝑾 : Width of Inner Box
+       𝑶𝑳 : Length of Outer Box   𝑳: Length of Cuboid
+       𝑶𝑾 : Width of Outer Box
+222    𝑯: Height of Arch Box
+                                                        Drawer Body             Drawer
+223                Structure Primitives                 Object Parts           Object              OST-Map
+224
+      Figure 3: Representation of OST-Map. Parameterized structure primitives are composed into
+225   object parts and further assembled into task-relevant objects. Each object is represented by identity-
+226   consistent structural nodes and their relations, while node poses evolve with manipulation. The
+227   resulting OST-Map provides a compact object-centric representation of scene structure and object-
+228   state transitions.
+229
+      Net (Charles et al., 2017) with object-specific MLP heads estimates structural parameters from
+230
+      masked point clouds. These outputs instantiate a temporally aligned map sequence.
+231
+232   Historical OST-Maps encode observed transitions. During training, the structural-node positions at
+233   the next Hk task keyframes define future-state targets,
+234                                                                    YtM = {p⋆t,h,i }H k ,N
+                                                                                       h=1,i=1 .             (2)
+235
+236
+      paired with TCP keyframes YtE and action chunk At . Future observations construct supervision
+      only and are unavailable at inference, while the shared OST-Map space supplies identity-aligned
+237
+      transition supervision.
+238
+239
+      Multimodal Context Encoding. OSTRA combines a sparse OST-Map with a dense Semantic
+240   Field. Depth points Xt = {xt,j }P  j=1 are paired with image-aligned pretrained DINO features dt,j .
+241
+      PointNet++ encodes [xt,j ; dt,j ] into dense tokens FtS for cross-attention and downsampled tokens
+242
+      F̄tS for compact planning context.
+243
+244   For each historical map, node embeddings combine PointNet features of Pi and Ai with semantic,
+245   pose, temporal, and identity embeddings; edge embeddings encode relation attributes and relative
+246   pose. A graph transformer produces coordinate-aware map tokens FtM . Map and scene tokens
+247
+      retain 3D coordinates for relative spatial attention, while robot state and diffusion timestep condition
+      prediction blocks through adaptive normalization.
+248
+249
+      Transition-Guided Attention. A central challenge is the large imbalance between the sparse
+250
+      OST-Map tokens and the dense Semantic Field tokens. Directly mixing them in a single atten-
+251   tion context can weaken the structured transition cues carried by the OST-Map. OSTRA therefore
+252   introduces Transition-Guided Attention, in which each prediction query first attends to historical
+253   OST-Map tokens and subsequently to the dense Semantic Field:
+254
+                                 e = CA(Z, F M ),
+                                 Z                        Z + = CA(Z, e F S ),                       (3)
+255
+256   where CA denotes cross-attention. All cross-attention operations use relative 3D rotary positional
+257   encodings computed from the query and context coordinates.
+258   For future object-state prediction, the queries are constructed by repeating the latest observed
+259   structural-node coordinates over the next Hk keyframes and augmenting them with learned
+260   keyframe-time and node-identity embeddings. TCP and action queries are constructed from their
+261   corresponding noisy diffusion variables. The map-first order preserves transition grounding before
+262   the much denser visual context is introduced.
+263   Staged Action Generation. As illustrated in Figure 2(c), OSTRA translates object-state transi-
+264   tions into executable robot motion through the hierarchy object state → TCP subgoal → action. At
+265   each diffusion step, future-object queries yield an object plan P M and predicted states Yb M . Noisy
+266   TCP queries then combine ordered map-to-scene attention with sg(P M ) to produce a TCP plan P E
+267   and TCP-noise estimate. Finally, noisy action queries condition on sg(P E ) to predict action noise
+268   and gripper openness. TCP keyframes and actions are progressively denoised from Gaussian noise,
+269   whereas future object states are directly re-predicted at every step. Position and rotation use separate
+      noise schedules. Algorithm 1 summarizes the complete procedure.
+
+
+                                                                                     5
+

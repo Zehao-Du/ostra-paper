@@ -1,0 +1,198 @@
+\section{Experiments}
+\label{sec:experiments}
+
+Our experiments address five questions:
+\textbf{Q1:} Does OSTRA outperform baseline policies across simulation
+benchmarks (\cref{sec:simulation_experiments})?
+\textbf{Q2:} Do these benefits hold in real-world manipulation
+(\cref{sec:real_world_experiments})?
+\textbf{Q3:} How do errors and computational costs in the foundation-model
+components affect OSTRA? We study their impact on task success in
+\cref{sec:system_error_breakdown} and their latency in \cref{sec:latency}.
+\textbf{Q4:} Which architectural designs contribute to performance?
+\textbf{Q5:} How sensitive is OSTRA to its key hyperparameters?
+The last two questions are addressed by the design ablations and
+hyperparameter analysis in \cref{sec:ablation_studies}.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth]{fig/4_demonstration.pdf}
+    \vspace{-20pt}
+    \caption{Task demonstrations from initial state to task completion.
+    The seven real-world tasks are \textit{Place Fork in Drawer},
+    \textit{Stack Three Blocks}, \textit{Collect Blocks},
+    \textit{Place Bread in Microwave}, \textit{Build Letter M with Blocks},
+    \textit{Cook the Pear}, and \textit{Arrange Food with Fork}.
+    The figure also shows representative tasks from the three simulation
+    benchmarks: \textit{Push the Box} from
+    RLBench2~\citep{James2020RLBench}, \textit{Place Sphere} from
+    ManiSkill~\citep{Gu2023ManiSkill2}, and \textit{Hang the Wine Bottle}
+    from LIBERO~\citep{liu2023libero}, together spanning articulated,
+    contact-rich, and long-horizon robot manipulation challenges.}
+    \label{fig:demonstration}
+    \vspace{-12pt}
+\end{figure}
+
+\input{tab/3_realworld}
+
+\input{tab/7_system_breakdown}
+
+\input{tab/8_latency}
+
+\input{tab/4_5_ablation_design}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=1.0\columnwidth]{fig/6_hyperparameter_sensitivity.pdf}
+    \vspace{-20pt}
+    \caption{Hyperparameter sensitivity on RLBench2.
+    (a) Past keyframes $H_p$, consecutive observations $T_o$, future keyframes
+    $H_k$, and predicted actions $H_a$.
+    (b) Object-state, TCP, and gripper loss weights relative to the action loss.
+    Each curve varies one parameter with all others fixed at their reference
+    values. The reference values are $H_p=T_o=H_k=4$, $H_a=16$, and
+    $\lambda_M/\lambda_A=\lambda_E/\lambda_A=\lambda_G/\lambda_A=1$.
+    All sweeps use the same evaluation protocol.}
+    \label{fig:hyperparameter_sensitivity}
+    \vspace{-12pt}
+\end{figure}
+
+\subsection{Simulation Experiments}
+\label{sec:simulation_experiments}
+
+\textbf{Benchmarks and Experimental Setup.}
+We benchmark OSTRA on three manipulation suites, with representative task
+rollouts shown in \cref{fig:demonstration}.
+\textbf{RLBench2}, based on RLBench~\citep{James2020RLBench}, contains seven
+multi-stage tasks requiring long-horizon object-state reasoning.
+\textbf{ManiSkill}~\citep{Gu2023ManiSkill2} contains six contact-rich insertion,
+placement, tool-use, and stacking tasks.
+\textbf{LIBERO}~\citep{liu2023libero} contains four ten-task suites---Spatial,
+Object, Goal, and Long---for diverse language-conditioned manipulation.
+We use benchmark-specific datasets and protocols and report task success rate.
+Implementation and benchmark details are provided in
+Appendices~\ref{app:implementation_details} and~\ref{app:benchmarks}.
+
+
+\textbf{Baselines.}
+We compare OSTRA with benchmark-specific methods spanning action generation,
+history and memory, future prediction, and object-centric perception and
+motion~\citep{Zhao2023Learning,chi2024diffusionpolicy,Ze2024DP3,
+Fang2025SAM2Act,Yang2025PPI,zhu2023learning,Hsu2025SPOT}.
+Detailed descriptions of all baselines are provided in
+Appendix~\ref{app:baseline_details}.
+
+\textbf{Simulation results.}
+As summarized in \cref{tab:main_results_summary}, OSTRA achieves $89.8\%$,
+$74.5\%$, and $97.4\%$ on RLBench2, ManiSkill, and LIBERO, improving over
+their strongest reported baselines by $5.3$, $17.7$, and $0.7$ points.
+The gains are especially pronounced on representative multi-stage tasks. On
+RLBench2, OSTRA reaches $82.7\%$ on Laptop and $77.7\%$ on Handover, improving
+over the strongest baselines by $30.7$ and $9.2$ points, respectively. On
+ManiSkill, it achieves $79\%$ on Pull Cube with Tool and $50\%$ on Stack
+Pyramid, gains of $22$ and $18$ points. These tasks require tool-mediated
+interaction, articulated state changes, or sequential object arrangements,
+where success depends on reaching appropriate intermediate object states
+rather than predicting a single short-horizon motion.
+Complete per-task results and method comparisons across benchmarks are reported in
+Appendix~\ref{app:full_sim_results}.
+
+\subsection{Real-World Experiments}
+\label{sec:real_world_experiments}
+
+We evaluate OSTRA on a 7-DoF Realman 75-BF arm with a Pika parallel gripper.
+An Intel RealSense D415 captures RGB-D observations, and
+Open3D~\citep{Zhou2018Open3D} reconstructs point clouds. The map constructor
+uses predicted masks, poses, and structural parameters, evaluating reasoning
+under errors accumulated by the OST-Map perception pipeline. Appendix
+~\ref{app:real_world_details} provides the complete hardware, task, and
+evaluation protocol.
+
+\textbf{Task suite.}
+We consider seven tasks spanning articulated interaction, long-horizon
+rearrangement, thin or reflective objects, and global spatial constraints.
+They require opening and closing containers, sequential stacking, cluttered
+placement, partial-occlusion reasoning, pattern construction, collection, and
+shared-workspace manipulation. As visualized in \cref{fig:demonstration}, they
+cover articulated state, support, containment, occupancy, and multi-object
+layout transitions.
+
+\textbf{Real-world results.}
+Across 20 trials per task (\cref{tab:real_world_results}), OSTRA averages
+$84.3\%$, exceeds SAM2Act+ ($59.3\%$) by $25.0$ points, and ranks first on all
+tasks. It is more reliable on drawer and microwave tasks and better preserves
+relations in stacking and shape construction than Diffusion
+Policy~\citep{chi2024diffusionpolicy} and DP3~\citep{Ze2024DP3}. Its largest
+gain is on \textit{Build Letter M with Blocks} ($65\%$ versus $15\%$), supporting
+OST-Map reasoning under noisy, partially occluded observations.
+
+\subsection{System Error Breakdown}
+\label{sec:system_error_breakdown}
+
+We use ground-truth replacements to identify which OST-Map Constructor errors
+most affect task success.
+We replace outputs of SAM 3 extraction, FoundationPose estimation and tracking,
+and PointNet--MLP structural estimation with ground-truth masks, poses, or
+sizes while fixing the policy and evaluation. We test all eight combinations:
+none, each single or pairwise replacement, and all GT. Ground truth is used
+only for diagnosis. The complete intervention protocol is provided in
+Appendix~\ref{app:additional_experiment_details}.
+\Cref{tab:system_breakdown} reports average success relative to Full OSTRA.
+Single and joint replacements reveal individual and interacting errors. The
+Semantic Field encoder and policy remain unchanged, so all-GT residual failures
+are not solely due to map construction.
+
+\subsection{Latency}
+\label{sec:latency}
+
+We profile batch-one inference on an NVIDIA GeForce RTX 4090. The first frame
+segments masks, registers poses, estimates structure, and initializes OST-Map.
+later frames track objects and update the map. Both include encoding and policy
+inference. Detailed profiling definitions are provided in
+Appendix~\ref{app:additional_experiment_details}.
+\Cref{tab:latency} reports $2835.325$ ms for initialization and $226.292$ ms
+($4.419$ FPS) thereafter, a $12.5\times$ speedup. Segmentation and pose estimation
+dominate. Map construction, encoding, and policy inference add little overhead.
+
+\subsection{Ablation Studies}
+\label{sec:ablation_studies}
+
+We ablate OST-Map temporal roles and attributes, map--visual attention order,
+staged denoising and stop-gradient, and temporal and loss hyperparameters.
+All variants use the same RLBench2 data, capacity, budget, and evaluation seeds.
+Appendix~\ref{app:additional_experiment_details} provides the complete
+ablation and sensitivity setups used for controlled training, evaluation, and
+hyperparameter comparisons in matched settings.
+
+\textbf{OST-Map.}
+\Cref{tab:ablation_transition_design} compares no map or future loss (Ex1),
+history only (Ex2), future supervision from the latest map (Ex3), and the full
+model (Ex11). Ex4--Ex11 progressively add geometry, semantics, affordances,
+and edge attributes to pose-only nodes under the same graph encoder and node
+correspondence. Full OST-Map reaches $89.8\%$, $20.4$ points above no map.
+history-only and future-only reach $84.5\%$ and $85.8\%$. Their combination and
+the Ex4--Ex11 trend show that both temporal roles and attribute groups help.
+
+\textbf{Transition-Guided Attention.}
+Ex1--Ex4 in \cref{tab:ablation_architecture} test map-only, visual-only, joint,
+and visual-first attention against map-first (Ex12), with the full hierarchy
+and stop-gradient boundaries. Map-first reaches $89.8\%$, exceeding these
+variants by $13.3$, $11.6$, $4.4$, and $2.7$ points, respectively.
+
+\textbf{Staged Denoising.}
+With map-first attention fixed, Ex5--Ex8 test action-only, object-to-action,
+TCP-to-action, and flat joint prediction. Ex9--Ex12 test object/TCP
+stop-gradient combinations. Removed stages omit their heads and losses, while
+the flat variant retains all targets without hierarchical conditioning. The
+full hierarchy exceeds action-only by $14.0$ points and flat prediction by
+$8.3$ points. Both stop-gradient boundaries add $3.9$ points over neither.
+
+\textbf{Hyperparameter sensitivity.}
+\Cref{fig:hyperparameter_sensitivity} varies four temporal counts---past
+keyframes $H_p$, observations $T_o$, future keyframes $H_k$, and actions
+$H_a$---and three loss ratios:
+$\lambda_M/\lambda_A$, $\lambda_E/\lambda_A$, and $\lambda_G/\lambda_A$.
+Each curve varies one parameter around the $89.8\%$ full-model reference.
+Performance is stable nearby but falls at short or long horizons. $H_a$, $H_p$,
+and object-state loss are most sensitive, while gripper loss remains stable
+across the evaluated range and is less sensitive to its weighting.
