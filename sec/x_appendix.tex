@@ -112,14 +112,17 @@ history.
 \label{app:ost_map_accuracy}
 
 We directly evaluate the accuracy of the OST-Map Constructor independently of
-the downstream policy. Object extraction is measured by mask mean intersection
-over union (mIoU). Pose accuracy is reported as the mean translation and
-rotation error of matched task objects. Structural accuracy is measured by the
-normalized mean absolute error (NMAE) of the predicted primitive dimensions,
-where each error is normalized by the corresponding ground-truth dimension.
-Temporal identity accuracy measures the fraction of tracked object and
-structural-node identities that remain consistent over the full observation
-window.
+the downstream policy on the simulation benchmarks. Ground-truth object masks,
+6-DoF poses, geometric parameters, and persistent object identities are read
+from the corresponding simulator states and task definitions. These quantities
+are used only for evaluation and are not provided to the constructor.
+Object extraction is measured by mask mean intersection over union (mIoU).
+Pose accuracy is reported as the mean translation and rotation error of
+matched task objects. Structural accuracy is measured by the normalized mean
+absolute error (NMAE) of the predicted primitive dimensions, where each error
+is normalized by the corresponding simulator-provided dimension. Temporal
+identity accuracy measures the fraction of tracked object and structural-node
+identities that remain consistent over the full observation window.
 
 We additionally report complete-map accuracy, a strict frame-level metric. An
 OST-Map is counted as correct only when all task-relevant objects are detected,
@@ -132,6 +135,9 @@ $\tau_{\mathrm{mask}}=0.75$, translation threshold
 $\tau_p=2.0\text{ cm}$, rotation threshold
 $\tau_R=10^\circ$, and structural NMAE threshold
 $\tau_{\theta}=10\%$.
+We do not report these constructor metrics for the real-world experiments,
+where the required dense masks, exact object poses, and geometric parameters
+are not available as independent ground truth.
 
 \begin{table*}[t]
     \centering
@@ -162,12 +168,10 @@ $\tau_{\theta}=10\%$.
         & 88.2 & 1.08 & 4.2 & 5.6 & 94.7 & 84.1 \\
         LIBERO
         & 89.1 & 0.94 & 3.7 & 5.1 & 95.3 & 86.0 \\
-        Real world
-        & 83.6 & 1.42 & 5.4 & 7.2 & 91.5 & 76.8 \\
         \midrule
-        Overall
-        & \textbf{87.8} & \textbf{1.07} & \textbf{4.1}
-        & \textbf{5.7} & \textbf{94.4} & \textbf{83.9} \\
+        Simulation average
+        & \textbf{89.2} & \textbf{0.96} & \textbf{3.7}
+        & \textbf{5.2} & \textbf{95.4} & \textbf{86.2} \\
         \bottomrule
     \end{tabular}
     \end{adjustbox}
