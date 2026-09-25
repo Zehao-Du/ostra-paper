@@ -4,31 +4,109 @@
 \subsection{Implementation Details}
 \label{app:implementation_details}
 
-\paragraph{Perception and map construction.}
+\paragraph{Perception and structural parameter estimation.}
 OSTRA receives RGB-D observations and robot states. SAM 3 segments prompted
-task objects, FoundationPose registers and tracks their 6-DoF poses, and a
-PointNet encoder with object-specific MLPs estimates structural parameters
-from masked point clouds. Persistent object and structural-node identities
-align the resulting OST-Maps across the observation history. The dense
-Semantic Field pairs depth points with image-aligned pretrained DINO features
-and encodes them with PointNet++.
+task objects, and FoundationPose registers their initial 6-DoF poses and
+tracks them in subsequent frames. For each masked object point cloud, we first
+center the points and normalize them by the maximum distance to the object
+center. A PointNet-style structural estimator applies shared point-wise layers
+with widths $64$, $128$, and $256$, each followed by batch normalization and
+ReLU, and max-pools over the points to obtain a 256-dimensional object
+descriptor. A task-specific regressor with widths
+$256\rightarrow256\rightarrow128\rightarrow D_{\theta}$ predicts the
+structural parameters, where the two hidden layers use ReLU and
+$D_{\theta}$ depends on the task template. A Softplus output transform ensures
+positive geometric dimensions. The estimated structure and tracked poses
+instantiate identity-aligned OST-Maps throughout the observation history.
 
-\paragraph{Policy inputs and outputs.}
+\paragraph{Semantic Field encoder.}
+We use a frozen ViT-S/16 visual backbone to extract a 384-dimensional semantic
+feature for each image-aligned depth point. Each point is therefore represented
+by its 3D coordinate concatenated with a 384-dimensional visual descriptor.
+The Semantic Field uses a two-level PointNet++ encoder. The first set
+abstraction layer samples 1024 centers, groups 32 neighbors within radius
+$0.04$, and applies point-wise channels $(64,64,128)$. The second layer samples
+512 centers, groups 64 neighbors within radius $0.08$, and applies channels
+$(128,128,240)$. Batch normalization and ReLU follow each point-wise
+convolution. This produces 512 downsampled 240-dimensional scene tokens per
+observation. In parallel, a two-layer MLP
+$384\rightarrow240\rightarrow240$ with ReLU projects the visual descriptor of
+every input point, preserving a dense full-resolution Semantic Field for
+cross-attention.
+
+\paragraph{OST-Map encoder.}
+All OST-Map attributes are embedded to width $d=240$. Structural and
+affordance point sets are encoded separately. Each point first passes through
+an MLP $3\rightarrow64\rightarrow64$, node-wise max pooling aggregates the
+point features, and a second MLP $64\rightarrow240\rightarrow240$ produces one
+geometry or affordance embedding per node. Layer normalization and ReLU are
+used in both MLPs. Node semantics are projected or embedded to 240 dimensions,
+while the 7D node pose is encoded by
+$7\rightarrow240\rightarrow240$. The geometry, affordance, semantic, and pose
+streams are concatenated and fused by a
+$960\rightarrow240$ projection with layer normalization and ReLU.
+
+For each relation, its discrete type, 3D continuous parameters, 24D endpoint
+anchors, and 7D relative pose are independently embedded to 240 dimensions.
+Their concatenation is fused by the same $960\rightarrow240$ design. The map
+backbone contains four relation-aware graph-transformer layers with eight
+attention heads. Before each attention operation, the edge representation is
+updated from the current edge and its two endpoint nodes and projected to a
+head-specific attention bias. The node feed-forward network expands
+$240\rightarrow960\rightarrow240$, uses GELU, and is wrapped by pre-layer
+normalization and residual connections. The encoder outputs one
+240-dimensional feature per structural node together with its 3D coordinate.
+
+\paragraph{Transition-guided prediction backbone.}
+The object-state, TCP, and action stages share width $d=240$ and use eight
+attention heads. Future-object queries are obtained by projecting the latest
+node coordinates from 3 to 240 dimensions and adding learned node-identity
+and future-keyframe embeddings. TCP and action queries are linear projections
+of their noisy 4D or 7D variables, augmented with learned temporal, arm, and
+target-type embeddings. Historical map tokens additionally receive learned
+map-time and node-identity embeddings.
+
+Each prediction stage follows the same map-first attention pattern. Two
+cross-attention blocks first ground the queries in historical OST-Map tokens,
+and two further cross-attention blocks incorporate the dense Semantic Field.
+Query and context coordinates are encoded with 3D rotary position embeddings.
+Each cross-attention block consists of eight-head attention, a residual
+connection and layer normalization, followed by a
+$240\rightarrow240\rightarrow240$ feed-forward network with ReLU and a second
+residual connection. The diffusion timestep and robot state modulate both the
+attention and feed-forward sublayers through adaptive layer normalization.
+
+After cross-attention, the object queries are concatenated with the
+downsampled scene and map tokens and processed by eight self-attention blocks.
+The resulting object plan conditions the TCP stage. The TCP queries undergo
+the same cross-attention and eight-block self-attention backbone after being
+concatenated with the object plan. Finally, the action queries are processed
+in the same manner while conditioned on the TCP plan. Stop-gradient is applied
+between the object and TCP stages and between the TCP and action stages.
+
+\paragraph{Conditioning and prediction heads.}
+The diffusion timestep is encoded by a 240-dimensional sinusoidal embedding
+followed by
+$240\rightarrow240\rightarrow240$ layers with SiLU. Robot state is encoded by
+an MLP $D_s\rightarrow240\rightarrow240$ with ReLU and averaged across the
+observation window. The sum of the timestep and robot-state embeddings forms
+the global adaptive-normalization condition. A final modulation layer
+$240\rightarrow480$ predicts scale and shift parameters before the output
+heads. Linear heads map each final token to a 3D future node position, a 4D or
+7D TCP target, a 4D or 7D action, and a scalar gripper openness.
+
+\paragraph{Policy inputs, training, and inference.}
 Each policy input contains $T_o$ consecutive observations and $H_p$ historical
 OST-Map keyframes. The policy predicts $H_k$ future object-state keyframes, TCP
 subgoals, and an action chunk of length $H_a$. Unless varied in the sensitivity
-study, we use $H_p=T_o=H_k=4$ and $H_a=16$. Transition-Guided Attention first
-attends to graph-transformer OST-Map tokens and then to dense Semantic Field
-tokens. Relative 3D rotary encodings provide coordinate-aware cross-attention.
-
-\paragraph{Training and inference.}
-Training jointly supervises future structural-node positions, TCP diffusion,
-action diffusion, and gripper state. The reference loss ratios are
-$\lambda_M/\lambda_A=\lambda_E/\lambda_A=\lambda_G/\lambda_A=1$. Stop-gradient
-separates the object, TCP, and action stages. At inference, map and field
-contexts are encoded once per replanning step; TCP keyframes and action chunks
-are denoised from Gaussian noise, the first predicted actions are executed,
-and the policy replans from the updated history.
+study, we use $H_p=T_o=H_k=4$ and $H_a=16$. Training jointly supervises future
+structural-node positions, TCP diffusion, action diffusion, and gripper state.
+The reference loss ratios are
+$\lambda_M/\lambda_A=\lambda_E/\lambda_A=\lambda_G/\lambda_A=1$.
+At inference, the map and field contexts are encoded once per replanning step;
+TCP keyframes and action chunks are denoised from Gaussian noise, the first
+predicted actions are executed, and the policy replans from the updated
+history.
 
 \subsection{Benchmarks and Baseline Details}
 \label{app:benchmarks}

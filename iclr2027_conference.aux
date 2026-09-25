@@ -232,8 +232,12 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {A.1}Implementation Details}{14}{subsection.A.1}\protected@file@percent }
 \newlabel{app:implementation_details}{{A.1}{14}{Implementation Details}{subsection.A.1}{}}
 \newlabel{app:implementation_details@cref}{{[subappendix][1][2147483647,1]A.1}{[1][14][]14}}
-\@writefile{toc}{\contentsline {paragraph}{Perception and map construction.}{14}{section*.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Policy inputs and outputs.}{14}{section*.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Perception and structural parameter estimation.}{14}{section*.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Semantic Field encoder.}{14}{section*.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{OST-Map encoder.}{15}{section*.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Transition-guided prediction backbone.}{15}{section*.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Conditioning and prediction heads.}{15}{section*.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Policy inputs, training, and inference.}{15}{section*.8}\protected@file@percent }
 \citation{James2020RLBench}
 \citation{Yang2025PPI}
 \citation{Gu2023ManiSkill2}
@@ -265,18 +269,6 @@
 \citation{Fang2025SAM2Act}
 \citation{zhu2023learning}
 \citation{Hsu2025SPOT}
-\@writefile{toc}{\contentsline {paragraph}{Training and inference.}{15}{section*.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {A.2}Benchmarks and Baseline Details}{15}{subsection.A.2}\protected@file@percent }
-\newlabel{app:benchmarks}{{A.2}{15}{Benchmarks and Baseline Details}{subsection.A.2}{}}
-\newlabel{app:benchmarks@cref}{{[subappendix][2][2147483647,1]A.2}{[1][15][]15}}
-\@writefile{toc}{\contentsline {paragraph}{Simulation benchmarks.}{15}{section*.6}\protected@file@percent }
-\newlabel{app:baseline_details}{{A.2}{15}{Baseline details}{section*.7}{}}
-\newlabel{app:baseline_details@cref}{{[subappendix][2][2147483647,1]A.2}{[1][15][]15}}
-\@writefile{toc}{\contentsline {paragraph}{Baseline details.}{15}{section*.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Action-generation policies.}{15}{section*.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{History and memory policies.}{15}{section*.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Future-prediction methods.}{15}{section*.10}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Object-centric perception and motion methods.}{15}{section*.11}\protected@file@percent }
 \citation{Zhao2023Learning}
 \citation{chi2024diffusionpolicy}
 \citation{Ze2024DP3}
@@ -295,72 +287,83 @@
 \citation{Zhu2025UWM}
 \citation{shi2025memoryvla}
 \citation{Mark2026BPP}
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.2}Benchmarks and Baseline Details}{16}{subsection.A.2}\protected@file@percent }
+\newlabel{app:benchmarks}{{A.2}{16}{Benchmarks and Baseline Details}{subsection.A.2}{}}
+\newlabel{app:benchmarks@cref}{{[subappendix][2][2147483647,1]A.2}{[1][16][]16}}
+\@writefile{toc}{\contentsline {paragraph}{Simulation benchmarks.}{16}{section*.9}\protected@file@percent }
+\newlabel{app:baseline_details}{{A.2}{16}{Baseline details}{section*.10}{}}
+\newlabel{app:baseline_details@cref}{{[subappendix][2][2147483647,1]A.2}{[1][16][]16}}
+\@writefile{toc}{\contentsline {paragraph}{Baseline details.}{16}{section*.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Action-generation policies.}{16}{section*.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{History and memory policies.}{16}{section*.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Future-prediction methods.}{16}{section*.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Object-centric perception and motion methods.}{16}{section*.14}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {A.3}Detailed Simulation Benchmark Scores}{16}{subsection.A.3}\protected@file@percent }
 \newlabel{app:full_sim_results}{{A.3}{16}{Detailed Simulation Benchmark Scores}{subsection.A.3}{}}
-\newlabel{app:full_sim_results@cref}{{[subappendix][3][2147483647,1]A.3}{[1][15][]16}}
-\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces \textbf  {Quantitative results on RLBench2.} We report task success rate (\%) as mean $\pm $ standard deviation over three checkpoints, with 100 evaluation rollouts per task for each checkpoint. \textbf  {Bold} and \underline  {underlining} denote the best and second-best results, respectively, across all seven tasks.}}{16}{table.7}\protected@file@percent }
-\newlabel{tab:rlbench2_results}{{7}{16}{\textbf {Quantitative results on RLBench2.} We report task success rate (\%) as mean $\pm $ standard deviation over three checkpoints, with 100 evaluation rollouts per task for each checkpoint. \textbf {Bold} and \underline {underlining} denote the best and second-best results, respectively, across all seven tasks}{table.7}{}}
-\newlabel{tab:rlbench2_results@cref}{{[table][7][2147483647]7}{[1][15][]16}}
-\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces \textbf  {Quantitative results on ManiSkill.} We report success (\%) over 100 episodes per task and the six-task mean. A dagger marks an unmatched published score, ``--'' an unavailable result, and \textbf  {bold} the best result under the official ManiSkill protocol.}}{16}{table.8}\protected@file@percent }
-\newlabel{tab:maniskill_results}{{8}{16}{\textbf {Quantitative results on ManiSkill.} We report success (\%) over 100 episodes per task and the six-task mean. A dagger marks an unmatched published score, ``--'' an unavailable result, and \textbf {bold} the best result under the official ManiSkill protocol}{table.8}{}}
-\newlabel{tab:maniskill_results@cref}{{[table][8][2147483647]8}{[1][16][]16}}
-\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces \textbf  {Quantitative results on LIBERO.} We report task success rate (\%), with 50 evaluation trials per task. \textbf  {Bold} and \underline  {underlining} denote the best and second-best results, respectively.}}{16}{table.9}\protected@file@percent }
-\newlabel{tab:libero_results}{{9}{16}{\textbf {Quantitative results on LIBERO.} We report task success rate (\%), with 50 evaluation trials per task. \textbf {Bold} and \underline {underlining} denote the best and second-best results, respectively}{table.9}{}}
-\newlabel{tab:libero_results@cref}{{[table][9][2147483647]9}{[1][16][]16}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {A.4}Real-World Details}{16}{subsection.A.4}\protected@file@percent }
-\newlabel{app:real_world_details}{{A.4}{16}{Real-World Details}{subsection.A.4}{}}
-\newlabel{app:real_world_details@cref}{{[subappendix][4][2147483647,1]A.4}{[1][16][]16}}
-\@writefile{toc}{\contentsline {paragraph}{Hardware and perception.}{16}{section*.12}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Tasks and protocol.}{16}{section*.13}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {A.5}Detailed Setups for Ablations and Diagnostic Experiments}{17}{subsection.A.5}\protected@file@percent }
-\newlabel{app:additional_experiment_details}{{A.5}{17}{Detailed Setups for Ablations and Diagnostic Experiments}{subsection.A.5}{}}
-\newlabel{app:additional_experiment_details@cref}{{[subappendix][5][2147483647,1]A.5}{[1][16][]17}}
-\@writefile{toc}{\contentsline {paragraph}{System error breakdown.}{17}{section*.14}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{System error analysis.}{17}{section*.15}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Latency profiling.}{17}{section*.16}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Latency analysis.}{17}{section*.17}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Ablations.}{17}{section*.18}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Historical and future OST-Maps.}{17}{section*.19}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{OST-Map attributes.}{17}{section*.20}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Map--visual attention order.}{18}{section*.21}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Staged prediction and gradient boundaries.}{18}{section*.22}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Hyperparameter sensitivity.}{18}{section*.23}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Hyperparameter analysis.}{18}{section*.24}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {B}OST-Map Representation Details}{18}{appendix.B}\protected@file@percent }
-\newlabel{app:ost_map_representation}{{B}{18}{OST-Map Representation Details}{appendix.B}{}}
-\newlabel{app:ost_map_representation@cref}{{[appendix][2][2147483647]B}{[1][18][]18}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B.1}Hierarchical Scene Representation}{19}{subsection.B.1}\protected@file@percent }
-\newlabel{app:ost_map_hierarchy}{{B.1}{19}{Hierarchical Scene Representation}{subsection.B.1}{}}
-\newlabel{app:ost_map_hierarchy@cref}{{[subappendix][1][2147483647,2]B.1}{[1][19][]19}}
-\newlabel{eq:ost_map_concrete}{{5}{19}{Hierarchical Scene Representation}{equation.B.5}{}}
-\newlabel{eq:ost_map_concrete@cref}{{[equation][5][2147483647]5}{[1][19][]19}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B.2}Structural Nodes}{19}{subsection.B.2}\protected@file@percent }
-\newlabel{app:ost_map_nodes}{{B.2}{19}{Structural Nodes}{subsection.B.2}{}}
-\newlabel{app:ost_map_nodes@cref}{{[subappendix][2][2147483647,2]B.2}{[1][19][]19}}
-\newlabel{eq:ost_map_node_full}{{6}{19}{Structural Nodes}{equation.B.6}{}}
-\newlabel{eq:ost_map_node_full@cref}{{[equation][6][2147483647]6}{[1][19][]19}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B.3}Relation Edges}{19}{subsection.B.3}\protected@file@percent }
-\newlabel{app:ost_map_edges}{{B.3}{19}{Relation Edges}{subsection.B.3}{}}
-\newlabel{app:ost_map_edges@cref}{{[subappendix][3][2147483647,2]B.3}{[1][19][]19}}
-\newlabel{eq:ost_map_edge_full}{{7}{19}{Relation Edges}{equation.B.7}{}}
-\newlabel{eq:ost_map_edge_full@cref}{{[equation][7][2147483647]7}{[1][19][]19}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B.4}Task Templates}{20}{subsection.B.4}\protected@file@percent }
-\newlabel{app:ost_map_templates}{{B.4}{20}{Task Templates}{subsection.B.4}{}}
-\newlabel{app:ost_map_templates@cref}{{[subappendix][4][2147483647,2]B.4}{[1][20][]20}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B.5}Attribute Encoding}{20}{subsection.B.5}\protected@file@percent }
-\newlabel{app:ost_map_attribute_encoding}{{B.5}{20}{Attribute Encoding}{subsection.B.5}{}}
-\newlabel{app:ost_map_attribute_encoding@cref}{{[subappendix][5][2147483647,2]B.5}{[1][20][]20}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B.6}Temporal Alignment and Transition Targets}{20}{subsection.B.6}\protected@file@percent }
-\newlabel{app:ost_map_temporal_alignment}{{B.6}{20}{Temporal Alignment and Transition Targets}{subsection.B.6}{}}
-\newlabel{app:ost_map_temporal_alignment@cref}{{[subappendix][6][2147483647,2]B.6}{[1][20][]20}}
-\newlabel{eq:ost_map_history_full}{{8}{20}{Temporal Alignment and Transition Targets}{equation.B.8}{}}
-\newlabel{eq:ost_map_history_full@cref}{{[equation][8][2147483647]8}{[1][20][]20}}
-\newlabel{eq:future_map_target_appendix}{{9}{20}{Temporal Alignment and Transition Targets}{equation.B.9}{}}
-\newlabel{eq:future_map_target_appendix@cref}{{[equation][9][2147483647]9}{[1][20][]20}}
-\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces \textbf  {Representative task-specific OST-Map templates.} The listed parameters describe episode-level geometry, while node poses vary over time.}}{21}{table.10}\protected@file@percent }
-\newlabel{tab:ost_map_templates}{{10}{21}{\textbf {Representative task-specific OST-Map templates.} The listed parameters describe episode-level geometry, while node poses vary over time}{table.10}{}}
-\newlabel{tab:ost_map_templates@cref}{{[table][10][2147483647]10}{[1][20][]21}}
-\@writefile{lot}{\contentsline {table}{\numberline {11}{\ignorespaces \textbf  {Numerical attributes of an OST-Map.} $N$, $M$, $P$, and $K$ denote the numbers of nodes, relations, structural points, and affordance points in one map.}}{21}{table.11}\protected@file@percent }
-\newlabel{tab:ost_map_tensor_layout}{{11}{21}{\textbf {Numerical attributes of an OST-Map.} $N$, $M$, $P$, and $K$ denote the numbers of nodes, relations, structural points, and affordance points in one map}{table.11}{}}
-\newlabel{tab:ost_map_tensor_layout@cref}{{[table][11][2147483647]11}{[1][20][]21}}
-\gdef \@abspage@last{21}
+\newlabel{app:full_sim_results@cref}{{[subappendix][3][2147483647,1]A.3}{[1][16][]16}}
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces \textbf  {Quantitative results on RLBench2.} We report task success rate (\%) as mean $\pm $ standard deviation over three checkpoints, with 100 evaluation rollouts per task for each checkpoint. \textbf  {Bold} and \underline  {underlining} denote the best and second-best results, respectively, across all seven tasks.}}{17}{table.7}\protected@file@percent }
+\newlabel{tab:rlbench2_results}{{7}{17}{\textbf {Quantitative results on RLBench2.} We report task success rate (\%) as mean $\pm $ standard deviation over three checkpoints, with 100 evaluation rollouts per task for each checkpoint. \textbf {Bold} and \underline {underlining} denote the best and second-best results, respectively, across all seven tasks}{table.7}{}}
+\newlabel{tab:rlbench2_results@cref}{{[table][7][2147483647]7}{[1][16][]17}}
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces \textbf  {Quantitative results on ManiSkill.} We report success (\%) over 100 episodes per task and the six-task mean. A dagger marks an unmatched published score, ``--'' an unavailable result, and \textbf  {bold} the best result under the official ManiSkill protocol.}}{17}{table.8}\protected@file@percent }
+\newlabel{tab:maniskill_results}{{8}{17}{\textbf {Quantitative results on ManiSkill.} We report success (\%) over 100 episodes per task and the six-task mean. A dagger marks an unmatched published score, ``--'' an unavailable result, and \textbf {bold} the best result under the official ManiSkill protocol}{table.8}{}}
+\newlabel{tab:maniskill_results@cref}{{[table][8][2147483647]8}{[1][16][]17}}
+\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces \textbf  {Quantitative results on LIBERO.} We report task success rate (\%), with 50 evaluation trials per task. \textbf  {Bold} and \underline  {underlining} denote the best and second-best results, respectively.}}{17}{table.9}\protected@file@percent }
+\newlabel{tab:libero_results}{{9}{17}{\textbf {Quantitative results on LIBERO.} We report task success rate (\%), with 50 evaluation trials per task. \textbf {Bold} and \underline {underlining} denote the best and second-best results, respectively}{table.9}{}}
+\newlabel{tab:libero_results@cref}{{[table][9][2147483647]9}{[1][16][]17}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.4}Real-World Details}{18}{subsection.A.4}\protected@file@percent }
+\newlabel{app:real_world_details}{{A.4}{18}{Real-World Details}{subsection.A.4}{}}
+\newlabel{app:real_world_details@cref}{{[subappendix][4][2147483647,1]A.4}{[1][16][]18}}
+\@writefile{toc}{\contentsline {paragraph}{Hardware and perception.}{18}{section*.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Tasks and protocol.}{18}{section*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.5}Detailed Setups for Ablations and Diagnostic Experiments}{18}{subsection.A.5}\protected@file@percent }
+\newlabel{app:additional_experiment_details}{{A.5}{18}{Detailed Setups for Ablations and Diagnostic Experiments}{subsection.A.5}{}}
+\newlabel{app:additional_experiment_details@cref}{{[subappendix][5][2147483647,1]A.5}{[1][18][]18}}
+\@writefile{toc}{\contentsline {paragraph}{System error breakdown.}{18}{section*.17}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{System error analysis.}{18}{section*.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Latency profiling.}{18}{section*.19}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Latency analysis.}{18}{section*.20}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Ablations.}{18}{section*.21}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Historical and future OST-Maps.}{19}{section*.22}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{OST-Map attributes.}{19}{section*.23}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Map--visual attention order.}{19}{section*.24}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Staged prediction and gradient boundaries.}{19}{section*.25}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Hyperparameter sensitivity.}{19}{section*.26}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Hyperparameter analysis.}{19}{section*.27}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {B}OST-Map Representation Details}{20}{appendix.B}\protected@file@percent }
+\newlabel{app:ost_map_representation}{{B}{20}{OST-Map Representation Details}{appendix.B}{}}
+\newlabel{app:ost_map_representation@cref}{{[appendix][2][2147483647]B}{[1][20][]20}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B.1}Hierarchical Scene Representation}{20}{subsection.B.1}\protected@file@percent }
+\newlabel{app:ost_map_hierarchy}{{B.1}{20}{Hierarchical Scene Representation}{subsection.B.1}{}}
+\newlabel{app:ost_map_hierarchy@cref}{{[subappendix][1][2147483647,2]B.1}{[1][20][]20}}
+\newlabel{eq:ost_map_concrete}{{5}{20}{Hierarchical Scene Representation}{equation.B.5}{}}
+\newlabel{eq:ost_map_concrete@cref}{{[equation][5][2147483647]5}{[1][20][]20}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B.2}Structural Nodes}{20}{subsection.B.2}\protected@file@percent }
+\newlabel{app:ost_map_nodes}{{B.2}{20}{Structural Nodes}{subsection.B.2}{}}
+\newlabel{app:ost_map_nodes@cref}{{[subappendix][2][2147483647,2]B.2}{[1][20][]20}}
+\newlabel{eq:ost_map_node_full}{{6}{20}{Structural Nodes}{equation.B.6}{}}
+\newlabel{eq:ost_map_node_full@cref}{{[equation][6][2147483647]6}{[1][20][]20}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B.3}Relation Edges}{21}{subsection.B.3}\protected@file@percent }
+\newlabel{app:ost_map_edges}{{B.3}{21}{Relation Edges}{subsection.B.3}{}}
+\newlabel{app:ost_map_edges@cref}{{[subappendix][3][2147483647,2]B.3}{[1][20][]21}}
+\newlabel{eq:ost_map_edge_full}{{7}{21}{Relation Edges}{equation.B.7}{}}
+\newlabel{eq:ost_map_edge_full@cref}{{[equation][7][2147483647]7}{[1][20][]21}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B.4}Task Templates}{21}{subsection.B.4}\protected@file@percent }
+\newlabel{app:ost_map_templates}{{B.4}{21}{Task Templates}{subsection.B.4}{}}
+\newlabel{app:ost_map_templates@cref}{{[subappendix][4][2147483647,2]B.4}{[1][21][]21}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B.5}Attribute Encoding}{21}{subsection.B.5}\protected@file@percent }
+\newlabel{app:ost_map_attribute_encoding}{{B.5}{21}{Attribute Encoding}{subsection.B.5}{}}
+\newlabel{app:ost_map_attribute_encoding@cref}{{[subappendix][5][2147483647,2]B.5}{[1][21][]21}}
+\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces \textbf  {Representative task-specific OST-Map templates.} The listed parameters describe episode-level geometry, while node poses vary over time.}}{22}{table.10}\protected@file@percent }
+\newlabel{tab:ost_map_templates}{{10}{22}{\textbf {Representative task-specific OST-Map templates.} The listed parameters describe episode-level geometry, while node poses vary over time}{table.10}{}}
+\newlabel{tab:ost_map_templates@cref}{{[table][10][2147483647]10}{[1][21][]22}}
+\@writefile{lot}{\contentsline {table}{\numberline {11}{\ignorespaces \textbf  {Numerical attributes of an OST-Map.} $N$, $M$, $P$, and $K$ denote the numbers of nodes, relations, structural points, and affordance points in one map.}}{22}{table.11}\protected@file@percent }
+\newlabel{tab:ost_map_tensor_layout}{{11}{22}{\textbf {Numerical attributes of an OST-Map.} $N$, $M$, $P$, and $K$ denote the numbers of nodes, relations, structural points, and affordance points in one map}{table.11}{}}
+\newlabel{tab:ost_map_tensor_layout@cref}{{[table][11][2147483647]11}{[1][21][]22}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B.6}Temporal Alignment and Transition Targets}{22}{subsection.B.6}\protected@file@percent }
+\newlabel{app:ost_map_temporal_alignment}{{B.6}{22}{Temporal Alignment and Transition Targets}{subsection.B.6}{}}
+\newlabel{app:ost_map_temporal_alignment@cref}{{[subappendix][6][2147483647,2]B.6}{[1][21][]22}}
+\newlabel{eq:ost_map_history_full}{{8}{22}{Temporal Alignment and Transition Targets}{equation.B.8}{}}
+\newlabel{eq:ost_map_history_full@cref}{{[equation][8][2147483647]8}{[1][22][]22}}
+\newlabel{eq:future_map_target_appendix}{{9}{22}{Temporal Alignment and Transition Targets}{equation.B.9}{}}
+\newlabel{eq:future_map_target_appendix@cref}{{[equation][9][2147483647]9}{[1][22][]22}}
+\gdef \@abspage@last{22}
