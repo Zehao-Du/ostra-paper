@@ -177,6 +177,28 @@ are not available as independent ground truth.
     \end{adjustbox}
 \end{table*}
 
+\paragraph{Analysis.}
+The constructor recovers accurate and temporally stable OST-Maps across all
+three simulation benchmarks. It achieves an average mask mIoU of $89.2\%$,
+while the mean pose errors remain below one centimeter in translation and
+$4^\circ$ in rotation. The $5.2\%$ structural NMAE further shows that the
+estimated primitive dimensions closely match the simulator geometry. These
+accuracies are important because OST-Map represents object state through both
+pose and fine-grained structure; small errors in either component would
+directly perturb the transition targets and spatial relations supplied to the
+policy.
+
+Identity accuracy reaches $95.4\%$, indicating that the same objects and
+structural parts are consistently aligned across the observation history.
+Under the stricter complete-map criterion, which requires every task-relevant
+element in a frame to satisfy all extraction, pose, structure, and identity
+conditions simultaneously, the constructor remains correct in $86.2\%$ of
+cases. The relatively small gap between the individual metrics and this
+all-or-nothing measure indicates that constructor errors are not dominated by
+frequent catastrophic map failures. Overall, the results show that OSTRA
+receives a reliable structured representation on which to model object-state
+transitions.
+
 \subsection{Benchmarks and Baseline Details}
 \label{app:benchmarks}
 
